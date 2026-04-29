@@ -618,9 +618,103 @@
   .sync-indicator.visible { opacity: 1; }
   .sync-indicator.success { color: var(--neon-blue); }
   .sync-indicator.error { color: var(--hp-color); }
+
+  /* ============ LOGOUT MODAL ============ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 3, 15, 0.8);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal-box {
+    width: 100%;
+    max-width: 300px;
+    margin: 20px;
+    background: linear-gradient(180deg, rgba(18, 10, 42, 0.98) 0%, rgba(6, 3, 15, 0.98) 100%);
+    border: 1px solid var(--neon-purple);
+    box-shadow: 0 0 40px var(--glow-purple);
+    padding: 28px 24px 20px;
+    transform: translateY(10px);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.visible .modal-box {
+    transform: translateY(0);
+  }
+  .modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 0.25em;
+    color: var(--neon-blue);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .modal-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .modal-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .modal-btn-cancel {
+    padding: 11px;
+    background: transparent;
+    border: 1px solid var(--border-mystic);
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-btn-cancel:hover {
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+  }
+  .modal-btn-confirm {
+    padding: 11px;
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    border: none;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+  }
+  .modal-btn-confirm:hover {
+    box-shadow: 0 0 16px var(--neon-purple);
+  }
 </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal-box">
+    <div class="modal-title">LOGOUT</div>
+    <div class="modal-body">セッションを終了しますか？<br>進行中のデータは失われます。</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeLogoutModal()">CANCEL</button>
+      <button class="modal-btn-confirm" onclick="location.reload()">LOGOUT</button>
+    </div>
+  </div>
+</div>
 
 <!-- ============ LOGIN SCREEN ============ -->
 <div class="login-screen" id="login-screen">
@@ -836,8 +930,10 @@ function enterApp(user) {
 }
 
 function doLogout() {
-  if (!confirm('セッションを終了しますか？')) return;
-  location.reload();
+  document.getElementById('logout-modal').classList.add('visible');
+}
+function closeLogoutModal() {
+  document.getElementById('logout-modal').classList.remove('visible');
 }
 
 /* ===========================================================
