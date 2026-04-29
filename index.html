@@ -930,7 +930,88 @@ body::after{
 }
 @keyframes darkTrailAnim{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
-/* ステージフラッシュ（属性別） */
+/* ===== SLASH EFFECT（剣の通常攻撃） ===== */
+.sp-slash-wrap{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
+}
+/* メイン斬撃アーク */
+.sp-slash{
+  position:absolute;
+  left:50%; top:50%;
+  width:140px; height:70px;
+  margin:-35px 0 0 -100px;
+  border-radius:0 0 140px 0;
+  border-right:6px solid rgba(255,255,255,.95);
+  border-bottom:3px solid rgba(255,255,255,.7);
+  box-shadow:
+    2px 2px 0 rgba(255,80,60,.8),
+    4px 4px 8px rgba(255,80,60,.5),
+    0 0 20px rgba(255,255,255,.6);
+  transform-origin:left center;
+  animation:slashArc .35s cubic-bezier(.2,.8,.4,1) forwards;
+}
+@keyframes slashArc{
+  0%  {transform:rotate(-70deg) scaleX(0);opacity:1;}
+  40% {transform:rotate(0deg)   scaleX(1);opacity:1;}
+  70% {transform:rotate(30deg)  scaleX(1);opacity:.8;}
+  100%{transform:rotate(50deg)  scaleX(.6);opacity:0;}
+}
+/* 残像1 */
+.sp-slash-trail1{
+  position:absolute;
+  left:50%; top:50%;
+  width:120px; height:55px;
+  margin:-27px 0 0 -90px;
+  border-radius:0 0 120px 0;
+  border-right:3px solid rgba(255,255,255,.5);
+  border-bottom:2px solid rgba(255,255,255,.3);
+  transform-origin:left center;
+  animation:slashTrail1 .4s cubic-bezier(.2,.8,.4,1) .04s forwards;
+}
+@keyframes slashTrail1{
+  0%  {transform:rotate(-65deg) scaleX(0);opacity:.7;}
+  40% {transform:rotate(5deg)   scaleX(1);opacity:.5;}
+  100%{transform:rotate(55deg)  scaleX(.4);opacity:0;}
+}
+/* 残像2 */
+.sp-slash-trail2{
+  position:absolute;
+  left:50%; top:50%;
+  width:100px; height:44px;
+  margin:-22px 0 0 -80px;
+  border-radius:0 0 100px 0;
+  border-right:2px solid rgba(255,255,255,.3);
+  border-bottom:1px solid rgba(255,255,255,.2);
+  transform-origin:left center;
+  animation:slashTrail2 .45s cubic-bezier(.2,.8,.4,1) .08s forwards;
+}
+@keyframes slashTrail2{
+  0%  {transform:rotate(-60deg) scaleX(0);opacity:.5;}
+  40% {transform:rotate(10deg)  scaleX(1);opacity:.3;}
+  100%{transform:rotate(60deg)  scaleX(.2);opacity:0;}
+}
+/* 衝撃スパーク（命中時） */
+.sp-slash-spark{
+  position:absolute;
+  left:calc(50% + 20px); top:calc(50% - 10px);
+  width:3px; height:3px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow:0 0 4px #fff, 0 0 8px rgba(255,80,60,.8);
+  animation:sparkFly .4s ease-out .25s forwards;
+  transform-origin:center;
+  opacity:0;
+}
+@keyframes sparkFly{
+  0%  {transform:translate(0,0) scale(2);opacity:1;}
+  100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0;}
+}
+/* ステージフラッシュ（物理斬撃） */
+.stage.flash-slash{animation:flashSlash .35s ease-out;}
+@keyframes flashSlash{
+  0%,100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1),0 0 20px rgba(0,0,0,.6);}
+  30%{box-shadow:inset 0 0 60px rgba(255,255,255,.3),0 0 30px rgba(255,80,60,.3);}
+}
 .stage.effect-fire   { animation:flashFire   .6s ease-out; }
 .stage.effect-ice    { animation:flashIce    .6s ease-out; }
 .stage.effect-thunder{ animation:flashThunder .5s ease-out; }
@@ -2220,10 +2301,12 @@ function doNormalAttack() {
     // 魔弾：MATKを参照
     dmg = Math.floor((S.player.matk + Math.random()*4) * S.player.magicPow);
     msg = `魔弾を放つ。<span class="dmg"> ${dmg} ダメージ</span>`;
+    playSpellEffect('無');
   } else {
     // 通常攻撃：ATKを参照
     dmg = Math.floor(S.player.atk + Math.random()*4);
     msg = `剣を振るう。<span class="dmg"> ${dmg} ダメージ</span>`;
+    playSlashEffect();
   }
   S.enemy.hp -= dmg;
   caption(msg);
@@ -2597,7 +2680,47 @@ function playSpellEffect(element) {
   setTimeout(() => { if(canvas) canvas.innerHTML=''; }, 1000);
 }
 
-function spawnParticles(parent, count, {colors, size, speed, life}) {
+// 剣の通常攻撃エフェクト
+function playSlashEffect() {
+  const canvas = document.getElementById('spell-canvas');
+  if (!canvas) return;
+  canvas.innerHTML = '';
+
+  // 斬撃本体
+  const wrap = document.createElement('div');
+  wrap.className = 'sp-slash-wrap';
+  wrap.innerHTML = `
+    <div class="sp-slash"></div>
+    <div class="sp-slash-trail1"></div>
+    <div class="sp-slash-trail2"></div>
+  `;
+
+  // スパーク（命中時の火花）8方向
+  const sparkAngles = [0, 25, 45, 70, 90, -20, -45, -70];
+  sparkAngles.forEach(angle => {
+    const sp = document.createElement('div');
+    sp.className = 'sp-slash-spark';
+    const rad = (angle * Math.PI) / 180;
+    const dist = 18 + Math.random() * 22;
+    sp.style.setProperty('--sx', Math.cos(rad) * dist + 'px');
+    sp.style.setProperty('--sy', Math.sin(rad) * dist + 'px');
+    sp.style.animationDelay = (0.25 + Math.random() * 0.05) + 's';
+    wrap.appendChild(sp);
+  });
+
+  canvas.appendChild(wrap);
+
+  // ステージフラッシュ
+  const stage = document.getElementById('stage');
+  stage.classList.remove('flash-slash');
+  void stage.offsetWidth;
+  stage.classList.add('flash-slash');
+
+  setTimeout(() => {
+    canvas.innerHTML = '';
+    stage.classList.remove('flash-slash');
+  }, 500);
+}
   for(let i=0;i<count;i++){
     const p = document.createElement('div');
     p.className = 'sp-particle';
