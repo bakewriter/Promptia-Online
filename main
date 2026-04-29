@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promptia Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Shippori+Mincho:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #06030f;
+    --bg-mid: #0d0820;
+    --bg-panel: #120a2a;
+    --border-mystic: #2a1a55;
+    --neon-blue: #4dd9ff;
+    --neon-purple: #b04dff;
+    --neon-pink: #ff4dd9;
+    --gold: #d4a850;
+    --gold-bright: #ffd97a;
+    --text-main: #e8e0ff;
+    --text-dim: #8a7fb8;
+    --hp-color: #ff5577;
+    --mp-color: #4dd9ff;
+    --essence-color: #ffd97a;
+    --shadow-deep: rgba(0, 0, 0, 0.6);
+    --glow-blue: rgba(77, 217, 255, 0.4);
+    --glow-purple: rgba(176, 77, 255, 0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--text-main);
+    background: var(--bg-deep);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(176, 77, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(77, 217, 255, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(13, 8, 32, 0.8) 0%, var(--bg-deep) 70%);
+    background-attachment: fixed;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, var(--neon-blue), transparent),
+      radial-gradient(1px 1px at 60% 70%, var(--neon-purple), transparent),
+      radial-gradient(1px 1px at 80% 20%, var(--gold-bright), transparent),
+      radial-gradient(1px 1px at 30% 80%, var(--neon-blue), transparent),
+      radial-gradient(1px 1px at 90% 50%, var(--neon-purple), transparent),
+      radial-gradient(1px 1px at 10% 60%, var(--gold-bright), transparent),
+      radial-gradient(1px 1px at 50% 10%, var(--neon-blue), transparent),
+      radial-gradient(1px 1px at 70% 40%, var(--neon-purple), transparent);
+    background-size: 200% 200%;
+    opacity: 0.6;
+    animation: starDrift 60s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes starDrift {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ============ LOGIN SCREEN ============ */
+  .login-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: linear-gradient(180deg, rgba(18, 10, 42, 0.95) 0%, rgba(6, 3, 15, 0.95) 100%);
+    border: 1px solid var(--border-mystic);
+    padding: 36px 28px 28px;
+    box-shadow:
+      0 0 60px var(--glow-purple),
+      inset 0 0 30px rgba(176, 77, 255, 0.05);
+    position: relative;
+  }
+  .login-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, transparent 30%, var(--neon-purple) 50%, transparent 70%);
+    opacity: 0.3;
+    z-index: -1;
+    filter: blur(8px);
+  }
+
+  .login-logo {
+    display: block;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 8px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px var(--glow-purple));
+    animation: logoFloat 4s ease-in-out infinite;
+  }
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .login-title {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    letter-spacing: 0.25em;
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 60%, var(--gold-bright) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 4px;
+  }
+  .login-subtitle {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.3em;
+    margin-bottom: 28px;
+  }
+
+  /* タブ切替 */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-mystic);
+  }
+  .tab {
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    color: white;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+  }
+  .tab:not(.active):hover {
+    color: var(--neon-blue);
+    background: rgba(77, 217, 255, 0.05);
+  }
+
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    padding: 11px 12px;
+    background: rgba(6, 3, 15, 0.6);
+    border: 1px solid var(--border-mystic);
+    color: var(--text-main);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .field input:focus {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 12px var(--glow-purple);
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    color: white;
+    border: none;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    margin-top: 10px;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+  }
+  .submit-btn:hover:not(:disabled) {
+    box-shadow: 0 0 24px var(--neon-purple);
+    transform: translateY(-1px);
+  }
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .login-msg {
+    margin-top: 14px;
+    padding: 8px 10px;
+    font-size: 12px;
+    border-left: 2px solid var(--neon-purple);
+    background: rgba(176, 77, 255, 0.08);
+    min-height: 14px;
+  }
+  .login-msg.error {
+    border-color: var(--hp-color);
+    background: rgba(255, 85, 119, 0.08);
+    color: var(--hp-color);
+  }
+  .login-msg.success {
+    border-color: var(--gold-bright);
+    background: rgba(255, 217, 122, 0.08);
+    color: var(--gold-bright);
+  }
+
+  .api-warning {
+    margin-top: 16px;
+    padding: 10px;
+    border: 1px dashed var(--gold);
+    font-size: 11px;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
+  }
+
+  /* ============ APP ============ */
+  .app {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px 18px 18px;
+    gap: 12px;
+  }
+  .app.hidden { display: none; }
+
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .title-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px var(--glow-purple));
+  }
+
+  .title-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .game-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 60%, var(--gold-bright) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px var(--glow-purple);
+  }
+
+  .user-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .user-info::before {
+    content: '◆';
+    color: var(--neon-purple);
+    font-size: 8px;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; text-shadow: 0 0 8px var(--neon-purple); }
+  }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .logout-btn {
+    background: transparent;
+    border: 1px solid var(--border-mystic);
+    color: var(--text-dim);
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover {
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255, 77, 217, 0.3);
+  }
+
+  .stats-mini {
+    display: flex;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+  }
+  .stat-pill {
+    padding: 2px 7px;
+    border: 1px solid var(--border-mystic);
+    background: rgba(13, 8, 32, 0.6);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .stat-pill .label { opacity: 0.6; }
+  .stat-pill.hp .val { color: var(--hp-color); }
+  .stat-pill.mp .val { color: var(--mp-color); }
+  .stat-pill.es .val { color: var(--essence-color); }
+  .stat-pill.fl .val { color: var(--neon-purple); }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+  }
+
+  .stage {
+    flex: 1;
+    border: 1px solid var(--border-mystic);
+    background:
+      radial-gradient(ellipse at center, rgba(176, 77, 255, 0.08) 0%, transparent 70%),
+      linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 40px rgba(176, 77, 255, 0.1),
+      0 0 20px var(--shadow-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+  }
+
+  .stage::before {
+    content: '';
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border: 1px solid var(--border-mystic);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: rotateSlow 40s linear infinite;
+  }
+  .stage::after {
+    content: '';
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border: 1px dashed var(--neon-purple);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: rotateSlow 30s linear infinite reverse;
+  }
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .stage-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .stage-icon {
+    font-size: 64px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 20px var(--glow-purple));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .stage-title {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    letter-spacing: 0.2em;
+    color: var(--neon-blue);
+    text-shadow: 0 0 12px var(--glow-blue);
+    margin-bottom: 8px;
+  }
+
+  .stage-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+  }
+
+  .stage.flash-attack { animation: flashAttack 0.5s ease-out; }
+  .stage.flash-hit { animation: flashHit 0.4s ease-out; }
+  @keyframes flashAttack {
+    0% { box-shadow: inset 0 0 40px rgba(176, 77, 255, 0.1), 0 0 20px var(--shadow-deep); }
+    50% { box-shadow: inset 0 0 80px rgba(77, 217, 255, 0.6), 0 0 40px var(--neon-blue); }
+    100% { box-shadow: inset 0 0 40px rgba(176, 77, 255, 0.1), 0 0 20px var(--shadow-deep); }
+  }
+  @keyframes flashHit {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .enemy-hp-bar {
+    margin-top: 12px;
+    width: 100%;
+    height: 6px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border-mystic);
+    position: relative;
+    overflow: hidden;
+  }
+  .enemy-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--hp-color) 0%, var(--neon-pink) 100%);
+    box-shadow: 0 0 8px var(--hp-color);
+    transition: width 0.5s ease-out;
+  }
+
+  .caption {
+    border: 1px solid var(--border-mystic);
+    border-top: none;
+    background: rgba(6, 3, 15, 0.9);
+    padding: 10px 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-main);
+    min-height: 60px;
+    max-height: 110px;
+    overflow-y: auto;
+    font-family: 'Shippori Mincho', serif;
+  }
+  .caption::-webkit-scrollbar { width: 4px; }
+  .caption::-webkit-scrollbar-thumb { background: var(--border-mystic); }
+  .caption .system { color: var(--text-dim); font-style: italic; font-size: 12px; }
+  .caption .damage { color: var(--neon-blue); font-weight: 700; }
+  .caption .weak { color: var(--gold-bright); font-weight: 700; }
+  .caption .hurt { color: var(--hp-color); font-weight: 700; }
+  .caption .enemy-name { color: var(--neon-purple); font-family: 'Cinzel', serif; }
+
+  .choices-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    padding: 14px 10px;
+    background: linear-gradient(135deg, rgba(18, 10, 42, 0.9) 0%, rgba(13, 8, 32, 0.9) 100%);
+    border: 1px solid var(--border-mystic);
+    color: var(--text-main);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    min-height: 52px;
+    text-align: center;
+  }
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(176, 77, 255, 0.2) 100%);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--neon-purple);
+    color: var(--neon-blue);
+    box-shadow: 0 0 16px var(--glow-purple), inset 0 0 16px rgba(176, 77, 255, 0.2);
+    transform: translateY(-1px);
+  }
+  .choice-btn:hover:not(:disabled)::before { opacity: 1; }
+  .choice-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .choice-btn .meta {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: 0.1em;
+  }
+
+  .cast-overlay {
+    grid-column: 1 / -1;
+    display: flex;
+    border: 1px solid var(--neon-purple);
+    background: rgba(13, 8, 32, 0.95);
+    box-shadow: 0 0 16px var(--glow-purple);
+  }
+  .cast-overlay input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 14px;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px;
+    color: var(--neon-blue);
+    outline: none;
+  }
+  .cast-overlay input::placeholder {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 12px;
+  }
+  .cost-display {
+    padding: 12px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--essence-color);
+    border-left: 1px solid var(--border-mystic);
+    display: flex;
+    align-items: center;
+    min-width: 70px;
+    justify-content: center;
+  }
+  .cost-display.over { color: var(--hp-color); }
+  .cast-confirm {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    color: white;
+    border: none;
+    border-left: 1px solid var(--neon-purple);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+  }
+  .cast-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .typing::after {
+    content: '▊';
+    color: var(--neon-blue);
+    animation: blink 0.8s steps(1) infinite;
+    margin-left: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .sync-indicator {
+    position: fixed;
+    bottom: 8px;
+    right: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .sync-indicator.visible { opacity: 1; }
+  .sync-indicator.success { color: var(--neon-blue); }
+  .sync-indicator.error { color: var(--hp-color); }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <img src="logo.png" alt="Promptia" class="login-logo">
+    <div class="login-title">PROMPTIA</div>
+    <div class="login-subtitle">— ONLINE —</div>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">LOGIN</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')">REGISTER</button>
+    </div>
+
+    <!-- LOGIN フォーム -->
+    <div id="form-login">
+      <div class="field">
+        <label>EMAIL</label>
+        <input type="email" id="login-email" placeholder="example@mail.com" autocomplete="email">
+      </div>
+      <button class="submit-btn" id="btn-login" onclick="doLogin()">ENTER THE DUNGEON</button>
+    </div>
+
+    <!-- REGISTER フォーム -->
+    <div id="form-register" style="display:none">
+      <div class="field">
+        <label>EMAIL</label>
+        <input type="email" id="reg-email" placeholder="example@mail.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>USER NAME（20文字以内）</label>
+        <input type="text" id="reg-name" placeholder="名もなき詠唱者" maxlength="20">
+      </div>
+      <button class="submit-btn" id="btn-register" onclick="doRegister()">CREATE NEW SOUL</button>
+    </div>
+
+    <div class="login-msg" id="login-msg"></div>
+
+    <div class="api-warning" id="api-warning" style="display:none">
+      ⚠ GAS_URL が未設定です。<br>
+      HTML 1265行目あたりの GAS_URL に、デプロイしたウェブアプリのURLを貼ってください。
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="app hidden" id="app">
+  <header>
+    <div class="title-area">
+      <img src="logo.png" alt="Promptia Online" class="logo">
+      <div class="title-text">
+        <div class="game-title">PROMPTIA</div>
+        <div class="user-info" id="user-info">—</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="logout-btn" onclick="doLogout()">LOGOUT</button>
+      <div class="stats-mini">
+        <span class="stat-pill fl"><span class="label">F</span><span class="val" id="stat-fl">1</span></span>
+        <span class="stat-pill hp"><span class="label">HP</span><span class="val" id="stat-hp">100</span></span>
+        <span class="stat-pill mp"><span class="label">MP</span><span class="val" id="stat-mp">50</span></span>
+        <span class="stat-pill es"><span class="label">★</span><span class="val" id="stat-es">0</span></span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="stage" id="stage">
+      <div class="stage-content" id="stage-content">
+        <div class="stage-icon">✦</div>
+        <div class="stage-title">PROMPTIA ONLINE</div>
+        <div class="stage-meta">— A WORLD WOVEN BY WORDS —</div>
+      </div>
+    </div>
+    <div class="caption" id="caption">古い門が、君の前で軋みながら開いてゆく──</div>
+  </main>
+
+  <footer>
+    <div class="choices-grid" id="choices"></div>
+  </footer>
+</div>
+
+<div class="sync-indicator" id="sync-indicator"></div>
+
+<script>
+/* ===========================================================
+   PROMPTIA ONLINE — プロトタイプ v3
+   ★ GAS_URL を必ず自分のデプロイ済みURLに書き換えてください
+   =========================================================== */
+
+const GAS_URL = ''; // ←ここに https://script.google.com/macros/s/XXXXX/exec を貼る
+
+// ---------- 起動チェック ----------
+window.addEventListener('DOMContentLoaded', () => {
+  if (!GAS_URL) {
+    document.getElementById('api-warning').style.display = 'block';
+  }
+});
+
+// ---------- GAS呼び出し共通 ----------
+async function callGAS(action, payload) {
+  if (!GAS_URL) {
+    return { ok: false, error: 'GAS_URL未設定' };
+  }
+  try {
+    // text/plain で送ることでCORSプリフライトを回避
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, ...payload }),
+      redirect: 'follow',
+    });
+    return await res.json();
+  } catch (err) {
+    return { ok: false, error: '通信エラー: ' + err.message };
+  }
+}
+
+function showSync(msg, type) {
+  const el = document.getElementById('sync-indicator');
+  el.textContent = msg;
+  el.className = 'sync-indicator visible ' + (type || '');
+  clearTimeout(showSync._t);
+  showSync._t = setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+// ---------- ログイン画面 ----------
+function switchTab(which) {
+  document.getElementById('tab-login').classList.toggle('active', which === 'login');
+  document.getElementById('tab-register').classList.toggle('active', which === 'register');
+  document.getElementById('form-login').style.display = which === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = which === 'register' ? 'block' : 'none';
+  setMsg('', '');
+}
+
+function setMsg(text, type) {
+  const el = document.getElementById('login-msg');
+  el.textContent = text;
+  el.className = 'login-msg' + (type ? ' ' + type : '');
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { setMsg('メールアドレスを入力してください', 'error'); return; }
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  setMsg('認証中...', '');
+
+  const r = await callGAS('login', { email });
+
+  if (r.ok) {
+    setMsg(`ようこそ、${r.user.userName} よ`, 'success');
+    setTimeout(() => enterApp(r.user), 800);
+  } else if (r.error === 'NOT_FOUND') {
+    setMsg('未登録のメールアドレスです。「REGISTER」タブから新規登録してください', 'error');
+    btn.disabled = false;
+  } else {
+    setMsg(r.error || 'ログイン失敗', 'error');
+    btn.disabled = false;
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('reg-email').value.trim();
+  const userName = document.getElementById('reg-name').value.trim();
+  if (!email || !userName) { setMsg('メールアドレスとユーザー名を入力してください', 'error'); return; }
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  setMsg('登録中...', '');
+
+  const r = await callGAS('register', { email, userName });
+
+  if (r.ok) {
+    setMsg(`「${r.user.userName}」の魂が記録されました（ID: ${r.user.id}）`, 'success');
+    setTimeout(() => enterApp(r.user), 1200);
+  } else {
+    setMsg(r.error || '登録失敗', 'error');
+    btn.disabled = false;
+  }
+}
+
+function enterApp(user) {
+  state.user = user;
+  state.player.maxFloor = user.maxFloor || 1;
+  document.getElementById('user-info').textContent = `${user.userName} (ID: ${user.id})`;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.remove('hidden');
+  startGame();
+}
+
+function doLogout() {
+  if (!confirm('セッションを終了しますか？')) return;
+  location.reload();
+}
+
+/* ===========================================================
+   ゲーム状態
+   =========================================================== */
+const state = {
+  user: null,
+  player: { name: '名もなき詠唱者', hp: 100, hpMax: 100, mp: 50, mpMax: 50, essence: 0, maxFloor: 1 },
+  dungeon: { floor: 1, room: 1, totalRooms: 3 },
+  enemy: null,
+  phase: 'intro',
+};
+
+const enemyPool = [
+  { name: '腐敗せし墓守', icon: '☠', hp: 35, atk: 8, weak: ['炎','光'], lore: '苔むした鎧の隙間から青白い瘴気が漏れ出している。' },
+  { name: '影喰らいの蝙蝠', icon: '🦇', hp: 22, atk: 6, weak: ['光','音'], lore: '闇から滲み出るように現れ、無数の翼が空気を切り裂く。' },
+  { name: '骨砕きの鬼', icon: '👹', hp: 55, atk: 14, weak: ['雷','聖'], lore: '人間の骨で編まれた首飾りを揺らし、地響きと共に立ちはだかる。' },
+  { name: '囁く水鏡', icon: '🪞', hp: 30, atk: 10, weak: ['炎','凍'], lore: '水面に映るのは、かつての自分の姿。鏡の奥から細い指が伸びてくる。' },
+  { name: '黄金喰らいの蛞蝓', icon: '🐌', hp: 45, atk: 7, weak: ['塩','炎'], lore: '体表に金貨が埋め込まれ、ぬらりと光っている。' },
+  { name: '深淵の番人', icon: '👁', hp: 80, atk: 18, weak: ['光','聖'], lore: '六本の腕を持ち、その瞳の奥には星々が渦巻いている。' },
+];
+
+const $stage = document.getElementById('stage');
+const $stageContent = document.getElementById('stage-content');
+const $caption = document.getElementById('caption');
+const $choices = document.getElementById('choices');
+
+function setStage({icon, title, meta, enemy}) {
+  let html = `<div class="stage-icon">${icon || '✦'}</div>`;
+  if (title) html += `<div class="stage-title">${title}</div>`;
+  if (meta) html += `<div class="stage-meta">${meta}</div>`;
+  if (enemy) {
+    const pct = Math.max(0, (enemy.hp / enemy.hpMax) * 100);
+    html += `<div class="enemy-hp-bar"><div class="enemy-hp-fill" style="width:${pct}%"></div></div>`;
+  }
+  $stageContent.innerHTML = html;
+}
+
+function flashStage(type) {
+  $stage.classList.remove('flash-attack', 'flash-hit');
+  void $stage.offsetWidth;
+  $stage.classList.add('flash-' + type);
+}
+
+function caption(html) { $caption.innerHTML = html; $caption.scrollTop = 0; }
+function captionAdd(html) { $caption.innerHTML += '<br>' + html; $caption.scrollTop = $caption.scrollHeight; }
+
+function updateStats() {
+  document.getElementById('stat-fl').textContent = state.dungeon.floor;
+  document.getElementById('stat-hp').textContent = state.player.hp;
+  document.getElementById('stat-mp').textContent = state.player.mp;
+  document.getElementById('stat-es').textContent = state.player.essence;
+}
+
+function calcCost(text) {
+  const len = [...text].length;
+  let cost = Math.ceil(len * 1.2);
+  const heavy = ['永劫','絶対','神','滅','黄金','深淵','業','暴','焔','雷','凍','聖'];
+  heavy.forEach(w => { if (text.includes(w)) cost += 5; });
+  return cost;
+}
+
+function setChoices(choices) {
+  $choices.innerHTML = '';
+  const padded = [...choices];
+  while (padded.length < 4 && padded.length > 0 && padded.length !== 1) padded.push(null);
+  padded.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    if (c) {
+      btn.innerHTML = c.label + (c.meta ? `<span class="meta">${c.meta}</span>` : '');
+      btn.onclick = c.action;
+    } else {
+      btn.innerHTML = '<span style="opacity:0.2">─</span>';
+      btn.disabled = true;
+    }
+    $choices.appendChild(btn);
+  });
+}
+
+function showCastInput() {
+  $choices.innerHTML = `
+    <div class="cast-overlay">
+      <input id="cast-input" type="text" placeholder="言葉を紡げ — 例: 燃え盛る赤き刃" maxlength="80" autofocus>
+      <span class="cost-display" id="cost-display">0/${state.player.mp}</span>
+      <button class="cast-confirm" id="cast-confirm">詠唱</button>
+    </div>
+    <button class="choice-btn" onclick="combatChoices()">← 戻る<span class="meta">CANCEL</span></button>
+    <button class="choice-btn" disabled><span style="opacity:0.2">─</span></button>
+  `;
+  const $input = document.getElementById('cast-input');
+  const $cost = document.getElementById('cost-display');
+  const $confirm = document.getElementById('cast-confirm');
+
+  function updateCost() {
+    const c = calcCost($input.value.trim());
+    $cost.textContent = `${c}/${state.player.mp}`;
+    $cost.classList.toggle('over', c > state.player.mp);
+  }
+  $input.addEventListener('input', updateCost);
+  $input.addEventListener('keydown', e => { if (e.key === 'Enter') doCast(); });
+  $confirm.onclick = doCast;
+  $input.focus();
+
+  async function doCast() {
+    const text = $input.value.trim();
+    if (!text) return;
+    const cost = calcCost(text);
+    if (cost > state.player.mp) {
+      caption(`<span class="system">魔力が足りない。必要MP: ${cost} / 現在MP: ${state.player.mp}</span>`);
+      return;
+    }
+    await castSpell(text, cost);
+  }
+}
+
+/* ===========================================================
+   ★ AI応答（ダミー）— ここをGemini APIに差し替える
+   =========================================================== */
+async function generateSpellEffect({prompt, cost, enemy}) {
+  await new Promise(r => setTimeout(r, 700 + Math.random() * 400));
+
+  const elementMap = {
+    '炎': ['炎','焔','火','燃','焼','業火','灼'],
+    '凍': ['氷','凍','凍結','雪','吹雪','寒'],
+    '雷': ['雷','電','稲妻','轟','閃光'],
+    '光': ['光','聖','輝','黄金','陽'],
+    '闇': ['闇','影','黒','虚','深淵'],
+    '音': ['音','響','鐘','叫','咆哮'],
+    '塩': ['塩','清め'],
+  };
+  let element = '無';
+  for (const [el, kws] of Object.entries(elementMap)) {
+    if (kws.some(k => prompt.includes(k))) { element = el; break; }
+  }
+
+  let damage = Math.floor(cost * 0.8 + Math.random() * 6);
+  const weakHit = enemy && enemy.weak.includes(element);
+  if (weakHit) damage = Math.floor(damage * 1.6);
+
+  const flavors = {
+    '炎': `紅蓮の炎が螺旋を描いて${enemy.name}を包む`,
+    '凍': `空気が凍てつき、${enemy.name}の動きが鈍る`,
+    '雷': `閃光が走り、${enemy.name}を貫く`,
+    '光': `眩い光輝が${enemy.name}を浄化せんと迸る`,
+    '闇': `黒い触手が${enemy.name}に絡みつく`,
+    '音': `不協和音が${enemy.name}の精神を揺さぶる`,
+    '塩': `祓いの結晶が${enemy.name}に降り注ぐ`,
+    '無': `形なき念が${enemy.name}を打つ`,
+  };
+
+  return { damage, element, weakHit, flavor: flavors[element] };
+}
+
+/* ===========================================================
+   ゲーム進行
+   =========================================================== */
+function startGame() {
+  setStage({ icon: '🜲', title: `第 ${state.dungeon.floor} 階層`, meta: `${state.dungeon.totalRooms} ROOMS AHEAD` });
+  caption(`<span class="enemy-name">${state.user.userName}</span> よ、ようこそ Promptia へ。<br>湿った石段を降りる。${state.dungeon.totalRooms}つの間が君を待っている。<br><span class="system">最高到達: 第 ${state.player.maxFloor} 階層</span>`);
+  setChoices([{ label: '進む', action: nextRoom, meta: 'ADVANCE' }]);
+  updateStats();
+}
+
+function nextRoom() {
+  state.phase = 'combat';
+  let enemy;
+  if (state.dungeon.room === state.dungeon.totalRooms) {
+    enemy = {...enemyPool[5]};
+  } else {
+    const pool = enemyPool.slice(0, 5);
+    enemy = {...pool[Math.floor(Math.random() * pool.length)]};
+  }
+  enemy.hpMax = enemy.hp;
+  state.enemy = enemy;
+  updateStats();
+
+  setStage({
+    icon: enemy.icon,
+    title: enemy.name,
+    meta: `ROOM ${state.dungeon.room}/${state.dungeon.totalRooms} · 弱点: ${enemy.weak.join('・')}`,
+    enemy,
+  });
+  caption(`<span class="enemy-name">${enemy.name}</span> が現れた。<br><span class="system">${enemy.lore}</span>`);
+  combatChoices();
+}
+
+function combatChoices() {
+  setChoices([
+    { label: '詠唱する', action: showCastInput, meta: 'CAST SPELL' },
+    { label: '休む', action: tryRest, meta: 'MP +5' },
+    { label: '観察', action: observe, meta: 'INSPECT' },
+    { label: '逃げる', action: tryEscape, meta: 'HP -10' },
+  ]);
+}
+
+function tryRest() {
+  const recover = 5 + Math.floor(Math.random() * 5);
+  state.player.mp = Math.min(state.player.mpMax, state.player.mp + recover);
+  updateStats();
+  caption(`君は呼吸を整える。魔力が <span class="weak">+${recover}</span> 戻った。`);
+  setTimeout(() => enemyAttack(), 800);
+}
+
+function observe() {
+  const e = state.enemy;
+  caption(`<span class="enemy-name">${e.name}</span> をじっと見つめる。<br>HP: ${e.hp}/${e.hpMax} · 攻撃力: ${e.atk} · 弱点: <span class="weak">${e.weak.join('・')}</span>`);
+  setTimeout(combatChoices, 100);
+}
+
+function tryEscape() {
+  state.player.hp = Math.max(0, state.player.hp - 10);
+  updateStats();
+  caption(`君は背を向け、暗闇の中を駆ける。背後の咆哮が骨に響く。<span class="hurt"> HP -10</span>`);
+  if (state.player.hp <= 0) return defeat();
+  setTimeout(advanceRoom, 1200);
+}
+
+async function castSpell(text, cost) {
+  state.player.mp -= cost;
+  updateStats();
+
+  caption(`<span style="color:var(--neon-blue)">「${text}」</span><br><span class="typing system">魔力が編まれてゆく</span>`);
+  flashStage('attack');
+
+  const result = await generateSpellEffect({ prompt: text, cost, enemy: state.enemy });
+
+  let line = `${result.flavor}。<span class="damage"> ${result.damage} ダメージ</span>`;
+  if (result.weakHit) line += ` <span class="weak">弱点ヒット！</span>`;
+  caption(line);
+
+  state.enemy.hp -= result.damage;
+  setStage({
+    icon: state.enemy.icon,
+    title: state.enemy.name,
+    meta: `HP ${Math.max(0, state.enemy.hp)}/${state.enemy.hpMax}`,
+    enemy: state.enemy,
+  });
+
+  if (state.enemy.hp <= 0) { setTimeout(enemyDefeated, 800); return; }
+  setTimeout(() => enemyAttack(), 900);
+}
+
+function enemyAttack() {
+  const dmg = Math.max(1, state.enemy.atk + Math.floor(Math.random() * 4) - 2);
+  state.player.hp = Math.max(0, state.player.hp - dmg);
+  state.player.mp = Math.min(state.player.mpMax, state.player.mp + 8);
+  updateStats();
+  flashStage('hit');
+  captionAdd(`<span class="enemy-name">${state.enemy.name}</span> の反撃。<span class="hurt"> ${dmg} ダメージ</span>。<span class="system">魔力 +8</span>`);
+  if (state.player.hp <= 0) return defeat();
+  setTimeout(combatChoices, 600);
+}
+
+function enemyDefeated() {
+  const reward = Math.floor(state.enemy.hpMax / 4);
+  state.player.essence += reward;
+  state.player.hp = Math.min(state.player.hpMax, state.player.hp + 10);
+  state.player.mp = Math.min(state.player.mpMax, state.player.mp + 15);
+  updateStats();
+
+  setStage({ icon: '✧', title: 'VICTORY', meta: `+${reward} ESSENCE` });
+  caption(`<span class="enemy-name">${state.enemy.name}</span> は塵となって崩れ落ちた。<br><span class="system">星屑を ${reward} 得た。傷が少し癒える。</span>`);
+
+  if (state.dungeon.room >= state.dungeon.totalRooms) {
+    setTimeout(floorClear, 1400);
+  } else {
+    setTimeout(() => {
+      setChoices([
+        { label: '次の間へ', action: advanceRoom, meta: 'NEXT ROOM' },
+        { label: '深く休む', action: deepRest, meta: '★-5 全回復' },
+      ]);
+    }, 1000);
+  }
+}
+
+function deepRest() {
+  if (state.player.essence < 5) {
+    caption('<span class="system">星屑が足りない。</span>');
+    setChoices([{ label: '次の間へ', action: advanceRoom, meta: 'NEXT ROOM' }]);
+    return;
+  }
+  state.player.essence -= 5;
+  state.player.hp = state.player.hpMax;
+  state.player.mp = state.player.mpMax;
+  updateStats();
+  caption('君は壁にもたれ、深く呼吸する。傷は塞がり、魔力は満ちた。');
+  setTimeout(advanceRoom, 1000);
+}
+
+function advanceRoom() {
+  state.dungeon.room++;
+  nextRoom();
+}
+
+async function floorClear() {
+  setStage({ icon: '⬇', title: `FLOOR ${state.dungeon.floor} CLEAR`, meta: 'A NEW DEPTH OPENS' });
+  caption(`深淵の番人が崩れ落ちると、床に下層への階段が口を開けた。`);
+
+  // ★ サーバーに到達階層を送信（最高記録更新時のみ）
+  await syncFloor(state.dungeon.floor);
+
+  setChoices([
+    { label: '降りる', action: nextFloor, meta: 'NEXT FLOOR' },
+    { label: '帰還する', action: endGame, meta: 'RETURN' },
+  ]);
+}
+
+async function syncFloor(floor) {
+  if (!state.user || !state.user.id) return;
+  showSync('saving...', '');
+  const r = await callGAS('updateFloor', { id: state.user.id, floor });
+  if (r.ok) {
+    if (r.updated) {
+      state.player.maxFloor = r.maxFloor;
+      showSync(`★ 最高到達更新！ 第${r.maxFloor}階層`, 'success');
+      captionAdd(`<span class="weak">★ 最高到達記録を更新した（第 ${r.maxFloor} 階層）</span>`);
+    } else {
+      showSync('saved', 'success');
+    }
+  } else {
+    showSync('sync error', 'error');
+  }
+}
+
+function nextFloor() {
+  state.dungeon.floor++;
+  state.dungeon.room = 1;
+  state.dungeon.totalRooms = 3 + state.dungeon.floor;
+  state.player.hpMax += 20; state.player.hp = state.player.hpMax;
+  state.player.mpMax += 10; state.player.mp = state.player.mpMax;
+  enemyPool.forEach(e => { e.hp = Math.floor(e.hp * 1.3); e.atk = Math.floor(e.atk * 1.2); });
+  updateStats();
+  startGame();
+}
+
+function defeat() {
+  setStage({ icon: '✟', title: 'GAME OVER', meta: `第 ${state.dungeon.floor} 階層 / 第 ${state.dungeon.room} の間` });
+  caption(`<span class="hurt">君の言葉は、ここで途絶えた。</span><br><span class="system">獲得した星屑: ${state.player.essence}</span>`);
+  setChoices([{ label: '最初から', action: () => location.reload(), meta: 'RESTART' }]);
+}
+
+function endGame() {
+  setStage({ icon: '✦', title: 'RETURNED', meta: `★ ${state.player.essence} BROUGHT BACK` });
+  caption(`君は地下迷宮を後にした。<br>持ち帰った星屑: <span class="weak">${state.player.essence}</span>`);
+  setChoices([{ label: 'もう一度', action: () => location.reload(), meta: 'AGAIN' }]);
+}
+
+// ---------- Enter キーでログイン/登録 ----------
+document.getElementById('login-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('reg-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('reg-name').focus();
+});
+document.getElementById('reg-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doRegister();
+});
+</script>
+</body>
+</html>
