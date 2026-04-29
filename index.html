@@ -321,6 +321,7 @@ body::after{
 .inv-list-section{
   flex:1;min-height:0;display:flex;flex-direction:column;gap:0;
   padding:8px 14px 12px;
+  overflow:hidden;
 }
 .inv-filter{display:flex;gap:3px;flex-shrink:0;flex-wrap:wrap;margin-bottom:6px;}
 .filter-btn{
@@ -1211,8 +1212,8 @@ const S = {
   invFilter: 'all',
   invSort: 'power',
   settings: {
-    accessory_drop_rate: 0.15,
-    accessory_drop_rate_boss: 0.40,
+    accessory_drop_rate: 0.05,
+    accessory_drop_rate_boss: 0.20,
     cost_per_floor_clear: 5,
     cost_bonus_per_10f: 10,
   },
@@ -1337,10 +1338,11 @@ async function loadGameSettings() {
   const r = await callGAS('getSettings', {});
   if (r?.ok && r.settings) {
     const s = r.settings;
-    if (s.accessory_drop_rate    !== undefined) S.settings.accessory_drop_rate    = Number(s.accessory_drop_rate);
-    if (s.accessory_drop_rate_boss !== undefined) S.settings.accessory_drop_rate_boss = Number(s.accessory_drop_rate_boss);
-    if (s.cost_per_floor_clear   !== undefined) S.settings.cost_per_floor_clear   = Number(s.cost_per_floor_clear);
-    if (s.cost_bonus_per_10f     !== undefined) S.settings.cost_bonus_per_10f     = Number(s.cost_bonus_per_10f);
+    // ドロップ率はスプシで0〜100の%表記 → 0〜1に変換
+    if (s.accessory_drop_rate      !== undefined) S.settings.accessory_drop_rate      = Number(s.accessory_drop_rate) / 100;
+    if (s.accessory_drop_rate_boss !== undefined) S.settings.accessory_drop_rate_boss = Number(s.accessory_drop_rate_boss) / 100;
+    if (s.cost_per_floor_clear     !== undefined) S.settings.cost_per_floor_clear     = Number(s.cost_per_floor_clear);
+    if (s.cost_bonus_per_10f       !== undefined) S.settings.cost_bonus_per_10f       = Number(s.cost_bonus_per_10f);
     showSync('設定読み込み完了', 'success');
   }
 }
