@@ -805,9 +805,142 @@ body::after{
 }
 .combat-item-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
 
-/* フラッシュ */
-.stage.flash-attack{animation:flashAtk .5s ease-out;}
-.stage.flash-hit{animation:flashHit .4s ease-out;}
+/* ===== SPELL EFFECTS ===== */
+.spell-canvas{
+  position:absolute;inset:0;z-index:10;
+  pointer-events:none;overflow:hidden;
+}
+
+/* 共通：パーティクル */
+.sp-particle{
+  position:absolute;border-radius:50%;
+  animation:spFloat linear forwards;
+}
+@keyframes spFloat{
+  0%  {transform:translate(0,0) scale(1);opacity:1;}
+  100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}
+}
+
+/* 炎：赤オレンジ コア */
+.sp-fire-core{
+  position:absolute;left:50%;top:50%;
+  width:60px;height:60px;
+  margin:-30px 0 0 -30px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff8e0 0%,#ff8800 30%,#ff2200 70%,transparent 100%);
+  box-shadow:0 0 30px 10px #ff4400,0 0 60px 20px rgba(255,100,0,.4);
+  animation:fireCoreAnim .7s ease-out forwards;
+}
+@keyframes fireCoreAnim{0%{transform:scale(0);opacity:1}60%{transform:scale(1.4);opacity:1}100%{transform:scale(0.8);opacity:0}}
+.sp-fire-ring{
+  position:absolute;left:50%;top:50%;
+  width:120px;height:60px;
+  margin:-30px 0 0 -60px;
+  border:3px solid #ff6600;
+  border-radius:50%;
+  box-shadow:0 0 12px #ff4400,inset 0 0 12px #ff4400;
+  animation:fireRingAnim .8s ease-out forwards;
+}
+@keyframes fireRingAnim{0%{transform:scale(0);opacity:1}100%{transform:scale(2);opacity:0}}
+
+/* 氷：青白 */
+.sp-ice-core{
+  position:absolute;left:50%;top:50%;
+  width:50px;height:50px;
+  margin:-25px 0 0 -25px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#88ddff 40%,#0088ff 80%,transparent 100%);
+  box-shadow:0 0 20px 8px #4dd9ff,0 0 50px 15px rgba(0,150,255,.3);
+  animation:iceCoreAnim .7s ease-out forwards;
+}
+@keyframes iceCoreAnim{0%{transform:scale(0);opacity:1}50%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}
+.sp-ice-shard{
+  position:absolute;left:50%;top:50%;
+  width:4px;height:30px;
+  margin:-15px 0 0 -2px;
+  background:linear-gradient(180deg,#fff,#4dd9ff,transparent);
+  transform-origin:center bottom;
+  animation:iceShardAnim .8s ease-out forwards;
+}
+@keyframes iceShardAnim{0%{transform:rotate(var(--rot)) scaleY(0);opacity:1}60%{transform:rotate(var(--rot)) scaleY(1);opacity:1}100%{transform:rotate(var(--rot)) scaleY(1) translateY(-20px);opacity:0}}
+
+/* 雷：青×金 */
+.sp-thunder-core{
+  position:absolute;left:50%;top:50%;
+  width:55px;height:55px;
+  margin:-27px 0 0 -27px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#ffffaa 30%,#4488ff 70%,transparent 100%);
+  box-shadow:0 0 25px 10px #4dd9ff,0 0 50px 20px rgba(77,217,255,.4);
+  animation:thunderCoreAnim .5s ease-out forwards;
+}
+@keyframes thunderCoreAnim{0%,20%,40%,60%,80%{opacity:1;transform:scale(1.2)}10%,30%,50%,70%{opacity:.5;transform:scale(0.9)}100%{opacity:0;transform:scale(0.5)}}
+.sp-thunder-bolt{
+  position:absolute;left:50%;top:50%;
+  width:3px;height:40px;
+  margin:-20px 0 0 -1px;
+  background:linear-gradient(180deg,#fff,#ffd97a,#4dd9ff,transparent);
+  transform-origin:center top;
+  clip-path:polygon(30% 0%,60% 0%,45% 50%,70% 50%,20% 100%,35% 55%,10% 55%);
+  width:20px;margin:-20px 0 0 -10px;
+  animation:boltAnim .6s ease-out forwards;
+}
+@keyframes boltAnim{0%{transform:rotate(var(--rot)) scaleY(0);opacity:1}50%{transform:rotate(var(--rot)) scaleY(1);opacity:1}100%{transform:rotate(var(--rot)) scaleY(1) translateY(var(--ty));opacity:0}}
+
+/* 光：金 */
+.sp-light-core{
+  position:absolute;left:50%;top:50%;
+  width:65px;height:65px;
+  margin:-32px 0 0 -32px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#ffeeaa 40%,#ffd97a 80%,transparent 100%);
+  box-shadow:0 0 30px 15px #ffd97a,0 0 70px 25px rgba(255,217,122,.5);
+  animation:lightCoreAnim .8s ease-out forwards;
+}
+@keyframes lightCoreAnim{0%{transform:scale(0);opacity:1}40%{transform:scale(1.5);opacity:1}100%{transform:scale(0.5);opacity:0}}
+.sp-light-ray{
+  position:absolute;left:50%;top:50%;
+  width:3px;height:70px;
+  margin:-35px 0 0 -1px;
+  background:linear-gradient(180deg,transparent,#ffd97a,#fff,#ffd97a,transparent);
+  transform-origin:center center;
+  animation:lightRayAnim .8s ease-out forwards;
+}
+@keyframes lightRayAnim{0%{transform:rotate(var(--rot)) scaleY(0);opacity:1}50%{transform:rotate(var(--rot)) scaleY(1);opacity:.8}100%{transform:rotate(var(--rot)) scaleY(1.2);opacity:0}}
+
+/* 闇：紫黒 */
+.sp-dark-core{
+  position:absolute;left:50%;top:50%;
+  width:55px;height:55px;
+  margin:-27px 0 0 -27px;
+  border-radius:50%;
+  background:radial-gradient(circle,#cc66ff 0%,#6600cc 50%,#1a0033 80%,transparent 100%);
+  box-shadow:0 0 25px 10px #9933ff,0 0 50px 20px rgba(150,0,255,.4);
+  animation:darkCoreAnim .9s ease-out forwards;
+}
+@keyframes darkCoreAnim{0%{transform:scale(0);opacity:.8}40%{transform:scale(1.3);opacity:1}100%{transform:scale(2);opacity:0}}
+.sp-dark-trail{
+  position:absolute;left:50%;top:50%;
+  width:8px;height:8px;
+  margin:-4px 0 0 -4px;
+  border-radius:50%;
+  background:#9933ff;
+  box-shadow:0 0 8px 4px #6600cc;
+  animation:darkTrailAnim 1s ease-out forwards;
+}
+@keyframes darkTrailAnim{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+
+/* ステージフラッシュ（属性別） */
+.stage.effect-fire   { animation:flashFire   .6s ease-out; }
+.stage.effect-ice    { animation:flashIce    .6s ease-out; }
+.stage.effect-thunder{ animation:flashThunder .5s ease-out; }
+.stage.effect-light  { animation:flashLight  .7s ease-out; }
+.stage.effect-dark   { animation:flashDark   .8s ease-out; }
+@keyframes flashFire   {0%,100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1)}50%{box-shadow:inset 0 0 80px rgba(255,68,0,.6),0 0 40px rgba(255,68,0,.4)}}
+@keyframes flashIce    {0%,100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1)}50%{box-shadow:inset 0 0 80px rgba(77,217,255,.6),0 0 40px rgba(77,217,255,.4)}}
+@keyframes flashThunder{0%,100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1)}25%,75%{box-shadow:inset 0 0 60px rgba(255,255,120,.7)}50%{box-shadow:inset 0 0 80px rgba(77,217,255,.7)}}
+@keyframes flashLight  {0%,100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1)}50%{box-shadow:inset 0 0 100px rgba(255,217,122,.8),0 0 60px rgba(255,217,122,.5)}}
+@keyframes flashDark   {0%,100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1)}50%{box-shadow:inset 0 0 80px rgba(150,0,255,.6),0 0 40px rgba(150,0,255,.4)}}
 @keyframes flashAtk{0%{box-shadow:inset 0 0 40px rgba(176,77,255,.1),0 0 20px var(--shadow-deep)}50%{box-shadow:inset 0 0 80px rgba(77,217,255,.6),0 0 40px var(--neon-blue)}100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1),0 0 20px var(--shadow-deep)}}
 @keyframes flashHit{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 
@@ -1173,6 +1306,7 @@ body::after{
   </div>
   <main style="flex:1;display:flex;flex-direction:column;min-height:0;">
     <div class="stage" id="stage">
+      <div class="spell-canvas" id="spell-canvas"></div>
       <div class="stage-content" id="stage-content">
         <div class="stage-icon">✦</div>
         <div class="stage-title">PROMPTIA</div>
@@ -1192,6 +1326,7 @@ body::after{
    GAS_URL: JSONPでCORS回避
 =========================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwYKOj_H7aQ7x__P5JYBVhrExXfoyHyobzRN1uAKIC8fIcAiqz1unsgjs6iRR5ogNta/exec';
+// ※ APIキーはGAS側で管理。HTML側には不要。
 
 // ============================================================
 // STATE
@@ -1421,18 +1556,19 @@ function recalcStats() {
   const job = JOBS[S.job]||JOBS.warrior;
   // ベース
   p.atk      = 5 + (p.level-1)*2 + job.bonus.atkBonus;
+  p.matk     = 5 + (p.level-1)*2; // 魔法攻撃力ベース（独立）
   p.def      = job.bonus.defBonus;
   p.magicPow = job.bonus.magicMul;
-  p.atkPct   = 0;   // ATK%ボーナス合計
-  p.matkPct  = 0;   // M.ATK%ボーナス合計
-  p.defPct   = 0;   // DEF%ボーナス合計
-  p.matkFlat = 0;   // 魔法攻撃力実数ボーナス
+  p.atkPct   = 0;
+  p.matkPct  = 0;
+  p.defPct   = 0;
+  p.matkFlat = 0;
 
   // 武器
   const w = S.equip.weapon;
   if (w) {
-    if (w.subtype==='sword') p.atk += w.power||0;
-    if (w.subtype==='staff') p.matkFlat += (w.power||0);
+    if (w.subtype==='sword') p.atk  += w.power||0;
+    if (w.subtype==='staff') p.matk += w.power||0; // 杖はMATKに加算
   }
   // 防具
   const a = S.equip.armor;
@@ -1443,19 +1579,21 @@ function recalcStats() {
     const acc = S.equip[slot];
     if (!acc || !acc.effects) return;
     acc.effects.forEach(ef => {
-      if      (ef.type==='atk_flat')   p.atk      += ef.value;
-      else if (ef.type==='matk_flat')  p.matkFlat += ef.value;
-      else if (ef.type==='atk_pct')    p.atkPct   += ef.value;
-      else if (ef.type==='matk_pct')   p.matkPct  += ef.value;
-      else if (ef.type==='def_flat')   p.def      += ef.value;
-      else if (ef.type==='def_pct')    p.defPct   += ef.value;
+      if      (ef.type==='atk_flat')  p.atk      += ef.value;
+      else if (ef.type==='matk_flat') p.matkFlat += ef.value;
+      else if (ef.type==='atk_pct')   p.atkPct   += ef.value;
+      else if (ef.type==='matk_pct')  p.matkPct  += ef.value;
+      else if (ef.type==='def_flat')  p.def      += ef.value;
+      else if (ef.type==='def_pct')   p.defPct   += ef.value;
     });
   });
 
   // %ボーナス適用
-  p.atk      = Math.floor(p.atk      * (1 + p.atkPct  / 100));
-  p.magicPow = (p.magicPow + p.matkFlat * 0.05) * (1 + p.matkPct / 100);
-  p.def      = Math.floor(p.def      * (1 + p.defPct  / 100));
+  p.atk  = Math.floor(p.atk  * (1 + p.atkPct  / 100));
+  p.matk = Math.floor((p.matk + p.matkFlat) * (1 + p.matkPct / 100));
+  p.def  = Math.floor(p.def  * (1 + p.defPct  / 100));
+  // magicPowはmatk参照用の倍率（魔法スキルのダメージ計算に使う）
+  p.magicPow = job.bonus.magicMul * (1 + p.matkPct / 100);
 }
 
 // ============================================================
@@ -1532,6 +1670,7 @@ function renderJobPanel() {
     <div class="job-stat-row"><span class="k">Lv</span><span class="v">${p.level}</span></div>
     <div class="job-stat-row"><span class="k">EXP</span><span class="v">${p.exp}/${p.expNext}</span></div>
     <div class="job-stat-row"><span class="k">ATK</span><span class="v">${p.atk}</span></div>
+    <div class="job-stat-row"><span class="k">M.ATK</span><span class="v">${p.matk||0}</span></div>
     <div class="job-stat-row"><span class="k">DEF</span><span class="v">${p.def}</span></div>
     <div class="job-stat-row"><span class="k">M.POW</span><span class="v">${(p.magicPow*100).toFixed(0)}%</span></div>
     <div class="job-stat-row"><span class="k">COST</span><span class="v">${p.cost}/${p.costMax}</span></div>`;
@@ -1924,21 +2063,25 @@ async function doCraft() {
   updateCraftCost();
 }
 
-/* ★ AI生成ダミー — ここをGemini APIに差し替える */
+// アイテム生成（GAS→Gemini経由）
 async function generateItem({ prompt, type, subtype, cost }) {
-  await new Promise(r => setTimeout(r, 800 + Math.random()*600));
   const rarity = rollRarity(S.dungeon.floor);
-  const mul = rarityPowerMul(rarity);
-  const power = Math.floor((cost * 0.6 + Math.random() * 5) * mul);
-  const suffixes = ['の断片','の残滓','の欠片','の記憶','の意志','の鼓動'];
-  const suf = suffixes[Math.floor(Math.random()*suffixes.length)];
-  const name = prompt.slice(0,8) + suf;
+  const mul    = rarityPowerMul(rarity);
+  const power  = Math.floor((cost * 0.6 + Math.random() * 5) * mul);
+
+  const r = await callGAS('geminiItem', { prompt, type, subtype, rarity, power });
+
+  // フォールバック（GAS失敗時）
+  const name   = r?.name   || prompt.slice(0,8) + 'の欠片';
+  const desc   = r?.desc   || `パワー ${power}`;
+  const flavor = r?.flavor || '';
+
   const item = (() => {
-    if (type==='weapon') return { type:'weapon', subtype, name, desc:`${subtype==='sword'?'物理ATK':'魔法威力'} +${power}　${prompt.slice(0,12)}`, power };
-    if (type==='armor')  return { type:'armor',  subtype, name, desc:`防御力 +${power}　${prompt.slice(0,12)}`, power };
-    if (type==='magic')  return { type:'magic',  subtype, name, desc:`${subtypeMagicDesc(subtype)} Lv${Math.floor(power/3)+1}　${prompt.slice(0,10)}`, power, mpCost:Math.ceil(cost*0.6) };
-    if (type==='item' && subtype==='heal_hp') return { type:'item', subtype:'heal_hp', name, desc:`HP +${power*3}を回復`, effect:'heal_hp', value:power*3 };
-    return { type:'item', subtype:'enhance', name, desc:`装備強化素材　効力: ${power}`, effect:'enhance', value:power };
+    if (type==='weapon') return { type:'weapon', subtype, name, desc, flavor, power };
+    if (type==='armor')  return { type:'armor',  subtype, name, desc, flavor, power };
+    if (type==='magic')  return { type:'magic',  subtype, name, desc, flavor, power, mpCost:Math.ceil(cost*0.6) };
+    if (type==='item' && subtype==='heal_hp') return { type:'item', subtype:'heal_hp', name, desc, flavor, effect:'heal_hp', value:power*3 };
+    return { type:'item', subtype:'enhance', name, desc, flavor, effect:'enhance', value:power };
   })();
   item.rarity = rarity;
   return item;
@@ -1968,12 +2111,12 @@ function enterDungeon() {
 // DUNGEON
 // ============================================================
 const enemyPool = [
-  { name:'腐敗せし墓守', icon:'☠', hp:35, atk:8,  weak:['炎','光'], lore:'苔むした鎧の隙間から青白い瘴気が漏れ出している。' },
-  { name:'影喰らいの蝙蝠', icon:'🦇', hp:22, atk:6,  weak:['光','音'], lore:'闇から滲み出るように現れ、無数の翼が空気を切り裂く。' },
-  { name:'骨砕きの鬼',    icon:'👹', hp:55, atk:14, weak:['雷','聖'], lore:'人間の骨で編まれた首飾りを揺らし、地響きと共に立ちはだかる。' },
-  { name:'囁く水鏡',      icon:'🪞', hp:30, atk:10, weak:['炎','凍'], lore:'水面に映るのは、かつての自分の姿。' },
-  { name:'黄金喰らいの蛞蝓',icon:'🐌',hp:45, atk:7,  weak:['塩','炎'], lore:'体表に金貨が埋め込まれ、ぬらりと光っている。' },
-  { name:'深淵の番人',    icon:'👁', hp:80, atk:18, weak:['光','聖'], lore:'六本の腕を持ち、その瞳の奥には星々が渦巻いている。' },
+  { name:'腐敗せし墓守',    icon:'☠',  hp:35, atk:8,  weak:['炎','光'], lore:'苔むした鎧の隙間から青白い瘴気が漏れ出している。' },
+  { name:'影喰らいの蝙蝠', icon:'🦇', hp:22, atk:6,  weak:['光','雷'], lore:'闇から滲み出るように現れ、無数の翼が空気を切り裂く。' },
+  { name:'骨砕きの鬼',     icon:'👹', hp:55, atk:14, weak:['雷','光'], lore:'人間の骨で編まれた首飾りを揺らし、地響きと共に立ちはだかる。' },
+  { name:'囁く水鏡',       icon:'🪞', hp:30, atk:10, weak:['炎','闇'], lore:'水面に映るのは、かつての自分の姿。' },
+  { name:'黄金喰らいの蛞蝓',icon:'🐌',hp:45, atk:7,  weak:['炎','雷'], lore:'体表に金貨が埋め込まれ、ぬらりと光っている。' },
+  { name:'深淵の番人',     icon:'👁', hp:80, atk:18, weak:['光','氷'], lore:'六本の腕を持ち、その瞳の奥には星々が渦巻いている。' },
 ];
 
 function setStage({icon, title, meta, enemy}) {
@@ -2054,8 +2197,9 @@ function nextRoom() {
 }
 
 function combatChoices() {
+  const isStaff = S.equip.weapon?.subtype === 'staff';
   setChoices([
-    { label:'通常攻撃', action:doNormalAttack, meta:'ATTACK' },
+    { label: isStaff ? '魔弾' : '通常攻撃', action:doNormalAttack, meta: isStaff ? 'M.ATK' : 'ATTACK' },
     { label:'魔法', action:showMagicSelect, meta:'CAST' },
     { label:'アイテム', action:showItemSelect, meta:'USE ITEM' },
     { label:'帰還', action:doRetreat, meta:'HP -10' },
@@ -2066,9 +2210,19 @@ function combatChoices() {
 function doNormalAttack() {
   if (S.busy) return;
   lockCombat();
-  const dmg = Math.floor((S.player.atk + Math.random()*4) * 1.0);
+  const isStaff = S.equip.weapon?.subtype === 'staff';
+  let dmg, msg;
+  if (isStaff) {
+    // 魔弾：MATKを参照
+    dmg = Math.floor((S.player.matk + Math.random()*4) * S.player.magicPow);
+    msg = `魔弾を放つ。<span class="dmg"> ${dmg} ダメージ</span>`;
+  } else {
+    // 通常攻撃：ATKを参照
+    dmg = Math.floor(S.player.atk + Math.random()*4);
+    msg = `剣を振るう。<span class="dmg"> ${dmg} ダメージ</span>`;
+  }
   S.enemy.hp -= dmg;
-  caption(`剣を振るう。<span class="dmg"> ${dmg} ダメージ</span>`);
+  caption(msg);
   setStage({ icon:S.enemy.icon, title:S.enemy.name, meta:`HP ${Math.max(0,S.enemy.hp)}/${S.enemy.hpMax}`, enemy:S.enemy });
   flashStage('attack');
   if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 400); return; }
@@ -2334,27 +2488,163 @@ function defeat() {
   setChoices([{ label:'ホームへ', action:() => { S.player.hp=S.player.hpMax; updateAllStats(); goScreen('s-town'); }, meta:'RETURN' }]);
 }
 
-/* ★ 魔法エフェクト生成（ダミー）— Gemini APIに差し替える */
-async function generateSpellEffect({ magic, enemy }) {
-  await new Promise(r => setTimeout(r, 150 + Math.random()*150));
-  const elementMap = {
-    '炎':['炎','焔','火','燃'], '凍':['氷','凍','雪'], '雷':['雷','電','稲妻'],
-    '光':['光','聖','輝'], '闇':['闇','影','深淵'], '音':['音','咆哮'], '塩':['塩'],
-  };
-  let element = '無';
-  for (const [el, kws] of Object.entries(elementMap)) {
-    if (kws.some(k => magic.name.includes(k))) { element = el; break; }
+// ============================================================
+// 属性判定
+// ============================================================
+const ELEMENT_KEYWORDS = {
+  '炎': ['炎','焔','火','燃','灼','紅蓮','業火','爆','ファイア','ほのお','かえん'],
+  '氷': ['氷','凍','雪','霜','吹雪','クリスタル','アイス','こおり','フリーズ','極寒','氷河'],
+  '雷': ['雷','電','稲妻','轟','閃光','サンダー','ライトニング','かみなり','帯電','電撃'],
+  '光': ['光','聖','輝','黄金','陽','ホーリー','神聖','ひかり','白','浄化','神'],
+  '闇': ['闇','影','黒','虚','深淵','カース','シャドウ','暗黒','呪','闇夜','奈落','滅'],
+};
+function detectElement(text) {
+  for (const [el, kws] of Object.entries(ELEMENT_KEYWORDS)) {
+    if (kws.some(k => text.includes(k))) return el;
   }
-  const baseDmg = Math.floor((magic.power||5) * S.player.magicPow + Math.random()*4);
-  const weakHit = enemy.weak.includes(element);
-  const damage = weakHit ? Math.floor(baseDmg * 1.6) : baseDmg;
-  const flavors = {
-    '炎':`紅蓮の炎が${enemy.name}を包む`, '凍':`${enemy.name}が凍りつく`,
-    '雷':`閃光が${enemy.name}を貫く`, '光':`光輝が${enemy.name}を浄化する`,
-    '闇':`闇が${enemy.name}に絡みつく`, '音':`轟音が${enemy.name}を揺さぶる`,
-    '塩':`祓いの塩が${enemy.name}に降る`, '無':`念が${enemy.name}を打つ`,
+  return '無';
+}
+
+// ============================================================
+// スペルエフェクト再生（CSS/SVGアニメーション）
+// ============================================================
+function playSpellEffect(element) {
+  const canvas = document.getElementById('spell-canvas');
+  if (!canvas) return;
+  canvas.innerHTML = '';
+
+  const stage = document.getElementById('stage');
+  // 属性別フラッシュ
+  const flashMap = { '炎':'fire','氷':'ice','雷':'thunder','光':'light','闇':'dark' };
+  const cls = flashMap[element];
+  if (cls) {
+    stage.classList.remove('effect-fire','effect-ice','effect-thunder','effect-light','effect-dark','flash-attack');
+    void stage.offsetWidth;
+    stage.classList.add('effect-' + cls);
+    setTimeout(() => stage.classList.remove('effect-' + cls), 700);
+  } else {
+    flashStage('attack');
+  }
+
+  // 属性別パーティクル生成
+  const generators = {
+    '炎': () => {
+      canvas.innerHTML = '<div class="sp-fire-core"></div><div class="sp-fire-ring"></div>';
+      spawnParticles(canvas, 18, {
+        colors: ['#ff2200','#ff6600','#ff8800','#ffcc00'],
+        size:[4,10], speed:80, life:600
+      });
+    },
+    '氷': () => {
+      canvas.innerHTML = '<div class="sp-ice-core"></div>';
+      for(let i=0;i<8;i++){
+        const s = document.createElement('div');
+        s.className='sp-ice-shard';
+        s.style.setProperty('--rot', (i*45)+'deg');
+        canvas.appendChild(s);
+      }
+      spawnParticles(canvas, 14, { colors:['#fff','#88ddff','#4dd9ff'], size:[3,7], speed:70, life:700 });
+    },
+    '雷': () => {
+      canvas.innerHTML = '<div class="sp-thunder-core"></div>';
+      for(let i=0;i<6;i++){
+        const b = document.createElement('div');
+        b.className='sp-thunder-bolt';
+        b.style.setProperty('--rot',(i*60)+'deg');
+        b.style.setProperty('--ty','-50px');
+        canvas.appendChild(b);
+      }
+      spawnParticles(canvas, 16, { colors:['#fff','#ffd97a','#4dd9ff'], size:[2,6], speed:100, life:500 });
+    },
+    '光': () => {
+      canvas.innerHTML = '<div class="sp-light-core"></div>';
+      for(let i=0;i<8;i++){
+        const r = document.createElement('div');
+        r.className='sp-light-ray';
+        r.style.setProperty('--rot',(i*45)+'deg');
+        canvas.appendChild(r);
+      }
+      spawnParticles(canvas, 20, { colors:['#fff','#ffeeaa','#ffd97a'], size:[3,8], speed:90, life:800 });
+    },
+    '闇': () => {
+      canvas.innerHTML = '<div class="sp-dark-core"></div>';
+      for(let i=0;i<12;i++){
+        const t = document.createElement('div');
+        t.className='sp-dark-trail';
+        const angle = (i/12)*Math.PI*2;
+        const dist = 40+Math.random()*40;
+        t.style.setProperty('--tx', Math.cos(angle)*dist+'px');
+        t.style.setProperty('--ty', Math.sin(angle)*dist+'px');
+        t.style.animationDelay = (i*0.05)+'s';
+        canvas.appendChild(t);
+      }
+      spawnParticles(canvas, 12, { colors:['#9933ff','#6600cc','#cc66ff'], size:[4,9], speed:60, life:900 });
+    },
   };
-  return { damage, element, weakHit, flavor: flavors[element] };
+
+  const gen = generators[element];
+  if (gen) gen();
+  else {
+    // 無属性：シアンパーティクル
+    spawnParticles(canvas, 12, { colors:['#4dd9ff','#b04dff'], size:[3,7], speed:70, life:600 });
+  }
+
+  // 一定時間後にクリア
+  setTimeout(() => { if(canvas) canvas.innerHTML=''; }, 1000);
+}
+
+function spawnParticles(parent, count, {colors, size, speed, life}) {
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'sp-particle';
+    const angle = Math.random()*Math.PI*2;
+    const dist  = speed * (0.5 + Math.random());
+    const s     = size[0] + Math.random()*(size[1]-size[0]);
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    p.style.cssText = `
+      left:calc(50% - ${s/2}px); top:calc(50% - ${s/2}px);
+      width:${s}px; height:${s}px;
+      background:${color};
+      box-shadow:0 0 ${s}px ${color};
+      --tx:${Math.cos(angle)*dist}px; --ty:${Math.sin(angle)*dist}px;
+      animation-duration:${life*(0.7+Math.random()*0.6)}ms;
+      animation-delay:${Math.random()*0.1}s;
+    `;
+    parent.appendChild(p);
+  }
+}
+
+// 魔法エフェクト生成（GAS→Gemini経由）
+async function generateSpellEffect({ magic, enemy }) {
+  const element = detectElement(magic.name + (magic.desc||''));
+  const baseDmg = Math.floor((S.player.matk||5) * S.player.magicPow + Math.random()*4);
+  const weakHit = enemy.weak.includes(element);
+  const damage  = weakHit ? Math.floor(baseDmg * 1.6) : baseDmg;
+
+  // エフェクトは即時再生（GAS待たない）
+  playSpellEffect(element);
+
+  // GAS経由でGeminiに戦闘描写を生成させる（非同期・失敗しても続行）
+  const r = await callGAS('geminiSpell', {
+    magicName: magic.name,
+    magicDesc: magic.desc || '',
+    element,
+    enemyName: enemy.name,
+    damage,
+    weakHit,
+  });
+
+  const defaultFlavors = {
+    '炎':`紅蓮の炎が${enemy.name}を包む`,
+    '氷':`${enemy.name}が極寒の結晶に閉じ込められる`,
+    '雷':`閃光が${enemy.name}を貫く`,
+    '光':`光輝が${enemy.name}を浄化する`,
+    '闇':`深淵の闇が${enemy.name}に絡みつく`,
+    '無':`念が${enemy.name}を打つ`,
+  };
+  const flavor = r?.flavor || defaultFlavors[element] || defaultFlavors['無'];
+
+  return { damage, element, weakHit, flavor };
 }
 
 async function syncFloor(floor) {
