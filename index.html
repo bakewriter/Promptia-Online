@@ -742,6 +742,34 @@ body::after{
 .stage::before{content:'';position:absolute;width:220px;height:220px;border:1px solid var(--border-mystic);border-radius:50%;opacity:.3;animation:rotateSlow 40s linear infinite;}
 .stage::after{content:'';position:absolute;width:160px;height:160px;border:1px dashed var(--neon-purple);border-radius:50%;opacity:.2;animation:rotateSlow 30s linear infinite reverse;}
 .stage-content{position:relative;z-index:2;text-align:center;padding:16px;width:100%;}
+/* 立ち絵（stage下部オーバーレイ） */
+.stage-chara{
+  position:absolute;
+  bottom:0;left:0;
+  z-index:3;
+  display:flex;align-items:flex-end;
+  padding:0 8px 4px;
+  pointer-events:none;
+}
+.stage-chara-inner{
+  font-size:52px;
+  filter:drop-shadow(0 0 14px var(--glow-purple));
+  animation:float 3s ease-in-out infinite;
+  line-height:1;
+}
+.stage-chara.warrior .stage-chara-inner{
+  filter:drop-shadow(0 2px 16px rgba(255,85,119,.7));
+}
+.stage-chara.mage .stage-chara-inner{
+  filter:drop-shadow(0 2px 16px rgba(77,217,255,.7));
+}
+.stage-chara.danger .stage-chara-inner{
+  animation:float 3s ease-in-out infinite, charaHpDanger 1s ease-in-out infinite;
+}
+@keyframes charaHpDanger{
+  0%,100%{filter:drop-shadow(0 0 16px rgba(255,34,0,.4));}
+  50%{filter:drop-shadow(0 0 28px rgba(255,34,0,1));}
+}
 .stage-icon{font-size:60px;margin-bottom:6px;filter:drop-shadow(0 0 18px var(--glow-purple));animation:float 3s ease-in-out infinite;}
 .stage-title{font-family:'Cinzel',serif;font-size:17px;letter-spacing:.2em;color:var(--neon-blue);text-shadow:0 0 10px var(--glow-blue);margin-bottom:6px;}
 .stage-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.12em;}
@@ -805,7 +833,200 @@ body::after{
 }
 .combat-item-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
 
-/* ===== SPELL EFFECTS ===== */
+/* ===== DUNGEON STATUS PANEL（4分割） ===== */
+.dungeon-status{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:auto auto;
+  border:1px solid var(--border-mystic);
+  border-top:none;
+  background:rgba(0,4,16,.9);
+  flex-shrink:0;
+  position:relative;
+}
+/* 中央の十字線 */
+.dungeon-status::before{
+  content:'';position:absolute;
+  top:0;bottom:0;left:50%;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(77,217,255,.2),transparent);
+  pointer-events:none;z-index:0;
+}
+.dungeon-status::after{
+  content:'';position:absolute;
+  left:0;right:0;top:50%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(77,217,255,.2),transparent);
+  pointer-events:none;z-index:0;
+}
+
+/* 左上：立ち絵 */
+.ds-portrait{
+  grid-column:1;grid-row:1;
+  display:flex;align-items:center;justify-content:center;
+  min-height:72px;
+  border-right:1px solid rgba(77,217,255,.1);
+  border-bottom:1px solid rgba(77,217,255,.1);
+  position:relative;overflow:hidden;
+}
+.ds-portrait-inner{
+  font-size:44px;
+  filter:drop-shadow(0 0 12px var(--glow-purple));
+  animation:float 3s ease-in-out infinite;
+  position:relative;z-index:1;
+}
+/* ジョブ別の立ち絵背景グロウ */
+.ds-portrait.warrior::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center bottom,rgba(255,85,119,.15),transparent 70%);
+}
+.ds-portrait.mage::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center bottom,rgba(77,217,255,.15),transparent 70%);
+}
+
+/* 右上：HP/MPバー */
+.ds-bars{
+  grid-column:2;grid-row:1;
+  display:flex;flex-direction:column;justify-content:center;gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid rgba(77,217,255,.1);
+}
+.ds-bar-row{ display:flex;flex-direction:column;gap:4px; }
+.ds-bar-label{
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.ds-bar-label .name{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:rgba(77,217,255,.5);letter-spacing:.15em;
+}
+.ds-bar-label .hp-val{ font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--hp-color); }
+.ds-bar-label .mp-val{ font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mp-color); }
+.ds-bar-track{
+  height:6px;
+  background:rgba(0,0,0,.5);
+  border:1px solid rgba(77,217,255,.1);
+  overflow:hidden;position:relative;
+}
+.ds-bar-fill{
+  height:100%;
+  transition:width .4s ease-out;
+  position:relative;
+}
+.ds-bar-fill.hp{
+  background:linear-gradient(90deg,#ff3355,#ff7799);
+  box-shadow:0 0 6px var(--hp-color);
+}
+.ds-bar-fill.mp{
+  background:linear-gradient(90deg,#0088ff,#4dd9ff);
+  box-shadow:0 0 6px var(--mp-color);
+}
+/* HP少ない時は点滅 */
+.ds-bar-fill.hp.danger{ animation:hpDanger .8s ease-in-out infinite; }
+@keyframes hpDanger{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* 左下：職業スキル */
+.ds-equip{
+  grid-column:1;grid-row:2;
+  padding:8px 10px;
+  border-right:1px solid rgba(77,217,255,.1);
+  display:flex;flex-direction:column;gap:3px;
+  overflow:hidden;
+}
+.ds-skill-title{
+  font-family:'JetBrains Mono',monospace;font-size:7px;
+  color:rgba(77,217,255,.3);letter-spacing:.2em;margin-bottom:3px;
+}
+.ds-skill-item{
+  display:flex;align-items:flex-start;gap:5px;
+  padding:3px 0;
+}
+.ds-skill-item .sk-icon{ font-size:11px;width:14px;flex-shrink:0; }
+.ds-skill-item .sk-info{ display:flex;flex-direction:column;gap:1px;min-width:0; }
+.ds-skill-item .sk-name{ font-size:10px;color:var(--neon-purple);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.ds-skill-item .sk-desc{ font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(77,217,255,.35);line-height:1.3; }
+
+/* 右下：装備魔法（タップで直接発動） */
+.ds-magics{
+  grid-column:2;grid-row:2;
+  padding:6px 8px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.ds-magic-item{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 8px;
+  background:rgba(176,77,255,.06);
+  border:1px solid rgba(176,77,255,.12);
+  cursor:pointer;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.ds-magic-item:hover:not(.disabled){border-color:var(--neon-purple);background:rgba(176,77,255,.2);box-shadow:0 0 8px var(--glow-purple);}
+.ds-magic-item.disabled{opacity:.35;cursor:not-allowed;}
+.ds-magic-item.casting{border-color:var(--neon-blue);animation:magicPulse .4s ease-out;}
+@keyframes magicPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px var(--neon-blue)}}
+.ds-magic-item .mg-num{ font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(176,77,255,.5);flex-shrink:0; }
+.ds-magic-item .mg-name{ font-size:10px;color:var(--neon-purple);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.ds-magic-item .mg-mp{ font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mp-color);flex-shrink:0; }
+.ds-magic-empty{ font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(77,217,255,.2);font-style:italic;padding:3px 6px; }
+
+/* マルチ時の立ち絵＋バー横並び */
+.dungeon-status.multi-mode{
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  grid-template-rows:auto auto;
+}
+.dungeon-status.multi-mode .ds-portrait{ min-height:54px; }
+.ds-member-unit{
+  display:flex;flex-direction:column;
+  border-right:1px solid rgba(77,217,255,.08);
+  padding:6px 8px;
+  gap:4px;
+}
+.ds-member-unit:last-child{ border-right:none; }
+.ds-member-unit .mu-name{
+  font-family:'JetBrains Mono',monospace;font-size:8px;
+  color:rgba(77,217,255,.5);letter-spacing:.05em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ds-member-unit.is-you .mu-name{ color:var(--neon-blue); }
+.member-card{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  background:rgba(0,8,28,.7);
+  border:1px solid rgba(77,217,255,.15);
+  border-left:2px solid rgba(77,217,255,.3);
+}
+.member-card.is-you{border-left-color:var(--neon-blue);}
+.member-card.host{border-left-color:var(--gold);}
+.member-card .m-name{font-size:12px;color:var(--text-main);flex:1;}
+.member-card .m-role{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim);}
+.member-card .m-ready{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  padding:2px 6px;border:1px solid rgba(77,217,255,.3);color:rgba(77,217,255,.5);
+}
+.member-card .m-ready.done{
+  border-color:var(--cost-color);color:var(--cost-color);
+  text-shadow:0 0 6px var(--cost-color);
+}
+.party-pill{
+  padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:9px;
+  border:1px solid rgba(77,217,255,.2);background:rgba(0,8,28,.6);
+  display:flex;align-items:center;gap:4px;
+}
+.party-pill.acted{border-color:var(--cost-color);color:var(--cost-color);}
+.md-waiting-overlay{
+  position:absolute;inset:0;z-index:20;
+  background:rgba(0,4,16,.85);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:var(--neon-blue);letter-spacing:.2em;
+  backdrop-filter:blur(2px);
+}
+.result-line{
+  padding:4px 0;font-size:12px;border-bottom:1px solid rgba(77,217,255,.08);
+}
+.result-line .r-name{color:var(--neon-purple);font-family:'Cinzel',serif;font-size:11px;}
+.result-line .r-dmg{color:var(--neon-blue);font-weight:700;}
+.result-line .r-sys{color:var(--text-dim);font-style:italic;font-size:11px;}
 .spell-canvas{
   position:absolute;inset:0;z-index:10;
   pointer-events:none;overflow:hidden;
@@ -1006,6 +1227,84 @@ body::after{
   0%  {transform:translate(0,0) scale(2);opacity:1;}
   100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0;}
 }
+
+/* ===== DUNGEON STATUS PANEL（4分割） ===== */
+.dungeon-status{
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  height:140px;flex-shrink:0;
+  border:1px solid var(--border-mystic);border-top:none;
+  background:rgba(0,4,16,.9);position:relative;overflow:hidden;
+}
+.dungeon-status::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;
+  background:rgba(77,217,255,.12);z-index:1;pointer-events:none;
+}
+.dungeon-status::after{
+  content:'';position:absolute;top:50%;left:0;right:0;height:1px;
+  background:rgba(77,217,255,.12);z-index:1;pointer-events:none;
+}
+/* 立ち絵（左上） */
+.ds-portrait{
+  grid-column:1;grid-row:1;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.ds-portrait::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(176,77,255,.12) 0%,transparent 70%);
+}
+.ds-portrait-inner{
+  font-size:50px;filter:drop-shadow(0 0 12px var(--glow-purple));
+  animation:float 3s ease-in-out infinite;position:relative;z-index:1;
+}
+/* HP・MPバー（右上） */
+.ds-bars{
+  grid-column:2;grid-row:1;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:8px;padding:10px 12px;
+}
+.ds-bar-row{display:flex;flex-direction:column;gap:3px;}
+.ds-bar-label{
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;
+}
+.ds-bar-label .name{color:var(--text-dim);}
+.ds-bar-label .val{font-size:10px;font-weight:700;}
+.ds-bar-label .hp-val{color:#4cff88;}
+.ds-bar-label .mp-val{color:var(--neon-blue);}
+.ds-bar-track{
+  height:5px;background:rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.08);overflow:hidden;border-radius:2px;
+}
+.ds-bar-fill{height:100%;border-radius:2px;transition:width .4s ease-out;}
+.ds-bar-fill.hp{background:linear-gradient(90deg,#2ecc71,#4cff88);box-shadow:0 0 6px rgba(76,255,136,.5);}
+.ds-bar-fill.mp{background:linear-gradient(90deg,#0088ff,var(--neon-blue));box-shadow:0 0 6px rgba(77,217,255,.5);}
+/* 装備（左下） */
+.ds-equip{
+  grid-column:1;grid-row:2;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:3px;padding:8px 10px;overflow:hidden;
+}
+.ds-equip-item{display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;}
+.ds-equip-item .ei-icon{font-size:12px;flex-shrink:0;}
+.ds-equip-item .ei-name{font-size:10px;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;}
+.ds-equip-item .ei-empty{color:rgba(77,217,255,.2);font-size:9px;font-family:'JetBrains Mono',monospace;}
+.ds-equip-item.has-item .ei-name{color:var(--neon-blue);}
+/* 魔法（右下） */
+.ds-magics{
+  grid-column:2;grid-row:2;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:4px;padding:8px 10px;
+}
+.ds-magic-item{display:flex;align-items:center;gap:4px;}
+.ds-magic-label{
+  font-family:'JetBrains Mono',monospace;font-size:8px;
+  color:rgba(176,77,255,.6);flex-shrink:0;width:26px;
+}
+.ds-magic-name{font-size:10px;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.ds-magic-name.empty{color:rgba(77,217,255,.2);font-family:'JetBrains Mono',monospace;font-size:9px;}
+.ds-magic-mp{flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mp-color);opacity:.7;}
+
 /* ステージフラッシュ（物理斬撃） */
 .stage.flash-slash{animation:flashSlash .35s ease-out;}
 @keyframes flashSlash{
@@ -1189,6 +1488,100 @@ body::after{
   </div>
 </div>
 
+<!-- ===== MULTI MODAL ===== -->
+<div class="modal-overlay" id="multi-modal">
+  <div class="modal-box" style="max-width:360px;">
+    <div class="modal-title">MULTI DUNGEON</div>
+    <div class="modal-body" style="margin-bottom:16px;">最大4人で同じダンジョンに潜れる。<br>全員の行動が揃ったら一斉処理。</div>
+
+    <!-- 部屋作成 -->
+    <div style="margin-bottom:12px;">
+      <button class="modal-ok" style="width:100%;margin-bottom:6px;" onclick="doCreateRoom()">部屋を作る（ホスト）</button>
+    </div>
+
+    <!-- 部屋参加 -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <input id="join-key-input" type="text" maxlength="4"
+        style="flex:1;padding:9px 10px;background:rgba(0,6,20,.8);border:1px solid rgba(77,217,255,.2);color:var(--neon-blue);font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.3em;outline:none;text-align:center;"
+        placeholder="XXXX">
+      <button class="modal-ok" onclick="doJoinRoom()">参加</button>
+    </div>
+
+    <div class="login-msg" id="multi-msg" style="margin-bottom:10px;"></div>
+    <button class="modal-cancel" style="width:100%;" onclick="closeModal('multi-modal')">CANCEL</button>
+  </div>
+</div>
+
+<!-- ===== MULTI LOBBY（待機室） ===== -->
+<div class="screen hidden" id="s-multi-lobby">
+  <div class="hdr">
+    <div class="title-area">
+      <img src="logo.png" class="logo">
+      <div>
+        <div class="game-title">MULTI</div>
+        <div class="user-tag">LOBBY</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <button class="icon-btn" onclick="leaveMulti()">退出</button>
+    </div>
+  </div>
+
+  <div class="town-stage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+    <div style="font-family:'Cinzel',serif;font-size:13px;color:var(--text-dim);letter-spacing:.2em;">ROOM KEY</div>
+    <div id="lobby-key" style="font-family:'JetBrains Mono',monospace;font-size:40px;color:var(--neon-blue);letter-spacing:.4em;text-shadow:0 0 20px var(--neon-blue);">----</div>
+    <div id="lobby-members" style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:300px;"></div>
+    <div id="lobby-status" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);">メンバーを待っています...</div>
+  </div>
+
+  <div style="display:flex;gap:8px;">
+    <button class="town-btn" id="lobby-start-btn" onclick="startMultiDungeon()" style="flex:1;display:none;">
+      ダンジョンへ<span class="btn-sub">HOST ONLY</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== MULTI DUNGEON ===== -->
+<div class="screen hidden" id="s-multi-dungeon">
+  <div class="hdr">
+    <div class="title-area">
+      <img src="logo.png" class="logo">
+      <div>
+        <div class="game-title">MULTI</div>
+        <div class="user-tag" id="md-room-info">ROOM ----</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-btns">
+        <button class="icon-btn" onclick="openInventory()">🎒 BAG</button>
+        <button class="icon-btn" onclick="leaveMulti()">退出</button>
+      </div>
+      <div class="stats-row">
+        <span class="spl fl"><span class="lbl">F</span><span class="val" id="md-fl">1</span></span>
+        <span class="spl hp"><span class="lbl">パーティHP</span><span class="val" id="md-php">400</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- パーティメンバー一覧 -->
+  <div id="md-party-bar" style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;"></div>
+
+  <!-- 演出ステージ（ソロ流用） -->
+  <main style="flex:1;display:flex;flex-direction:column;min-height:0;">
+    <div class="stage" id="md-stage">
+      <div class="spell-canvas" id="md-spell-canvas"></div>
+      <div class="stage-content" id="md-stage-content">
+        <div class="stage-icon">⚔</div>
+        <div class="stage-title">MULTI DUNGEON</div>
+      </div>
+    </div>
+    <div class="caption" id="md-caption">パーティで挑む。</div>
+  </main>
+
+  <!-- アクション選択 -->
+  <div id="md-choices" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+</div>
+
 <!-- ===== LOGOUT MODAL ===== -->
 <div class="modal-overlay" id="logout-modal">
   <div class="modal-box">
@@ -1324,9 +1717,9 @@ body::after{
   </div>
   <div class="town-caption" id="town-caption">ホームタウンへようこそ。次の冒険に備えよ。</div>
   <div class="town-menu">
-    <button class="town-btn" onclick="enterDungeon()">ダンジョン<span class="btn-sub">DUNGEON · 潜る</span></button>
+    <button class="town-btn" onclick="enterDungeon()">ソロ<span class="btn-sub">SOLO · 一人で潜る</span></button>
+    <button class="town-btn" onclick="openMultiModal()">マルチ<span class="btn-sub">MULTI · 最大4人</span></button>
     <button class="town-btn" onclick="goScreen('s-craft')">生成<span class="btn-sub">CRAFT · コスト消費</span></button>
-    <button class="town-btn" onclick="showShop()">商店<span class="btn-sub">SHOP · 売買</span></button>
     <button class="town-btn" onclick="openInventory()">アイテム<span class="btn-sub">ITEM · 所持品</span></button>
   </div>
 </div>
@@ -1388,6 +1781,7 @@ body::after{
   <main style="flex:1;display:flex;flex-direction:column;min-height:0;">
     <div class="stage" id="stage">
       <div class="spell-canvas" id="spell-canvas"></div>
+      <div class="stage-chara" id="stage-chara"><div class="stage-chara-inner" id="stage-chara-icon">⚔</div></div>
       <div class="stage-content" id="stage-content">
         <div class="stage-icon">✦</div>
         <div class="stage-title">PROMPTIA</div>
@@ -1396,6 +1790,42 @@ body::after{
     </div>
     <div class="caption" id="caption">深淵へ続く階段が口を開けている。</div>
   </main>
+
+  <!-- ステータスパネル（4分割） -->
+  <div class="dungeon-status" id="dungeon-status">
+    <!-- 左上：立ち絵 -->
+    <div class="ds-portrait" id="ds-portrait-wrap">
+      <div class="ds-portrait-inner" id="ds-portrait">⚔</div>
+    </div>
+    <!-- 右上：HP・MP -->
+    <div class="ds-bars">
+      <div class="ds-bar-row">
+        <div class="ds-bar-label">
+          <span class="name">HP</span>
+          <span class="val hp-val" id="ds-hp-val">100/100</span>
+        </div>
+        <div class="ds-bar-track">
+          <div class="ds-bar-fill hp" id="ds-hp-bar" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="ds-bar-row">
+        <div class="ds-bar-label">
+          <span class="name">MP</span>
+          <span class="val mp-val" id="ds-mp-val">50/50</span>
+        </div>
+        <div class="ds-bar-track">
+          <div class="ds-bar-fill mp" id="ds-mp-bar" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+    <!-- 左下：職業スキル -->
+    <div class="ds-equip" id="ds-equip">
+      <div class="ds-skill-title">— SKILLS —</div>
+    </div>
+    <!-- 右下：装備魔法（タップで直接発動） -->
+    <div class="ds-magics" id="ds-magics"></div>
+  </div>
+
   <div class="choices" id="choices"></div>
 </div>
 
@@ -1631,6 +2061,7 @@ function updateAllStats() {
   document.getElementById('c-ct').textContent = p.cost+'/'+p.costMax;
   document.getElementById('c-mp').textContent = p.mp;
   const gd=document.getElementById('inv-gold-disp'); if(gd) gd.textContent=p.gold;
+  updateDungeonStatus();
 }
 function recalcStats() {
   const p = S.player;
@@ -1725,8 +2156,110 @@ function updateCostTimer() {
 }
 
 // ============================================================
-// JOB PANEL
+// DUNGEON STATUS PANEL 更新
 // ============================================================
+function updateDungeonStatus() {
+  const p = S.player;
+  const job = JOBS[S.job] || JOBS.warrior;
+  const isMulti = S.currentScreen === 's-multi-dungeon';
+
+  // ソロ用ステータスパネルのみ更新
+  if (isMulti) {
+    renderMultiStatusPanel();
+    return;
+  }
+
+  // 立ち絵（stage下部）
+  const charaWrap = document.getElementById('stage-chara');
+  const charaIcon = document.getElementById('stage-chara-icon');
+  const portraitWrap = document.getElementById('ds-portrait-wrap');
+  const portrait = document.getElementById('ds-portrait');
+  const hpPct0 = (p.hp / p.hpMax) * 100;
+  if (charaIcon) charaIcon.textContent = job.icon;
+  if (charaWrap) {
+    charaWrap.className = 'stage-chara ' + S.job + (hpPct0 < 25 ? ' danger' : '');
+  }
+  // 旧立ち絵エリアも更新
+  if (portrait) portrait.textContent = job.icon;
+  if (portraitWrap) portraitWrap.className = 'ds-portrait ' + S.job;
+
+  // HPバー
+  const hpPct = Math.max(0, Math.min(100, (p.hp / p.hpMax) * 100));
+  const hpBar = document.getElementById('ds-hp-bar');
+  const hpVal = document.getElementById('ds-hp-val');
+  if (hpBar) {
+    hpBar.style.width = hpPct + '%';
+    hpBar.classList.toggle('danger', hpPct < 25);
+    if (hpPct < 25) {
+      hpBar.style.background = 'linear-gradient(90deg,#ff2200,#ff5544)';
+      hpBar.style.boxShadow = '0 0 8px rgba(255,34,0,.8)';
+    } else if (hpPct < 50) {
+      hpBar.style.background = 'linear-gradient(90deg,#ffaa00,#ffcc44)';
+      hpBar.style.boxShadow = '0 0 6px rgba(255,170,0,.5)';
+    } else {
+      hpBar.style.background = '';
+      hpBar.style.boxShadow = '';
+    }
+  }
+  if (hpVal) hpVal.textContent = p.hp + '/' + p.hpMax;
+
+  // MPバー
+  const mpPct = Math.max(0, Math.min(100, (p.mp / p.mpMax) * 100));
+  const mpBar = document.getElementById('ds-mp-bar');
+  const mpVal = document.getElementById('ds-mp-val');
+  if (mpBar) mpBar.style.width = mpPct + '%';
+  if (mpVal) mpVal.textContent = p.mp + '/' + p.mpMax;
+
+  // 左下：職業スキル
+  const equipEl = document.getElementById('ds-equip');
+  if (equipEl) {
+    const skills = job.skills || [];
+    equipEl.innerHTML = `<div class="ds-skill-title">${job.icon} ${job.name} SKILLS</div>` +
+      skills.map(sk => `
+        <div class="ds-skill-item">
+          <span class="sk-icon">✦</span>
+          <div class="sk-info">
+            <span class="sk-name">${sk.name}</span>
+            <span class="sk-desc">${sk.desc}</span>
+          </div>
+        </div>
+      `).join('');
+  }
+
+  // 右下：装備魔法（タップで直接発動）
+  const magicsEl = document.getElementById('ds-magics');
+  if (magicsEl) {
+    magicsEl.innerHTML = ['magic1','magic2','magic3'].map((slot, i) => {
+      const m = S.equip[slot];
+      if (!m) return `<div class="ds-magic-empty">魔法${i+1} ─ 未装備</div>`;
+      const noMp = (m.mpCost||10) > p.mp;
+      const busy = S.busy;
+      return `<div class="ds-magic-item${(noMp||busy)?' disabled':''}"
+        onclick="${(noMp||busy)?'':` castMagicFromPanel(${i})`}">
+        <span class="mg-num">魔法${i+1}</span>
+        <span class="mg-name">${m.name}</span>
+        <span class="mg-mp">MP${m.mpCost||10}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// 魔法パネルから直接発動
+async function castMagicFromPanel(idx) {
+  if (S.busy) return;
+  if (S.phase !== 'combat' && S.dungeon.inDungeon) {
+    // 戦闘中のみ発動
+    await castEquippedMagic(idx);
+  }
+}
+
+// マルチ用：メンバー横並びステータス
+function renderMultiStatusPanel() {
+  // マルチ画面には専用のmd-party-barがあるので
+  // dungeon-statusパネルは非表示にする
+  const ds = document.getElementById('dungeon-status');
+  if (ds) ds.style.display = 'none';
+}
 function openJobPanel() {
   if (!S.user) return;
   renderJobPanel();
@@ -2188,6 +2721,9 @@ function enterDungeon() {
   S.dungeon.inDungeon = true;
   S.dungeon.room = 1;
   S.dungeon.totalRooms = 3 + Math.floor((S.dungeon.floor - 1) / 2);
+  // ステータスパネル表示
+  const ds = document.getElementById('dungeon-status');
+  if (ds) ds.style.display = '';
   goScreen('s-dungeon');
   startDungeonFloor();
 }
@@ -2788,8 +3324,351 @@ async function syncFloor(floor) {
 }
 
 // ============================================================
-// ENTER KEY
+// MULTI SYSTEM
 // ============================================================
+const M = {
+  room: null,
+  pollTimer: null,
+  actionSubmitted: false,
+};
+
+function openMultiModal() {
+  document.getElementById('multi-msg').textContent = '';
+  document.getElementById('join-key-input').value = '';
+  openModal('multi-modal');
+}
+function setMultiMsg(t, type) {
+  const el = document.getElementById('multi-msg');
+  el.textContent = t;
+  el.className = 'login-msg' + (type ? ' ' + type : '');
+}
+
+// 部屋作成
+async function doCreateRoom() {
+  setMultiMsg('作成中...', '');
+  const r = await callGAS('createRoom', {
+    userId: S.user.id, userName: S.user.userName,
+    floor: S.dungeon.floor,
+  });
+  if (!r?.ok) { setMultiMsg(r?.error || '失敗', 'error'); return; }
+  M.room = r.room;
+  closeModal('multi-modal');
+  enterLobby();
+}
+
+// 部屋参加
+async function doJoinRoom() {
+  const key = document.getElementById('join-key-input').value.trim();
+  if (key.length !== 4) { setMultiMsg('4桁のキーを入力してください', 'error'); return; }
+  setMultiMsg('参加中...', '');
+  const r = await callGAS('joinRoom', {
+    userId: S.user.id, userName: S.user.userName, roomKey: key,
+  });
+  if (!r?.ok) { setMultiMsg(r?.error || '失敗', 'error'); return; }
+  M.room = r.room;
+  closeModal('multi-modal');
+  enterLobby();
+}
+
+// ロビーに入る
+function enterLobby() {
+  goScreen('s-multi-lobby');
+  document.getElementById('lobby-key').textContent = M.room.roomKey;
+  renderLobbyMembers();
+  // ホストのみ「開始」ボタンを表示
+  const isHost = M.room.hostId === S.user.id;
+  document.getElementById('lobby-start-btn').style.display = isHost ? 'block' : 'none';
+  startPolling('lobby');
+}
+
+function renderLobbyMembers() {
+  const el = document.getElementById('lobby-members');
+  if (!M.room) return;
+  el.innerHTML = M.room.members.map(m => `
+    <div class="member-card${m.id===S.user.id?' is-you':''}${m.id===M.room.hostId?' host':''}">
+      <span class="m-name">${m.name}${m.id===S.user.id?' (あなた)':''}</span>
+      <span class="m-role">${m.id===M.room.hostId?'HOST':'GUEST'}</span>
+    </div>
+  `).join('');
+  document.getElementById('lobby-status').textContent =
+    `${M.room.members.length}/4 人参加中`;
+  // ホストのみ開始ボタン表示
+  const isHost = M.room.hostId === S.user.id;
+  document.getElementById('lobby-start-btn').style.display =
+    isHost && M.room.members.length >= 1 ? 'block' : 'none';
+}
+
+// ダンジョン開始（ホストのみ）
+async function startMultiDungeon() {
+  if (!M.room) return;
+  enterMultiDungeon();
+}
+
+// マルチダンジョン画面へ
+function enterMultiDungeon() {
+  goScreen('s-multi-dungeon');
+  stopPolling();
+  document.getElementById('md-room-info').textContent = 'ROOM ' + M.room.roomKey;
+  document.getElementById('md-fl').textContent = M.room.floor;
+  document.getElementById('md-php').textContent = M.room.partyHp + '/' + M.room.partyHpMax;
+  renderPartyBar();
+  renderMultiStage();
+  setMultiChoices();
+  M.actionSubmitted = false;
+  startPolling('dungeon');
+}
+
+function renderPartyBar() {
+  const el = document.getElementById('md-party-bar');
+  if (!M.room) return;
+  el.innerHTML = M.room.members.map(m => {
+    const acted = M.room.actions && M.room.actions[m.id];
+    return `<div class="party-pill${acted?' acted':''}">
+      ${m.name === S.user.userName ? '★ ' : ''}${m.name}
+      ${acted ? ' ✓' : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderMultiStage() {
+  if (!M.room?.enemyState) return;
+  const e = M.room.enemyState;
+  const pct = Math.max(0, e.hp / e.hpMax * 100);
+  document.getElementById('md-stage-content').innerHTML = `
+    <div class="stage-icon">${e.icon||'👹'}</div>
+    <div class="stage-title">${e.name}</div>
+    <div class="stage-meta">ROOM ${M.room.room}/${M.room.totalRooms} · 弱点: ${(e.weak||[]).join('・')}</div>
+    <div class="enemy-hp-bar"><div class="enemy-hp-fill" style="width:${pct}%"></div></div>
+  `;
+}
+
+// アクション選択UI
+function setMultiChoices() {
+  const el = document.getElementById('md-choices');
+  if (M.actionSubmitted) {
+    el.innerHTML = `<div class="md-waiting-overlay" style="position:relative;grid-column:1/-1;padding:20px;border:1px solid rgba(77,217,255,.2);">他のメンバーを待っています...</div>`;
+    return;
+  }
+  const isStaff = S.equip.weapon?.subtype === 'staff';
+  el.innerHTML = '';
+  const choices = [
+    { label: isStaff ? '魔弾' : '通常攻撃', meta: isStaff ? 'M.ATK' : 'ATTACK', fn: () => submitMultiAction('attack') },
+    { label: '魔法', meta: 'CAST', fn: () => submitMultiMagic() },
+    { label: 'アイテム', meta: 'ITEM', fn: () => submitMultiItem() },
+    { label: '帰還', meta: 'RETREAT', fn: () => submitMultiAction('retreat') },
+  ];
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `${c.label}<span class="meta">${c.meta}</span>`;
+    btn.onclick = c.fn;
+    el.appendChild(btn);
+  });
+}
+
+// アクション送信
+async function submitMultiAction(type, extra = {}) {
+  if (M.actionSubmitted) return;
+  M.actionSubmitted = true;
+  const p = S.player;
+  const action = {
+    type,
+    atk: p.atk, matk: p.matk || 5, magicPow: p.magicPow,
+    ...extra,
+  };
+  setMultiChoices(); // 待機表示に切り替え
+  await callGAS('submitAction', { roomKey: M.room.roomKey, userId: S.user.id, action });
+}
+
+async function submitMultiMagic() {
+  const magics = ['magic1','magic2','magic3'].map(s => S.equip[s]).filter(Boolean);
+  if (magics.length === 0) {
+    document.getElementById('md-caption').innerHTML = '<span class="sys">魔法が装備されていません</span>';
+    return;
+  }
+  // 魔法選択UI
+  const el = document.getElementById('md-choices');
+  el.innerHTML = `
+    <div class="magic-select" style="grid-column:1/-1">
+      <div class="magic-select-title">— 魔法を選択 —</div>
+      <div class="magic-list">
+        ${magics.map((m,i)=>`
+          <button class="magic-btn" onclick="submitMultiAction('magic',{magicName:'${m.name}',magicDesc:'${m.desc||''}',element:'${detectElement(m.name+(m.desc||''))}',mpCost:${m.mpCost||10}})">
+            ${m.name}<span class="magic-cost">MP ${m.mpCost||10}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+    <button class="choice-btn" onclick="M.actionSubmitted=false;setMultiChoices()">← 戻る</button>
+    <button class="choice-btn" disabled><span style="opacity:.2">─</span></button>
+  `;
+}
+
+async function submitMultiItem() {
+  const items = S.inventory.filter(it => it.type === 'item');
+  if (items.length === 0) {
+    document.getElementById('md-caption').innerHTML = '<span class="sys">消耗品がありません</span>';
+    return;
+  }
+  const el = document.getElementById('md-choices');
+  el.innerHTML = `
+    <div class="item-select" style="grid-column:1/-1">
+      <div class="magic-select-title">— アイテムを選択 —</div>
+      <div class="combat-item-list">
+        ${items.map(it => {
+          const idx = S.inventory.indexOf(it);
+          return `<button class="combat-item-btn" onclick="submitMultiAction('item',{itemName:'${it.name}',value:${it.value||30},itemIdx:${idx}})">
+            <span>${itemIcon(it.type)} ${it.name}</span>
+            <span style="font-size:10px;color:var(--text-dim)">${it.desc||''}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+    <button class="choice-btn" onclick="M.actionSubmitted=false;setMultiChoices()">← 戻る</button>
+    <button class="choice-btn" disabled></button>
+  `;
+}
+
+// ポーリング
+function startPolling(mode) {
+  stopPolling();
+  M.pollTimer = setInterval(() => pollRoom(mode), 3000);
+}
+function stopPolling() {
+  if (M.pollTimer) { clearInterval(M.pollTimer); M.pollTimer = null; }
+}
+
+async function pollRoom(mode) {
+  if (!M.room) return;
+  const r = await callGAS('pollRoom', { roomKey: M.room.roomKey });
+  if (!r?.ok) return;
+  M.room = r.room;
+
+  if (mode === 'lobby') {
+    renderLobbyMembers();
+    return;
+  }
+
+  // ダンジョンモード
+  document.getElementById('md-fl').textContent = M.room.floor;
+  document.getElementById('md-php').textContent = M.room.partyHp + '/' + M.room.partyHpMax;
+  renderPartyBar();
+
+  const phase = M.room.phase;
+
+  if (phase === 'waiting' || phase === 'ready') {
+    // まだ待機中 → 自分のアクション送信済みなら待機表示
+    if (M.actionSubmitted) setMultiChoices();
+    return;
+  }
+
+  // 結果が出た → 演出再生
+  if (phase === 'room_clear' || phase === 'floor_clear' || phase === 'defeat' || phase === 'waiting') {
+    stopPolling();
+    await showMultiResults();
+  }
+}
+
+// 全員のアクション結果を順番に演出
+async function showMultiResults() {
+  const results = M.room.lastResults || [];
+  const cap = document.getElementById('md-caption');
+  cap.innerHTML = '';
+  renderMultiStage();
+
+  for (const res of results) {
+    if (res.system) {
+      cap.innerHTML += `<br><span class="sys">${res.desc}</span>`;
+    } else {
+      const dmgHtml = res.dmg > 0 ? ` <span class="dmg">${res.dmg} ダメージ</span>` : '';
+      cap.innerHTML += `<br><span class="r-name">${res.memberName}</span>：${res.desc}${dmgHtml}`;
+      if (res.action === 'magic' || res.action === 'attack') {
+        const elem = res.element || '無';
+        playSpellEffectOnCanvas('md-spell-canvas', elem);
+        await new Promise(r => setTimeout(r, 400));
+      }
+    }
+    cap.scrollTop = cap.scrollHeight;
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // フェーズ別の次アクション
+  await new Promise(r => setTimeout(r, 600));
+  const phase = M.room.phase;
+
+  if (phase === 'defeat') {
+    document.getElementById('md-stage-content').innerHTML = '<div class="stage-icon">✟</div><div class="stage-title">DEFEAT</div>';
+    document.getElementById('md-choices').innerHTML = `
+      <button class="choice-btn" style="grid-column:1/-1" onclick="leaveMulti()">ホームへ<span class="meta">RETURN</span></button>`;
+    return;
+  }
+  if (phase === 'floor_clear') {
+    document.getElementById('md-stage-content').innerHTML = `<div class="stage-icon">⬇</div><div class="stage-title">FLOOR CLEAR</div>`;
+    const isHost = M.room.hostId === S.user.id;
+    document.getElementById('md-choices').innerHTML = `
+      ${isHost ? `<button class="choice-btn" onclick="multiNextFloor()">次の階層<span class="meta">HOST</span></button>` : '<button class="choice-btn" disabled>ホスト待ち</button>'}
+      <button class="choice-btn" onclick="leaveMulti()">帰還<span class="meta">RETURN</span></button>`;
+    if (!isHost) startPolling('dungeon');
+    return;
+  }
+  if (phase === 'room_clear') {
+    const isHost = M.room.hostId === S.user.id;
+    document.getElementById('md-choices').innerHTML = `
+      ${isHost ? `<button class="choice-btn" onclick="multiNextRoom()">次の間へ<span class="meta">HOST</span></button>` : '<button class="choice-btn" disabled>ホスト待ち</button>'}
+      <button class="choice-btn" onclick="leaveMulti()">帰還<span class="meta">RETURN</span></button>`;
+    if (!isHost) startPolling('dungeon');
+    return;
+  }
+
+  // 次のターン
+  M.actionSubmitted = false;
+  setMultiChoices();
+  startPolling('dungeon');
+}
+
+// エフェクトを別canvasで再生（マルチステージ用）
+function playSpellEffectOnCanvas(canvasId, element) {
+  const orig = document.getElementById('spell-canvas');
+  const target = document.getElementById(canvasId);
+  if (!target) { playSpellEffect(element); return; }
+  // 一時的にspell-canvasをmd-spell-canvasに向ける
+  const tmp = orig.id;
+  orig.id = '_tmp_canvas';
+  target.id = 'spell-canvas';
+  playSpellEffect(element);
+  // 元に戻す
+  setTimeout(() => {
+    document.getElementById('spell-canvas').id = canvasId;
+    document.getElementById('_tmp_canvas').id = 'spell-canvas';
+  }, 1100);
+}
+
+async function multiNextRoom() {
+  const r = await callGAS('nextRoom', { roomKey: M.room.roomKey, userId: S.user.id });
+  if (!r?.ok) return;
+  M.room = r.room;
+  M.actionSubmitted = false;
+  renderMultiStage();
+  document.getElementById('md-caption').textContent = '次の間へ進む。';
+  setMultiChoices();
+  startPolling('dungeon');
+}
+
+async function multiNextFloor() {
+  // 階層クリア → 新しい部屋を作り直す（GAS側でfloor++して再スポーン）
+  // 簡易実装：退出してソロに戻る
+  showSync('階層クリア！ホームに戻ります', 'success');
+  await leaveMulti();
+}
+
+async function leaveMulti() {
+  stopPolling();
+  if (M.room) {
+    await callGAS('leaveRoom', { roomKey: M.room.roomKey, userId: S.user.id });
+    M.room = null;
+  }
+  M.actionSubmitted = false;
+  goScreen('s-town');
+}
 document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-name').focus(); });
 document.getElementById('login-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 document.getElementById('reg-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('reg-name').focus(); });
