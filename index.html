@@ -734,6 +734,10 @@
         <label>EMAIL</label>
         <input type="email" id="login-email" placeholder="example@mail.com" autocomplete="email">
       </div>
+      <div class="field">
+        <label>USER NAME</label>
+        <input type="text" id="login-name" placeholder="登録済みのユーザー名" maxlength="20">
+      </div>
       <button class="submit-btn" id="btn-login" onclick="doLogin()">ENTER THE DUNGEON</button>
     </div>
 
@@ -879,20 +883,25 @@ function setMsg(text, type) {
 }
 
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  if (!email) { setMsg('メールアドレスを入力してください', 'error'); return; }
+  const email    = document.getElementById('login-email').value.trim();
+  const userName = document.getElementById('login-name').value.trim();
+  if (!email)    { setMsg('メールアドレスを入力してください', 'error'); return; }
+  if (!userName) { setMsg('ユーザー名を入力してください', 'error'); return; }
 
   const btn = document.getElementById('btn-login');
   btn.disabled = true;
   setMsg('認証中...', '');
 
-  const r = await callGAS('login', { email });
+  const r = await callGAS('login', { email, userName });
 
   if (r.ok) {
     setMsg(`ようこそ、${r.user.userName} よ`, 'success');
     setTimeout(() => enterApp(r.user), 800);
   } else if (r.error === 'NOT_FOUND') {
     setMsg('未登録のメールアドレスです。「REGISTER」タブから新規登録してください', 'error');
+    btn.disabled = false;
+  } else if (r.error === 'NAME_MISMATCH') {
+    setMsg('ユーザー名が一致しません', 'error');
     btn.disabled = false;
   } else {
     setMsg(r.error || 'ログイン失敗', 'error');
@@ -1284,6 +1293,9 @@ function endGame() {
 
 // ---------- Enter キーでログイン/登録 ----------
 document.getElementById('login-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-name').focus();
+});
+document.getElementById('login-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
 document.getElementById('reg-email').addEventListener('keydown', e => {
