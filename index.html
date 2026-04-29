@@ -707,13 +707,11 @@
    ★ GAS_URL を必ず自分のデプロイ済みURLに書き換えてください
    =========================================================== */
 
-const GAS_URL = ''; // ←ここに https://script.google.com/macros/s/XXXXX/exec を貼る
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwYKOj_H7aQ7x__P5JYBVhrExXfoyHyobzRN1uAKIC8fIcAiqz1unsgjs6iRR5ogNta/exec';
 
 // ---------- 起動チェック ----------
 window.addEventListener('DOMContentLoaded', () => {
-  if (!GAS_URL) {
-    document.getElementById('api-warning').style.display = 'block';
-  }
+  // GAS_URL設定済みのため警告非表示
 });
 
 // ---------- GAS呼び出し共通 ----------
