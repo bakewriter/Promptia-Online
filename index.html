@@ -716,27 +716,49 @@ window.addEventListener('DOMContentLoaded', () => {
   // GAS_URL設定済みのため警告非表示
 });
 
-// ---------- GAS呼び出し共通 ----------
-// GASはPOSTでCORSエラーが出やすいため、GETパラメータ方式で完全回避
-async function callGAS(action, payload) {
-  if (!GAS_URL) {
-    return { ok: false, error: 'GAS_URL未設定' };
-  }
-  try {
+// ---------- GAS呼び出し共通（JSONP方式 — CORS完全回避） ----------
+function callGAS(action, payload) {
+  return new Promise((resolve) => {
+    if (!GAS_URL) {
+      resolve({ ok: false, error: 'GAS_URL未設定' });
+      return;
+    }
+
+    // ユニークなコールバック名
+    const cbName = 'gasCallback_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+
+    // タイムアウト（15秒）
+    const timer = setTimeout(() => {
+      cleanup();
+      resolve({ ok: false, error: 'タイムアウト（15秒）' });
+    }, 15000);
+
+    // コールバック関数をグローバルに登録
+    window[cbName] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script && script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    // scriptタグでGASを呼ぶ
     const params = new URLSearchParams({
       action,
-      data: JSON.stringify(payload || {})
+      data: JSON.stringify(payload || {}),
+      callback: cbName,
     });
-    const res = await fetch(`${GAS_URL}?${params.toString()}`, {
-      method: 'GET',
-      redirect: 'follow',
-    });
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch { return { ok: false, error: 'レスポンス解析失敗: ' + text.slice(0, 100) }; }
-  } catch (err) {
-    return { ok: false, error: '通信エラー: ' + err.message };
-  }
+    const script = document.createElement('script');
+    script.src = `${GAS_URL}?${params.toString()}`;
+    script.onerror = () => {
+      cleanup();
+      resolve({ ok: false, error: 'スクリプト読み込みエラー' });
+    };
+    document.head.appendChild(script);
+  });
 }
 
 function showSync(msg, type) {
