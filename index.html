@@ -1961,7 +1961,17 @@ function captionMsg(html) {
   // ダンジョン中かどうかで出力先を変える
   if (S.currentScreen === 's-dungeon') captionAdd(html);
 }
+// 処理中フラグ（連打防止）
+function lockCombat() {
+  S.busy = true;
+  document.querySelectorAll('#choices .choice-btn').forEach(b => b.disabled = true);
+}
+function unlockCombat() {
+  S.busy = false;
+}
+
 function setChoices(choices) {
+  unlockCombat();
   const el = document.getElementById('choices');
   el.innerHTML = '';
   const padded = [...choices];
@@ -1971,7 +1981,7 @@ function setChoices(choices) {
     btn.className = 'choice-btn';
     if (c) {
       btn.innerHTML = c.label + (c.meta ? `<span class="meta">${c.meta}</span>` : '');
-      btn.onclick = c.action;
+      btn.onclick = () => { if (S.busy) return; c.action(); };
     } else {
       btn.innerHTML = '<span style="opacity:.2">─</span>'; btn.disabled = true;
     }
@@ -2014,13 +2024,15 @@ function combatChoices() {
 
 // 通常攻撃
 function doNormalAttack() {
+  if (S.busy) return;
+  lockCombat();
   const dmg = Math.floor((S.player.atk + Math.random()*4) * 1.0);
   S.enemy.hp -= dmg;
   caption(`剣を振るう。<span class="dmg"> ${dmg} ダメージ</span>`);
   setStage({ icon:S.enemy.icon, title:S.enemy.name, meta:`HP ${Math.max(0,S.enemy.hp)}/${S.enemy.hpMax}`, enemy:S.enemy });
   flashStage('attack');
-  if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 700); return; }
-  setTimeout(enemyAttack, 900);
+  if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 400); return; }
+  setTimeout(enemyAttack, 500);
 }
 
 // 魔法選択
@@ -2047,14 +2059,16 @@ function showMagicSelect() {
   `;
 }
 async function castEquippedMagic(idx) {
+  if (S.busy) return;
+  lockCombat();
   const magics = ['magic1','magic2','magic3'].map(s => S.equip[s]).filter(Boolean);
   const magic = magics[idx];
-  if (!magic) return;
+  if (!magic) { unlockCombat(); return; }
   const mpCost = magic.mpCost || 10;
-  if (mpCost > S.player.mp) return;
+  if (mpCost > S.player.mp) { unlockCombat(); return; }
   S.player.mp -= mpCost;
   updateAllStats();
-  caption(`<span style="color:var(--neon-blue)">「${magic.name}」</span><br><span class="sys typing">魔力が編まれてゆく</span>`);
+  caption(`<span style="color:var(--neon-blue)">「${magic.name}」</span><br><span class="sys">魔力が編まれてゆく</span>`);
   flashStage('attack');
   const result = await generateSpellEffect({ magic, enemy: S.enemy });
   let line = `${result.flavor}。<span class="dmg"> ${result.damage} ダメージ</span>`;
@@ -2062,8 +2076,8 @@ async function castEquippedMagic(idx) {
   caption(line);
   S.enemy.hp -= result.damage;
   setStage({ icon:S.enemy.icon, title:S.enemy.name, meta:`HP ${Math.max(0,S.enemy.hp)}/${S.enemy.hpMax}`, enemy:S.enemy });
-  if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 700); return; }
-  setTimeout(enemyAttack, 900);
+  if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 400); return; }
+  setTimeout(enemyAttack, 500);
 }
 
 // アイテム選択（戦闘中）
@@ -2101,6 +2115,8 @@ function useCombatItem(idx) {
 
 // 帰還
 function doRetreat() {
+  if (S.busy) return;
+  lockCombat();
   S.player.hp = Math.max(0, S.player.hp - 10);
   updateAllStats();
   caption(`君は戦場から身を引いた。<span class="hurt"> HP -10</span>`);
@@ -2112,7 +2128,7 @@ function doRetreat() {
     updateAllStats();
     goScreen('s-town');
     document.getElementById('town-caption').textContent = '帰還した。HP・MPが全快した。';
-  }, 1200);
+  }, 600);
 }
 
 // 敵の攻撃
@@ -2125,7 +2141,7 @@ function enemyAttack() {
   flashStage('hit');
   captionAdd(`<span class="en">${S.enemy.name}</span> の反撃。<span class="hurt"> ${dmg} ダメージ</span>　<span class="sys">MP +6</span>`);
   if (S.player.hp <= 0) { defeat(); return; }
-  setTimeout(combatChoices, 600);
+  setTimeout(combatChoices, 300);
 }
 
 // 敵撃破
@@ -2153,7 +2169,7 @@ function enemyDefeated() {
   }
 
   if (S.dungeon.room >= S.dungeon.totalRooms) {
-    setTimeout(floorClear, 1200);
+    setTimeout(floorClear, 600);
   } else {
     setTimeout(() => {
       setChoices([
@@ -2165,7 +2181,7 @@ function enemyDefeated() {
           document.getElementById('town-caption').textContent = '帰還した。HP・MPが全快した。';
         }, meta:'RETURN' },
       ]);
-    }, 1000);
+    }, 400);
   }
 }
 
@@ -2222,7 +2238,7 @@ function defeat() {
 
 /* ★ 魔法エフェクト生成（ダミー）— Gemini APIに差し替える */
 async function generateSpellEffect({ magic, enemy }) {
-  await new Promise(r => setTimeout(r, 600 + Math.random()*400));
+  await new Promise(r => setTimeout(r, 150 + Math.random()*150));
   const elementMap = {
     '炎':['炎','焔','火','燃'], '凍':['氷','凍','雪'], '雷':['雷','電','稲妻'],
     '光':['光','聖','輝'], '闇':['闇','影','深淵'], '音':['音','咆哮'], '塩':['塩'],
