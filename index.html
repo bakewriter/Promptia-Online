@@ -172,22 +172,24 @@ body::after{
 /* ===== INVENTORY PANEL — CYBER FANTASY ===== */
 .inv-panel{
   position:fixed;inset:0;z-index:40;
-  display:flex;flex-direction:column;
+  display:none;
+  flex-direction:column;
   max-width:480px;margin:0 auto;
   background:
     linear-gradient(180deg,rgba(0,4,26,.97) 0%,rgba(2,6,32,.97) 100%);
-  /* 回路基板パターン */
   background-image:
     linear-gradient(180deg,rgba(0,4,26,.97) 0%,rgba(2,6,32,.97) 100%),
     repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px),
     repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px);
   border-right:1px solid rgba(77,217,255,.2);
-  transform:translateX(100%);transition:transform .3s ease;
   padding:0;
   gap:0;
   overflow:hidden;
+  opacity:0;
+  transform:translateX(30px);
+  transition:opacity .25s, transform .25s;
 }
-.inv-panel.open{transform:translateX(0);}
+.inv-panel.open{opacity:1;transform:translateX(0);}
 
 /* ヘッダー */
 .inv-header{
@@ -804,7 +806,7 @@ body::after{
 </div>
 
 <!-- ===== INVENTORY PANEL ===== -->
-<div class="inv-panel" id="inv-panel">
+<div class="inv-panel" id="inv-panel" style="display:none">
   <div class="inv-header">
     <div class="inv-title">INVENTORY</div>
     <button class="inv-close" onclick="closeInventory()">✕ CLOSE</button>
@@ -1176,12 +1178,17 @@ function recalcStats() {
 // INVENTORY
 // ============================================================
 function openInventory() {
+  if (!S.user) return; // ログイン前は開かない
   renderInventory();
   renderEquipSlots();
-  document.getElementById('inv-panel').classList.add('open');
+  const panel = document.getElementById('inv-panel');
+  panel.style.display = 'flex';
+  requestAnimationFrame(() => panel.classList.add('open'));
 }
 function closeInventory() {
-  document.getElementById('inv-panel').classList.remove('open');
+  const panel = document.getElementById('inv-panel');
+  panel.classList.remove('open');
+  setTimeout(() => { panel.style.display = 'none'; }, 300);
   document.getElementById('item-action-menu').classList.remove('open');
 }
 function setInvFilter(f) {
