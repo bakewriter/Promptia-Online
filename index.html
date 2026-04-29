@@ -198,7 +198,7 @@ body::after{
 
 /* ===== INVENTORY PANEL — CYBER FANTASY ===== */
 .inv-panel{
-  position:fixed;top:0;left:0;bottom:0;z-index:40;
+  position:fixed;top:0;right:0;bottom:0;z-index:40;
   display:none;
   flex-direction:column;
   width:320px;
@@ -206,11 +206,11 @@ body::after{
     linear-gradient(180deg,rgba(0,4,26,.97) 0%,rgba(2,6,32,.97) 100%),
     repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px),
     repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px);
-  border-right:1px solid rgba(77,217,255,.3);
-  box-shadow:4px 0 30px rgba(77,217,255,.1);
+  border-left:1px solid rgba(77,217,255,.3);
+  box-shadow:-4px 0 30px rgba(77,217,255,.1);
   padding:0;gap:0;overflow:hidden;
   opacity:0;
-  transform:translateX(-20px);
+  transform:translateX(20px);
   transition:opacity .25s, transform .25s;
 }
 .inv-panel.open{opacity:1;transform:translateX(0);}
@@ -853,7 +853,9 @@ body::after{
 
 /* ===== JOB PANEL ===== */
 .job-panel{
-  position:fixed;top:0;left:0;bottom:0;z-index:35;
+  position:fixed;top:0;bottom:0;z-index:35;
+  /* メインUIの左端に合わせる: 画面中央 - メイン幅半分(240px) - パネル幅(200px) */
+  right:calc(50% + 240px);
   width:200px;
   display:none;
   flex-direction:column;
@@ -865,6 +867,14 @@ body::after{
   overflow:hidden;
 }
 .job-panel.open{opacity:1;transform:translateX(0);}
+/* 画面が狭い時はメインUIの上に重ねる */
+@media(max-width:880px){
+  .job-panel{
+    right:auto;left:0;
+    width:200px;
+    z-index:45;
+  }
+}
 .job-panel-header{
   padding:12px 14px 10px;
   border-bottom:1px solid rgba(77,217,255,.15);
