@@ -169,104 +169,300 @@ body::after{
 .modal-ok{padding:10px;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;color:#fff;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;cursor:pointer;transition:all .2s;text-shadow:0 0 8px rgba(0,0,0,.5);}
 .modal-ok:hover{box-shadow:0 0 14px var(--neon-purple);}
 
-/* ===== INVENTORY PANEL ===== */
+/* ===== INVENTORY PANEL — CYBER FANTASY ===== */
 .inv-panel{
   position:fixed;inset:0;z-index:40;
   display:flex;flex-direction:column;
   max-width:480px;margin:0 auto;
-  background:linear-gradient(180deg,rgba(6,3,15,.98),rgba(13,8,32,.98));
-  border:1px solid var(--border-mystic);
+  background:
+    linear-gradient(180deg,rgba(0,4,26,.97) 0%,rgba(2,6,32,.97) 100%);
+  /* 回路基板パターン */
+  background-image:
+    linear-gradient(180deg,rgba(0,4,26,.97) 0%,rgba(2,6,32,.97) 100%),
+    repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px),
+    repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px);
+  border-right:1px solid rgba(77,217,255,.2);
   transform:translateX(100%);transition:transform .3s ease;
-  padding:14px 16px 16px;
-  gap:10px;
+  padding:0;
+  gap:0;
+  overflow:hidden;
 }
 .inv-panel.open{transform:translateX(0);}
-.inv-header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
-.inv-title{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.2em;color:var(--neon-blue);}
-.inv-close{background:transparent;border:1px solid var(--border-mystic);color:var(--text-dim);padding:4px 10px;font-family:'Cinzel',serif;font-size:10px;cursor:pointer;transition:all .2s;}
-.inv-close:hover{border-color:var(--neon-pink);color:var(--neon-pink);}
 
-/* 装備スロット */
-.equip-section{flex-shrink:0;}
-.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.2em;margin-bottom:6px;}
-.equip-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+/* ヘッダー */
+.inv-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;flex-shrink:0;
+  background:linear-gradient(90deg,rgba(0,20,60,.9),rgba(10,0,40,.9));
+  border-bottom:1px solid rgba(77,217,255,.3);
+  position:relative;overflow:hidden;
+}
+.inv-header::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 20px,rgba(77,217,255,.04) 20px,rgba(77,217,255,.04) 21px);
+}
+.inv-header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--neon-blue) 30%,var(--neon-purple) 70%,transparent);
+  box-shadow:0 0 8px var(--neon-blue);
+}
+.inv-title{
+  font-family:'Cinzel',serif;font-size:14px;letter-spacing:.3em;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  position:relative;z-index:1;
+}
+.inv-close{
+  background:transparent;
+  border:1px solid rgba(77,217,255,.3);
+  color:var(--neon-blue);padding:4px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  cursor:pointer;transition:all .2s;position:relative;z-index:1;
+  clip-path:polygon(4px 0%,100% 0%,100% calc(100% - 4px),calc(100% - 4px) 100%,0% 100%,0% 4px);
+}
+.inv-close:hover{
+  background:rgba(255,77,217,.15);border-color:var(--neon-pink);color:var(--neon-pink);
+  box-shadow:0 0 10px rgba(255,77,217,.3);
+}
+
+/* 装備セクション */
+.equip-section{
+  flex-shrink:0;padding:10px 14px 8px;
+  background:rgba(0,8,30,.5);
+  border-bottom:1px solid rgba(77,217,255,.15);
+  position:relative;
+}
+.equip-section::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(77,217,255,.4),transparent);
+}
+.section-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--neon-blue);letter-spacing:.3em;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.section-label::before,.section-label::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--neon-blue),transparent);
+  opacity:.4;
+}
+.section-label::after{background:linear-gradient(270deg,var(--neon-blue),transparent);}
+
+.equip-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
 .equip-slot{
-  border:1px solid var(--border-mystic);
-  background:rgba(13,8,32,.6);
-  padding:5px;min-height:52px;
-  cursor:pointer;transition:all .2s;
+  border:1px solid rgba(77,217,255,.15);
+  background:rgba(0,10,40,.6);
+  padding:5px 3px;min-height:50px;
+  cursor:pointer;transition:all .25s;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  text-align:center;
+  text-align:center;position:relative;overflow:hidden;
+  clip-path:polygon(3px 0%,100% 0%,100% calc(100% - 3px),calc(100% - 3px) 100%,0% 100%,0% 3px);
 }
-.equip-slot:hover{border-color:var(--neon-purple);box-shadow:0 0 8px var(--glow-purple);}
-.equip-slot.filled{border-color:var(--neon-blue);}
-.equip-slot.magic-slot.filled{border-color:var(--neon-purple);}
-.equip-slot .slot-label{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:.05em;}
-.equip-slot .slot-name{font-size:10px;color:var(--text-main);line-height:1.2;}
-.equip-slot .slot-empty{font-size:9px;color:var(--text-dim);opacity:.5;}
+.equip-slot::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(77,217,255,.05) 0%,transparent 60%);
+  opacity:0;transition:opacity .2s;
+}
+.equip-slot:hover{border-color:rgba(77,217,255,.5);box-shadow:0 0 10px rgba(77,217,255,.2),inset 0 0 10px rgba(77,217,255,.05);}
+.equip-slot:hover::before{opacity:1;}
+.equip-slot.filled{
+  border-color:rgba(77,217,255,.5);
+  background:rgba(0,20,60,.7);
+  box-shadow:inset 0 0 8px rgba(77,217,255,.1);
+}
+.equip-slot.magic-slot.filled{
+  border-color:rgba(176,77,255,.5);
+  background:rgba(20,0,60,.7);
+  box-shadow:inset 0 0 8px rgba(176,77,255,.1);
+}
+.equip-slot .slot-label{
+  font-family:'JetBrains Mono',monospace;font-size:7px;
+  color:rgba(77,217,255,.5);letter-spacing:.05em;
+}
+.equip-slot .slot-name{font-size:9px;color:var(--neon-blue);line-height:1.2;text-shadow:0 0 6px var(--neon-blue);}
+.equip-slot .slot-empty{font-size:9px;color:rgba(77,217,255,.2);}
 
-/* インベントリリスト */
-.inv-list-section{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;}
-.inv-filter{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;}
+/* フィルター＆ツールバー */
+.inv-list-section{
+  flex:1;min-height:0;display:flex;flex-direction:column;gap:0;
+  padding:8px 14px 12px;
+}
+.inv-filter{display:flex;gap:3px;flex-shrink:0;flex-wrap:wrap;margin-bottom:6px;}
 .filter-btn{
-  padding:4px 8px;background:transparent;border:1px solid var(--border-mystic);
-  color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;
-  letter-spacing:.1em;cursor:pointer;transition:all .2s;
+  padding:4px 8px;
+  background:rgba(0,10,40,.6);
+  border:1px solid rgba(77,217,255,.15);
+  color:rgba(77,217,255,.5);
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.05em;cursor:pointer;transition:all .2s;
+  clip-path:polygon(3px 0%,100% 0%,100% calc(100% - 3px),calc(100% - 3px) 100%,0% 100%,0% 3px);
 }
-.filter-btn.active{background:rgba(176,77,255,.2);border-color:var(--neon-purple);color:var(--neon-blue);}
-.inv-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);flex-shrink:0;}
-.inv-count span{color:var(--gold-bright);}
-.inv-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
-.inv-list::-webkit-scrollbar{width:4px;}
-.inv-list::-webkit-scrollbar-thumb{background:var(--border-mystic);}
-.inv-item{
-  display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
-  padding:8px 10px;
-  background:rgba(13,8,32,.6);border:1px solid var(--border-mystic);
-  cursor:pointer;transition:all .2s;
+.filter-btn.active{
+  background:rgba(77,217,255,.12);
+  border-color:var(--neon-blue);
+  color:var(--neon-blue);
+  box-shadow:0 0 6px rgba(77,217,255,.2);
+  text-shadow:0 0 6px var(--neon-blue);
 }
-.inv-item:hover{border-color:var(--neon-purple);background:rgba(176,77,255,.08);}
-.inv-item.equipped{border-color:var(--neon-blue);}
-.item-icon{font-size:18px;width:24px;text-align:center;}
-.item-info{min-width:0;}
-.item-name{font-size:12px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.item-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);}
-.item-badge{
+.filter-btn:hover:not(.active){border-color:rgba(176,77,255,.4);color:var(--neon-purple);}
+
+.inv-toolbar{
+  display:flex;gap:4px;align-items:center;flex-shrink:0;
+  flex-wrap:wrap;margin-bottom:6px;
+  padding:5px 8px;
+  background:rgba(0,6,24,.5);
+  border:1px solid rgba(77,217,255,.08);
+}
+.sort-btn{
+  padding:3px 7px;
+  background:transparent;
+  border:1px solid rgba(77,217,255,.12);
+  color:rgba(77,217,255,.4);
   font-family:'JetBrains Mono',monospace;font-size:8px;
-  padding:2px 5px;border:1px solid;white-space:nowrap;
+  letter-spacing:.05em;cursor:pointer;transition:all .2s;
 }
-.item-badge.weapon{color:var(--hp-color);border-color:var(--hp-color);}
-.item-badge.armor{color:var(--neon-blue);border-color:var(--neon-blue);}
-.item-badge.magic{color:var(--neon-purple);border-color:var(--neon-purple);}
-.item-badge.item{color:var(--gold-bright);border-color:var(--gold-bright);}
-.item-badge.accessory{color:var(--gold);border-color:var(--gold);}
-.item-badge.equipped-mark{background:rgba(77,217,255,.15);color:var(--neon-blue);border-color:var(--neon-blue);}
-.inv-empty{text-align:center;padding:20px;color:var(--text-dim);font-size:12px;}
+.sort-btn.active{
+  background:rgba(77,217,255,.1);
+  border-color:var(--neon-blue);color:var(--neon-blue);
+  box-shadow:0 0 4px rgba(77,217,255,.2);
+}
+.inv-gold{
+  margin-left:auto;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--gold-bright);
+  text-shadow:0 0 8px rgba(255,217,122,.4);
+}
+.inv-count{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:rgba(77,217,255,.4);flex-shrink:0;margin-bottom:6px;
+}
+.inv-count span{color:var(--gold-bright);}
+
+/* アイテムリスト */
+.inv-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
+.inv-list::-webkit-scrollbar{width:3px;}
+.inv-list::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--neon-blue),var(--neon-purple));
+}
+.inv-item{
+  display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;
+  padding:7px 10px;
+  background:rgba(0,8,28,.6);
+  border:1px solid rgba(77,217,255,.1);
+  border-left:2px solid rgba(77,217,255,.2);
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.inv-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,transparent,var(--neon-blue),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.inv-item:hover{
+  border-color:rgba(77,217,255,.3);
+  background:rgba(0,15,50,.7);
+  box-shadow:0 0 10px rgba(77,217,255,.08),inset 0 0 20px rgba(77,217,255,.03);
+}
+.inv-item:hover::before{opacity:1;}
+.inv-item.equipped{
+  border-color:rgba(77,217,255,.4);
+  border-left-color:var(--neon-blue);
+  background:rgba(0,15,50,.8);
+  box-shadow:inset 0 0 12px rgba(77,217,255,.06);
+}
+.inv-item.locked-item{
+  border-left-color:var(--gold);
+  background:rgba(20,12,0,.5);
+}
+.item-icon{font-size:20px;width:26px;text-align:center;filter:drop-shadow(0 0 4px currentColor);}
+.item-info{min-width:0;}
+.item-name{
+  font-size:12px;color:var(--text-main);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 0 8px rgba(255,255,255,.2);
+}
+.item-sub{
+  font-family:'JetBrains Mono',monospace;font-size:8px;
+  color:rgba(77,217,255,.4);margin-top:1px;
+}
+.item-badge{
+  font-family:'JetBrains Mono',monospace;font-size:7px;
+  padding:1px 4px;border:1px solid;white-space:nowrap;
+  letter-spacing:.05em;
+}
+.item-badge.weapon{color:#ff6b8a;border-color:rgba(255,107,138,.4);}
+.item-badge.armor{color:var(--neon-blue);border-color:rgba(77,217,255,.3);}
+.item-badge.magic{color:var(--neon-purple);border-color:rgba(176,77,255,.3);}
+.item-badge.item{color:var(--gold-bright);border-color:rgba(255,217,122,.3);}
+.item-badge.accessory{color:var(--gold);border-color:rgba(212,168,80,.3);}
+.item-badge.locked{color:var(--gold);border-color:rgba(212,168,80,.4);}
+.item-badge.equipped-mark{
+  background:rgba(77,217,255,.1);color:var(--neon-blue);
+  border-color:rgba(77,217,255,.4);
+  box-shadow:0 0 4px rgba(77,217,255,.2);
+}
+.inv-empty{text-align:center;padding:24px;color:rgba(77,217,255,.3);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;}
+
+/* クイックボタン */
+.item-right-col{display:flex;flex-direction:column;gap:3px;align-items:flex-end;}
+.item-quick-btns{display:flex;gap:3px;}
+.iq-btn{
+  padding:2px 6px;
+  background:rgba(0,8,24,.8);
+  border:1px solid rgba(77,217,255,.15);
+  color:rgba(77,217,255,.5);
+  font-family:'JetBrains Mono',monospace;font-size:8px;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.iq-btn:hover{border-color:rgba(77,217,255,.5);color:var(--neon-blue);box-shadow:0 0 6px rgba(77,217,255,.2);}
+.iq-btn.equip{border-color:rgba(77,217,255,.3);color:var(--neon-blue);}
+.iq-btn.equip:hover{background:rgba(77,217,255,.12);box-shadow:0 0 8px rgba(77,217,255,.3);}
+.iq-btn.lock{border-color:rgba(212,168,80,.3);color:var(--gold);}
+.iq-btn.lock.locked{background:rgba(212,168,80,.1);color:var(--gold-bright);border-color:var(--gold);box-shadow:0 0 4px rgba(212,168,80,.3);}
+.iq-btn.sell{border-color:rgba(255,85,119,.2);color:rgba(255,85,119,.6);}
+.iq-btn.sell:hover{background:rgba(255,85,119,.08);border-color:var(--hp-color);color:var(--hp-color);}
 
 /* アイテムアクションメニュー */
 .item-action-menu{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  position:fixed;bottom:0;left:50%;
   width:100%;max-width:480px;
-  background:linear-gradient(180deg,rgba(18,10,42,.99),rgba(6,3,15,.99));
-  border-top:1px solid var(--neon-purple);
-  padding:14px 16px;
+  background:linear-gradient(180deg,rgba(0,8,30,.99),rgba(0,4,16,.99));
+  border-top:1px solid rgba(77,217,255,.3);
+  padding:14px 16px 18px;
   z-index:60;
   transform:translateX(-50%) translateY(100%);
   transition:transform .25s;
+  position:fixed;
 }
 .item-action-menu.open{transform:translateX(-50%) translateY(0);}
-.action-item-name{font-family:'Cinzel',serif;font-size:13px;color:var(--neon-blue);margin-bottom:4px;}
-.action-item-desc{font-size:11px;color:var(--text-dim);margin-bottom:12px;line-height:1.5;}
-.action-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.item-action-menu::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--neon-blue) 30%,var(--neon-purple) 70%,transparent);
+  box-shadow:0 0 8px var(--neon-blue);
+}
+.action-item-name{
+  font-family:'Cinzel',serif;font-size:13px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:3px;
+}
+.action-item-desc{font-size:11px;color:rgba(77,217,255,.5);margin-bottom:12px;line-height:1.5;font-family:'JetBrains Mono',monospace;}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap;}
 .action-btn{
-  padding:9px 14px;border:1px solid var(--border-mystic);background:transparent;
+  padding:9px 12px;
+  border:1px solid rgba(77,217,255,.2);
+  background:rgba(0,8,28,.8);
   color:var(--text-main);font-family:'Shippori Mincho',serif;font-size:12px;
   cursor:pointer;transition:all .2s;flex:1;min-width:60px;text-align:center;
+  clip-path:polygon(4px 0%,100% 0%,100% calc(100% - 4px),calc(100% - 4px) 100%,0% 100%,0% 4px);
 }
-.action-btn:hover{border-color:var(--neon-purple);color:var(--neon-blue);box-shadow:0 0 8px var(--glow-purple);}
-.action-btn.danger{border-color:rgba(255,85,119,.3);color:var(--hp-color);}
-.action-btn.danger:hover{border-color:var(--hp-color);box-shadow:0 0 8px rgba(255,85,119,.4);}
-.action-btn.primary{background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;color:#fff;}
+.action-btn:hover{border-color:var(--neon-purple);color:var(--neon-blue);box-shadow:0 0 10px var(--glow-purple);}
+.action-btn.danger{border-color:rgba(255,85,119,.25);color:rgba(255,85,119,.7);}
+.action-btn.danger:hover{border-color:var(--hp-color);color:var(--hp-color);box-shadow:0 0 8px rgba(255,85,119,.3);}
+.action-btn.primary{
+  background:linear-gradient(135deg,rgba(77,100,255,.4),rgba(176,77,255,.4));
+  border-color:var(--neon-purple);color:var(--neon-blue);
+  box-shadow:0 0 10px rgba(176,77,255,.2);
+}
 
 /* ===== HOMETOWN ===== */
 #s-town{overflow:hidden;}
@@ -318,61 +514,184 @@ body::after{
 .town-btn:hover::before{opacity:1;}
 .town-btn .btn-sub{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;}
 
-/* ===== CRAFT SCREEN ===== */
+/* ===== CRAFT SCREEN — CYBER FANTASY ===== */
 #s-craft{overflow:hidden;}
-.craft-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border-mystic);flex-shrink:0;}
+.craft-tabs{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;flex-shrink:0;
+  border:1px solid rgba(77,217,255,.2);
+  background:rgba(0,4,20,.8);
+  position:relative;
+}
+.craft-tabs::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--neon-blue) 30%,var(--neon-purple) 70%,transparent);
+  box-shadow:0 0 6px var(--neon-blue);
+}
 .craft-tab{
-  padding:9px 4px;background:transparent;border:none;border-right:1px solid var(--border-mystic);
-  color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;
+  padding:10px 4px;background:transparent;
+  border:none;border-right:1px solid rgba(77,217,255,.15);
+  color:rgba(77,217,255,.35);
+  font-family:'JetBrains Mono',monospace;font-size:10px;
   letter-spacing:.05em;cursor:pointer;transition:all .2s;text-align:center;
+  position:relative;
 }
 .craft-tab:last-child{border-right:none;}
-.craft-tab.active{background:rgba(176,77,255,.2);color:var(--neon-blue);}
-.craft-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:0;}
-.craft-body::-webkit-scrollbar{width:4px;}
-.craft-body::-webkit-scrollbar-thumb{background:var(--border-mystic);}
-.craft-sub-tabs{display:flex;gap:6px;flex-wrap:wrap;}
-.craft-sub-btn{
-  padding:6px 12px;background:transparent;border:1px solid var(--border-mystic);
-  color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;
-  cursor:pointer;transition:all .2s;
+.craft-tab.active{
+  background:linear-gradient(180deg,rgba(0,20,60,.8),rgba(10,0,40,.6));
+  color:var(--neon-blue);
+  text-shadow:0 0 8px var(--neon-blue);
 }
-.craft-sub-btn.active{background:rgba(176,77,255,.2);border-color:var(--neon-purple);color:var(--neon-blue);}
+.craft-tab.active::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--neon-blue),transparent);
+  box-shadow:0 0 6px var(--neon-blue);z-index:1;
+}
+.craft-tab:hover:not(.active){color:rgba(77,217,255,.6);}
+
+.craft-body{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:0;
+  padding:12px 2px 4px;
+}
+.craft-body::-webkit-scrollbar{width:3px;}
+.craft-body::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--neon-blue),var(--neon-purple));}
+
+/* サブタブ */
+.craft-sub-tabs{display:flex;gap:5px;flex-wrap:wrap;}
+.craft-sub-btn{
+  padding:6px 12px;
+  background:rgba(0,8,28,.7);
+  border:1px solid rgba(77,217,255,.15);
+  color:rgba(77,217,255,.4);
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  cursor:pointer;transition:all .2s;
+  clip-path:polygon(4px 0%,100% 0%,100% calc(100% - 4px),calc(100% - 4px) 100%,0% 100%,0% 4px);
+}
+.craft-sub-btn.active{
+  background:rgba(77,217,255,.1);
+  border-color:var(--neon-blue);
+  color:var(--neon-blue);
+  box-shadow:0 0 8px rgba(77,217,255,.2);
+  text-shadow:0 0 6px var(--neon-blue);
+}
+.craft-sub-btn:hover:not(.active){border-color:rgba(176,77,255,.3);color:var(--neon-purple);}
+
+/* コストバー */
 .craft-cost-bar{
   display:flex;align-items:center;gap:8px;
-  padding:8px 12px;border:1px solid var(--border-mystic);background:rgba(13,8,32,.6);
+  padding:8px 12px;
+  background:rgba(0,8,28,.7);
+  border:1px solid rgba(77,217,255,.15);
+  border-left:2px solid var(--neon-blue);
+  position:relative;overflow:hidden;
 }
-.craft-cost-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);}
-.craft-cost-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cost-color);}
-.craft-cost-val.over{color:var(--hp-color);}
+.craft-cost-bar::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 20px,rgba(77,217,255,.02) 20px,rgba(77,217,255,.02) 21px);
+}
+.craft-cost-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:rgba(77,217,255,.5);letter-spacing:.1em;
+  position:relative;z-index:1;
+}
+.craft-cost-val{
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--cost-color);
+  text-shadow:0 0 8px rgba(160,255,154,.4);
+  position:relative;z-index:1;
+}
+.craft-cost-val.over{color:var(--hp-color);text-shadow:0 0 8px rgba(255,85,119,.4);}
+
+/* プロンプトエリア */
 .craft-prompt-area{display:flex;flex-direction:column;gap:6px;}
-.craft-prompt-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.1em;}
-.craft-input-row{display:flex;border:1px solid var(--border-mystic);background:rgba(6,3,15,.6);}
-.craft-input-row:focus-within{border-color:var(--neon-purple);box-shadow:0 0 10px var(--glow-purple);}
+.craft-prompt-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:rgba(77,217,255,.5);letter-spacing:.2em;
+  display:flex;align-items:center;gap:6px;
+}
+.craft-prompt-label::before{content:'◈';color:var(--neon-blue);font-size:8px;}
+.craft-input-row{
+  display:flex;
+  background:rgba(0,6,20,.8);
+  border:1px solid rgba(77,217,255,.2);
+  position:relative;overflow:hidden;
+  transition:all .2s;
+}
+.craft-input-row::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(77,217,255,.3),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.craft-input-row:focus-within{
+  border-color:rgba(77,217,255,.5);
+  box-shadow:0 0 14px rgba(77,217,255,.15),inset 0 0 14px rgba(77,217,255,.03);
+}
+.craft-input-row:focus-within::before{opacity:1;}
 .craft-input{
-  flex:1;background:transparent;border:none;padding:11px 12px;
-  font-family:'Shippori Mincho',serif;font-size:13px;color:var(--neon-blue);outline:none;
+  flex:1;background:transparent;border:none;padding:12px 12px;
+  font-family:'Shippori Mincho',serif;font-size:13px;
+  color:var(--neon-blue);outline:none;
+  text-shadow:0 0 8px rgba(77,217,255,.3);
 }
-.craft-input::placeholder{color:var(--text-dim);font-style:italic;font-size:11px;}
+.craft-input::placeholder{color:rgba(77,217,255,.25);font-style:italic;font-size:11px;}
 .craft-cost-inline{
-  padding:11px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;
-  color:var(--cost-color);border-left:1px solid var(--border-mystic);
-  display:flex;align-items:center;min-width:60px;justify-content:center;
+  padding:12px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--cost-color);
+  border-left:1px solid rgba(77,217,255,.15);
+  display:flex;align-items:center;min-width:58px;justify-content:center;
+  background:rgba(0,10,30,.5);
+  text-shadow:0 0 6px rgba(160,255,154,.3);
 }
-.craft-cost-inline.over{color:var(--hp-color);}
+.craft-cost-inline.over{color:var(--hp-color);text-shadow:0 0 6px rgba(255,85,119,.3);}
+
+/* 生成ボタン */
 .craft-btn{
   width:100%;padding:13px;
-  background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));
-  color:#fff;border:none;font-family:'Cinzel',serif;font-size:12px;
-  letter-spacing:.25em;cursor:pointer;text-shadow:0 0 8px rgba(0,0,0,.5);transition:all .2s;
+  background:linear-gradient(135deg,rgba(0,20,80,.9),rgba(40,0,80,.9));
+  border:1px solid rgba(77,217,255,.3);
+  color:var(--neon-blue);
+  font-family:'Cinzel',serif;font-size:12px;
+  letter-spacing:.4em;cursor:pointer;
+  text-shadow:0 0 8px var(--neon-blue);
+  transition:all .2s;position:relative;overflow:hidden;
+  clip-path:polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);
 }
-.craft-btn:hover:not(:disabled){box-shadow:0 0 20px var(--neon-purple);}
-.craft-btn:disabled{opacity:.4;cursor:not-allowed;}
+.craft-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent,rgba(77,217,255,.1),transparent);
+  transform:translateX(-100%);transition:transform .4s;
+}
+.craft-btn:hover:not(:disabled){
+  border-color:var(--neon-blue);
+  box-shadow:0 0 20px rgba(77,217,255,.3),inset 0 0 20px rgba(77,217,255,.05);
+}
+.craft-btn:hover:not(:disabled)::before{transform:translateX(100%);}
+.craft-btn:disabled{opacity:.3;cursor:not-allowed;color:rgba(77,217,255,.3);}
+
+/* 生成結果 */
 .craft-result{
-  padding:12px;border:1px solid var(--gold);background:rgba(212,168,80,.08);
+  padding:14px;
+  background:rgba(0,12,40,.7);
+  border:1px solid rgba(255,217,122,.3);
+  border-left:2px solid var(--gold-bright);
+  position:relative;overflow:hidden;
 }
-.craft-result-title{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-bright);margin-bottom:6px;}
-.craft-result-body{font-size:12px;color:var(--text-main);line-height:1.7;}
+.craft-result::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--gold-bright),transparent);
+  opacity:.5;
+}
+.craft-result-title{
+  font-family:'Cinzel',serif;font-size:12px;
+  color:var(--gold-bright);margin-bottom:8px;
+  text-shadow:0 0 8px rgba(255,217,122,.4);
+  letter-spacing:.2em;
+}
+.craft-result-body{
+  font-size:12px;color:var(--text-main);line-height:1.8;
+  font-family:'JetBrains Mono',monospace;
+}
 
 /* ===== DUNGEON SCREEN ===== */
 #s-dungeon{overflow:hidden;}
@@ -529,6 +848,14 @@ body::after{
       <button class="filter-btn" onclick="setInvFilter('item')">消耗品</button>
       <button class="filter-btn" onclick="setInvFilter('accessory')">アクセ</button>
     </div>
+    <div class="inv-toolbar">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim)">SORT:</span>
+      <button class="sort-btn active" id="sort-btn-power" onclick="setInvSort('power')">強↓</button>
+      <button class="sort-btn" id="sort-btn-powerasc" onclick="setInvSort('powerasc')">強↑</button>
+      <button class="sort-btn" id="sort-btn-type" onclick="setInvSort('type')">種類</button>
+      <button class="sort-btn" id="sort-btn-new" onclick="setInvSort('new')">新着</button>
+      <span class="inv-gold">💰 <span id="inv-gold-disp">0</span></span>
+    </div>
     <div class="inv-count">所持: <span id="inv-count-num">0</span>/20</div>
     <div class="inv-list" id="inv-list"></div>
   </div>
@@ -680,6 +1007,7 @@ const S = {
     hp: 100, hpMax: 100,
     mp: 50,  mpMax: 50,
     cost: 10, costMax: 10,
+    gold: 0,
     atk: 5, def: 0, magicPow: 1.0,
   },
   dungeon: { floor: 1, room: 1, totalRooms: 3, inDungeon: false },
@@ -687,6 +1015,13 @@ const S = {
   equip: { weapon: null, magic1: null, magic2: null, magic3: null, armor: null, acc1: null, acc2: null },
   inventory: [],   // max 20
   invFilter: 'all',
+  invSort: 'power',
+  settings: {
+    accessory_drop_rate: 0.15,
+    accessory_drop_rate_boss: 0.40,
+    cost_per_floor_clear: 5,
+    cost_bonus_per_10f: 10,
+  },
   craftTab: 'weapon',
   craftSubType: null,
   currentScreen: 's-login',
@@ -786,6 +1121,19 @@ function enterApp(user) {
   goScreen('s-town');
   document.getElementById('town-caption').textContent =
     `${user.userName} よ、ようこそ。最高到達: 第${user.maxFloor || 1}階層。`;
+  // サーバーからSettings取得
+  loadGameSettings();
+}
+async function loadGameSettings() {
+  const r = await callGAS('getSettings', {});
+  if (r?.ok && r.settings) {
+    const s = r.settings;
+    if (s.accessory_drop_rate    !== undefined) S.settings.accessory_drop_rate    = Number(s.accessory_drop_rate);
+    if (s.accessory_drop_rate_boss !== undefined) S.settings.accessory_drop_rate_boss = Number(s.accessory_drop_rate_boss);
+    if (s.cost_per_floor_clear   !== undefined) S.settings.cost_per_floor_clear   = Number(s.cost_per_floor_clear);
+    if (s.cost_bonus_per_10f     !== undefined) S.settings.cost_bonus_per_10f     = Number(s.cost_bonus_per_10f);
+    showSync('設定読み込み完了', 'success');
+  }
 }
 
 // ============================================================
@@ -806,6 +1154,9 @@ function updateAllStats() {
   // craft
   document.getElementById('c-ct').textContent = p.cost + '/' + p.costMax;
   document.getElementById('c-mp').textContent = p.mp;
+  // インベントリgold
+  const gd = document.getElementById('inv-gold-disp');
+  if (gd) gd.textContent = p.gold;
   // equip stats
   recalcStats();
 }
@@ -843,28 +1194,108 @@ function setInvFilter(f) {
   });
   renderInventory();
 }
+function setInvSort(s) {
+  S.invSort = s;
+  ['power','powerasc','type','new'].forEach(k => {
+    const b = document.getElementById('sort-btn-' + k);
+    if (b) b.classList.toggle('active', k === s);
+  });
+  renderInventory();
+}
+function sortedInventory(items) {
+  const copy = [...items];
+  if (S.invSort === 'power')    return copy.sort((a,b) => (b.power||0)-(a.power||0));
+  if (S.invSort === 'powerasc') return copy.sort((a,b) => (a.power||0)-(b.power||0));
+  if (S.invSort === 'type') {
+    const order = {weapon:0,magic:1,armor:2,accessory:3,item:4};
+    return copy.sort((a,b) => (order[a.type]||9)-(order[b.type]||9));
+  }
+  return copy; // new = 追加順
+}
+function sellPrice(item) {
+  if (item.type === 'item') return 5;
+  return Math.max(1, (item.power||1) * 10);
+}
 function renderInventory() {
   const list = document.getElementById('inv-list');
   const filtered = S.inventory.filter(it => S.invFilter === 'all' || it.type === S.invFilter);
+  const sorted = sortedInventory(filtered);
   document.getElementById('inv-count-num').textContent = S.inventory.length;
-  if (filtered.length === 0) {
+  const gd = document.getElementById('inv-gold-disp');
+  if (gd) gd.textContent = S.player.gold;
+  if (sorted.length === 0) {
     list.innerHTML = '<div class="inv-empty">アイテムがありません</div>'; return;
   }
-  list.innerHTML = filtered.map((it, idx) => {
+  const inDungeon = S.dungeon.inDungeon;
+  list.innerHTML = sorted.map(it => {
     const realIdx = S.inventory.indexOf(it);
     const equipped = isEquipped(it);
-    return `<div class="inv-item${equipped ? ' equipped' : ''}" onclick="onItemClick(${realIdx})">
+    const locked = !!it.locked;
+    const price = sellPrice(it);
+    // クイックボタン生成
+    let quickBtns = '';
+    // 装備ボタン（装備可能タイプのみ・ダンジョン中は非表示）
+    if (!inDungeon && (it.type==='weapon'||it.type==='armor'||it.type==='magic')) {
+      if (equipped) {
+        quickBtns += `<button class="iq-btn equip" onclick="event.stopPropagation();quickUnequip(${realIdx})">外す</button>`;
+      } else {
+        quickBtns += `<button class="iq-btn equip" onclick="event.stopPropagation();quickEquip(${realIdx})">装備</button>`;
+      }
+    }
+    // ロックボタン
+    quickBtns += `<button class="iq-btn lock${locked?' locked':''}" onclick="event.stopPropagation();toggleLock(${realIdx})">${locked?'🔒':'🔓'}</button>`;
+    // 売却ボタン（ロック・装備中は無効）
+    if (!locked && !equipped) {
+      quickBtns += `<button class="iq-btn sell" onclick="event.stopPropagation();sellItem(${realIdx})">💰${price}</button>`;
+    }
+    return `<div class="inv-item${equipped?' equipped':''}${locked?' locked-item':''}" onclick="onItemClick(${realIdx})">
       <div class="item-icon">${itemIcon(it.type)}</div>
       <div class="item-info">
-        <div class="item-name">${it.name}</div>
-        <div class="item-sub">${it.desc || ''}</div>
+        <div class="item-name">${locked?'🔒 ':''}${it.name}</div>
+        <div class="item-sub">${it.desc||''}</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end">
-        <span class="item-badge ${it.type}">${typeName(it.type)}</span>
-        ${equipped ? '<span class="item-badge equipped-mark">装備中</span>' : ''}
+      <div class="item-right-col">
+        <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end">
+          <span class="item-badge ${it.type}">${typeName(it.type)}</span>
+          ${equipped?'<span class="item-badge equipped-mark">装備中</span>':''}
+          ${it.power?`<span class="item-badge" style="color:var(--cost-color);border-color:var(--cost-color)">PWR${it.power}</span>`:''}
+        </div>
+        <div class="item-quick-btns">${quickBtns}</div>
       </div>
     </div>`;
   }).join('');
+}
+function quickEquip(idx) {
+  const item = S.inventory[idx];
+  if (!item) return;
+  if (item.type === 'weapon') { S.equip.weapon = item; }
+  else if (item.type === 'armor') { S.equip.armor = item; }
+  else if (item.type === 'magic') {
+    // 空きスロットに入れる、なければmagic1に上書き
+    const emptySlot = ['magic1','magic2','magic3'].find(s => !S.equip[s]);
+    S.equip[emptySlot || 'magic1'] = item;
+  }
+  renderEquipSlots(); renderInventory(); updateAllStats();
+}
+function quickUnequip(idx) {
+  const item = S.inventory[idx];
+  if (!item) return;
+  unequip(item);
+}
+function toggleLock(idx) {
+  const item = S.inventory[idx];
+  if (!item) return;
+  item.locked = !item.locked;
+  renderInventory();
+}
+function sellItem(idx) {
+  const item = S.inventory[idx];
+  if (!item || item.locked || isEquipped(item)) return;
+  const price = sellPrice(item);
+  S.player.gold += price;
+  S.inventory.splice(idx, 1);
+  updateAllStats(); renderInventory();
+  showSync(`💰 ${item.name} を ${price}G で売却`, 'success');
 }
 function renderEquipSlots() {
   const slots = ['weapon','magic1','magic2','magic3','armor','acc1','acc2'];
@@ -935,7 +1366,8 @@ function onItemClick(idx) {
     addActionBtn(btns, '使う', () => { useItem(item, idx); closeItemMenu(); }, 'primary');
   }
   addActionBtn(btns, '捨てる', () => {
-    if (isEquipped(item)) { alert('装備中は捨てられません'); return; }
+    if (item.locked) { showSync('ロック中は捨てられません', 'error'); return; }
+    if (isEquipped(item)) { showSync('装備中は捨てられません', 'error'); return; }
     S.inventory.splice(idx, 1); closeItemMenu(); renderInventory();
   }, 'danger');
   addActionBtn(btns, 'キャンセル', closeItemMenu);
@@ -1314,8 +1746,11 @@ function doRetreat() {
   if (S.player.hp <= 0) { defeat(); return; }
   setTimeout(() => {
     S.dungeon.inDungeon = false;
+    S.player.hp = S.player.hpMax;
+    S.player.mp = S.player.mpMax;
+    updateAllStats();
     goScreen('s-town');
-    document.getElementById('town-caption').textContent = '傷を負いながらも、辛うじて帰還した。';
+    document.getElementById('town-caption').textContent = '帰還した。HP・MPが全快した。';
   }, 1200);
 }
 
@@ -1342,8 +1777,12 @@ function enemyDefeated() {
   setStage({ icon:'✧', title:'VICTORY', meta:`ROOM ${S.dungeon.room}/${S.dungeon.totalRooms}` });
   caption(`<span class="en">${S.enemy.name}</span> は塵となった。<span class="sys"> HP+${hpRestore} MP+${mpRestore}</span>`);
 
-  // ★ アクセサリードロップ（低確率）
-  if (Math.random() < 0.15) {
+  // ★ アクセサリードロップ（スプシ設定値を使用）
+  const isBoss = S.dungeon.room === S.dungeon.totalRooms;
+  const dropRate = isBoss
+    ? S.settings.accessory_drop_rate_boss
+    : S.settings.accessory_drop_rate;
+  if (Math.random() < dropRate) {
     const acc = generateAccessoryDrop();
     if (addToInventory(acc)) {
       captionAdd(`<span class="wk">✧ アクセサリーを入手: ${acc.name}</span>`);
@@ -1356,7 +1795,12 @@ function enemyDefeated() {
     setTimeout(() => {
       setChoices([
         { label:'次の間へ', action:() => { S.dungeon.room++; nextRoom(); }, meta:'NEXT ROOM' },
-        { label:'帰還する', action:() => { S.dungeon.inDungeon=false; goScreen('s-town'); }, meta:'RETURN' },
+        { label:'帰還する', action:() => {
+          S.dungeon.inDungeon=false;
+          S.player.hp=S.player.hpMax; S.player.mp=S.player.mpMax;
+          updateAllStats(); goScreen('s-town');
+          document.getElementById('town-caption').textContent = '帰還した。HP・MPが全快した。';
+        }, meta:'RETURN' },
       ]);
     }, 1000);
   }
@@ -1370,24 +1814,31 @@ function generateAccessoryDrop() {
 }
 
 async function floorClear() {
-  // コスト値+5
-  S.player.cost = Math.min(S.player.costMax, S.player.cost + 5);
-  // 10階層ごとにコスト上限+10
+  // コスト値+（設定値）
+  const costGain = S.settings.cost_per_floor_clear;
+  S.player.cost = Math.min(S.player.costMax, S.player.cost + costGain);
+  // 10階層ごとにコスト上限+（設定値）
   if (S.dungeon.floor % 10 === 0) {
-    S.player.costMax += 10;
+    const bonus = S.settings.cost_bonus_per_10f;
+    S.player.costMax += bonus;
     S.player.cost = S.player.costMax;
   }
   updateAllStats();
-  setStage({ icon:'⬇', title:`FLOOR ${S.dungeon.floor} CLEAR`, meta:'COST +5' });
-  caption(`深淵の番人が崩れ落ちる。下層への道が開いた。<span class="wk"> コスト +5</span>`);
-  if (S.dungeon.floor % 10 === 0) captionAdd(`<span class="wk">★ コスト上限が +10 増加した！</span>`);
+  setStage({ icon:'⬇', title:`FLOOR ${S.dungeon.floor} CLEAR`, meta:`COST +${costGain}` });
+  caption(`深淵の番人が崩れ落ちる。下層への道が開いた。<span class="wk"> コスト +${costGain}</span>`);
+  if (S.dungeon.floor % 10 === 0) captionAdd(`<span class="wk">★ コスト上限が +${S.settings.cost_bonus_per_10f} 増加した！</span>`);
 
   // GASに最高到達を送信
   await syncFloor(S.dungeon.floor);
 
   setChoices([
     { label:'降りる', action:goNextFloor, meta:'NEXT FLOOR' },
-    { label:'帰還する', action:() => { S.dungeon.inDungeon=false; goScreen('s-town'); }, meta:'RETURN' },
+    { label:'帰還する', action:() => {
+      S.dungeon.inDungeon=false;
+      S.player.hp=S.player.hpMax; S.player.mp=S.player.mpMax;
+      updateAllStats(); goScreen('s-town');
+      document.getElementById('town-caption').textContent = '帰還した。HP・MPが全快した。';
+    }, meta:'RETURN' },
   ]);
 }
 function goNextFloor() {
