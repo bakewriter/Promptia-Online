@@ -1140,14 +1140,26 @@ async function doRegister() {
 }
 function enterApp(user) {
   S.user = user;
+  // 最高到達階層からリスタート
+  const startFloor = Math.max(1, user.maxFloor || 1);
+  S.dungeon.floor = startFloor;
+  S.dungeon.totalRooms = 3 + Math.floor((startFloor - 1) / 2);
+  // 階層に応じてHP/MP上限もスケール
+  S.player.hpMax = 100 + (startFloor - 1) * 10;
+  S.player.hp    = S.player.hpMax;
+  S.player.mpMax = 50  + (startFloor - 1) * 5;
+  S.player.mp    = S.player.mpMax;
+  // コスト上限もスケール（10階層ごとに+10）
+  S.player.costMax = 10 + Math.floor((startFloor - 1) / 10) * 10;
+  S.player.cost    = S.player.costMax;
+
   document.getElementById('s-login').style.display = 'none';
   document.getElementById('town-user').textContent = user.userName + ' #' + user.id;
   document.getElementById('d-user').textContent = user.userName + ' #' + user.id;
   updateAllStats();
   goScreen('s-town');
   document.getElementById('town-caption').textContent =
-    `${user.userName} よ、ようこそ。最高到達: 第${user.maxFloor || 1}階層。`;
-  // サーバーからSettings取得
+    `${user.userName} よ、ようこそ。第${startFloor}階層から再開。`;
   loadGameSettings();
 }
 async function loadGameSettings() {
