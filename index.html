@@ -11,863 +11,728 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Shippori+Mincho:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-deep: #06030f;
-    --bg-mid: #0d0820;
-    --bg-panel: #120a2a;
-    --border-mystic: #2a1a55;
-    --neon-blue: #4dd9ff;
-    --neon-purple: #b04dff;
-    --neon-pink: #ff4dd9;
-    --gold: #d4a850;
-    --gold-bright: #ffd97a;
-    --text-main: #e8e0ff;
-    --text-dim: #8a7fb8;
-    --hp-color: #ff5577;
-    --mp-color: #4dd9ff;
-    --essence-color: #ffd97a;
-    --shadow-deep: rgba(0, 0, 0, 0.6);
-    --glow-blue: rgba(77, 217, 255, 0.4);
-    --glow-purple: rgba(176, 77, 255, 0.4);
-  }
+:root {
+  --bg-deep: #06030f;
+  --bg-mid: #0d0820;
+  --bg-panel: #120a2a;
+  --border-mystic: #2a1a55;
+  --neon-blue: #4dd9ff;
+  --neon-purple: #b04dff;
+  --neon-pink: #ff4dd9;
+  --gold: #d4a850;
+  --gold-bright: #ffd97a;
+  --text-main: #e8e0ff;
+  --text-dim: #8a7fb8;
+  --hp-color: #ff5577;
+  --mp-color: #4dd9ff;
+  --cost-color: #a0ff9a;
+  --shadow-deep: rgba(0,0,0,0.6);
+  --glow-blue: rgba(77,217,255,0.4);
+  --glow-purple: rgba(176,77,255,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Shippori Mincho',serif;
+  color:var(--text-main);
+  background:var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 20% 0%,rgba(176,77,255,.15) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 100%,rgba(77,217,255,.12) 0%,transparent 50%);
+  position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%,var(--neon-blue),transparent),
+    radial-gradient(1px 1px at 60% 70%,var(--neon-purple),transparent),
+    radial-gradient(1px 1px at 80% 20%,var(--gold-bright),transparent),
+    radial-gradient(1px 1px at 30% 80%,var(--neon-blue),transparent),
+    radial-gradient(1px 1px at 90% 50%,var(--neon-purple),transparent),
+    radial-gradient(1px 1px at 10% 60%,var(--gold-bright),transparent);
+  background-size:200% 200%;
+  opacity:.5;
+  animation:starDrift 60s linear infinite;
+  pointer-events:none;z-index:0;
+}
+@keyframes starDrift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.04;pointer-events:none;z-index:1;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
+/* ===== SCREEN WRAPPER ===== */
+.screen{
+  position:fixed;inset:0;z-index:2;
+  display:flex;flex-direction:column;
+  max-width:480px;margin:0 auto;
+  padding:12px 16px 16px;
+  gap:10px;
+  transition:opacity .25s;
+}
+.screen.hidden{opacity:0;pointer-events:none;}
 
-  body {
-    font-family: 'Shippori Mincho', serif;
-    color: var(--text-main);
-    background: var(--bg-deep);
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(176, 77, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(77, 217, 255, 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(13, 8, 32, 0.8) 0%, var(--bg-deep) 70%);
-    background-attachment: fixed;
-    position: relative;
-  }
+/* ===== HEADER ===== */
+.hdr{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:start;
+  gap:8px;
+  flex-shrink:0;
+}
+.title-area{display:flex;align-items:center;gap:8px;}
+.logo{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 0 10px var(--glow-purple));}
+.game-title{
+  font-family:'Cinzel',serif;font-weight:700;font-size:15px;letter-spacing:.15em;
+  background:linear-gradient(135deg,var(--neon-blue) 0%,var(--neon-purple) 60%,var(--gold-bright) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.user-tag{
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);
+  display:flex;align-items:center;gap:4px;
+}
+.user-tag::before{content:'◆';color:var(--neon-purple);font-size:7px;animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1;text-shadow:0 0 8px var(--neon-purple)}}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.hdr-btns{display:flex;gap:6px;}
+.icon-btn{
+  background:transparent;border:1px solid var(--border-mystic);
+  color:var(--text-dim);padding:4px 8px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;
+  cursor:pointer;transition:all .2s;
+}
+.icon-btn:hover{border-color:var(--neon-purple);color:var(--neon-blue);box-shadow:0 0 8px var(--glow-purple);}
+.stats-row{display:flex;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;flex-wrap:wrap;justify-content:flex-end;}
+.spl{
+  padding:2px 6px;border:1px solid var(--border-mystic);
+  background:rgba(13,8,32,.6);display:flex;gap:3px;align-items:center;
+}
+.spl .lbl{opacity:.6;}
+.spl.hp .val{color:var(--hp-color);}
+.spl.mp .val{color:var(--mp-color);}
+.spl.ct .val{color:var(--cost-color);}
+.spl.fl .val{color:var(--neon-purple);}
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 20% 30%, var(--neon-blue), transparent),
-      radial-gradient(1px 1px at 60% 70%, var(--neon-purple), transparent),
-      radial-gradient(1px 1px at 80% 20%, var(--gold-bright), transparent),
-      radial-gradient(1px 1px at 30% 80%, var(--neon-blue), transparent),
-      radial-gradient(1px 1px at 90% 50%, var(--neon-purple), transparent),
-      radial-gradient(1px 1px at 10% 60%, var(--gold-bright), transparent),
-      radial-gradient(1px 1px at 50% 10%, var(--neon-blue), transparent),
-      radial-gradient(1px 1px at 70% 40%, var(--neon-purple), transparent);
-    background-size: 200% 200%;
-    opacity: 0.6;
-    animation: starDrift 60s linear infinite;
-    pointer-events: none;
-    z-index: 0;
-  }
-  @keyframes starDrift {
-    0% { background-position: 0% 0%; }
-    100% { background-position: 100% 100%; }
-  }
+/* ===== LOGIN SCREEN ===== */
+#s-login{
+  position:fixed;inset:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-card{
+  width:100%;max-width:400px;
+  background:linear-gradient(180deg,rgba(18,10,42,.97) 0%,rgba(6,3,15,.97) 100%);
+  border:1px solid var(--border-mystic);
+  padding:32px 26px 24px;
+  box-shadow:0 0 60px var(--glow-purple),inset 0 0 30px rgba(176,77,255,.05);
+}
+.login-logo{display:block;width:120px;height:120px;margin:0 auto 6px;object-fit:contain;filter:drop-shadow(0 0 18px var(--glow-purple));animation:logoFloat 4s ease-in-out infinite;}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.login-title{text-align:center;font-family:'Cinzel',serif;font-size:20px;letter-spacing:.25em;background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple) 60%,var(--gold-bright));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:3px;}
+.login-sub{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.3em;margin-bottom:24px;}
+.tabs{display:grid;grid-template-columns:1fr 1fr;margin-bottom:18px;border:1px solid var(--border-mystic);}
+.tab{padding:9px;background:transparent;border:none;color:var(--text-dim);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;cursor:pointer;transition:all .2s;}
+.tab.active{background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));color:#fff;text-shadow:0 0 8px rgba(0,0,0,.5);}
+.field{margin-bottom:12px;}
+.field label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.15em;margin-bottom:5px;}
+.field input{width:100%;padding:10px 11px;background:rgba(6,3,15,.6);border:1px solid var(--border-mystic);color:var(--text-main);font-family:'Shippori Mincho',serif;font-size:14px;outline:none;transition:all .2s;}
+.field input:focus{border-color:var(--neon-purple);box-shadow:0 0 10px var(--glow-purple);}
+.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));color:#fff;border:none;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.3em;cursor:pointer;margin-top:8px;text-shadow:0 0 8px rgba(0,0,0,.5);transition:all .2s;}
+.submit-btn:hover:not(:disabled){box-shadow:0 0 22px var(--neon-purple);transform:translateY(-1px);}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-msg{margin-top:12px;padding:7px 9px;font-size:12px;border-left:2px solid var(--neon-purple);background:rgba(176,77,255,.08);min-height:14px;}
+.login-msg.error{border-color:var(--hp-color);background:rgba(255,85,119,.08);color:var(--hp-color);}
+.login-msg.success{border-color:var(--gold-bright);background:rgba(255,217,122,.08);color:var(--gold-bright);}
 
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.05;
-    pointer-events: none;
-    z-index: 1;
-  }
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;z-index:50;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(6,3,15,.85);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.visible{opacity:1;pointer-events:all;}
+.modal-box{
+  width:100%;max-width:340px;margin:20px;
+  background:linear-gradient(180deg,rgba(18,10,42,.98),rgba(6,3,15,.98));
+  border:1px solid var(--neon-purple);
+  box-shadow:0 0 40px var(--glow-purple);
+  padding:24px 20px 18px;
+  transform:translateY(10px);transition:transform .2s;
+}
+.modal-overlay.visible .modal-box{transform:translateY(0);}
+.modal-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.25em;color:var(--neon-blue);text-align:center;margin-bottom:6px;}
+.modal-body{font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:20px;line-height:1.6;}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.modal-cancel{padding:10px;background:transparent;border:1px solid var(--border-mystic);color:var(--text-dim);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;cursor:pointer;transition:all .2s;}
+.modal-cancel:hover{border-color:var(--neon-blue);color:var(--neon-blue);}
+.modal-ok{padding:10px;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;color:#fff;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;cursor:pointer;transition:all .2s;text-shadow:0 0 8px rgba(0,0,0,.5);}
+.modal-ok:hover{box-shadow:0 0 14px var(--neon-purple);}
 
-  /* ============ LOGIN SCREEN ============ */
-  .login-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
+/* ===== INVENTORY PANEL ===== */
+.inv-panel{
+  position:fixed;inset:0;z-index:40;
+  display:flex;flex-direction:column;
+  max-width:480px;margin:0 auto;
+  background:linear-gradient(180deg,rgba(6,3,15,.98),rgba(13,8,32,.98));
+  border:1px solid var(--border-mystic);
+  transform:translateX(100%);transition:transform .3s ease;
+  padding:14px 16px 16px;
+  gap:10px;
+}
+.inv-panel.open{transform:translateX(0);}
+.inv-header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.inv-title{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.2em;color:var(--neon-blue);}
+.inv-close{background:transparent;border:1px solid var(--border-mystic);color:var(--text-dim);padding:4px 10px;font-family:'Cinzel',serif;font-size:10px;cursor:pointer;transition:all .2s;}
+.inv-close:hover{border-color:var(--neon-pink);color:var(--neon-pink);}
 
-  .login-card {
-    width: 100%;
-    max-width: 400px;
-    background: linear-gradient(180deg, rgba(18, 10, 42, 0.95) 0%, rgba(6, 3, 15, 0.95) 100%);
-    border: 1px solid var(--border-mystic);
-    padding: 36px 28px 28px;
-    box-shadow:
-      0 0 60px var(--glow-purple),
-      inset 0 0 30px rgba(176, 77, 255, 0.05);
-    position: relative;
-  }
-  .login-card::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    background: linear-gradient(135deg, transparent 30%, var(--neon-purple) 50%, transparent 70%);
-    opacity: 0.3;
-    z-index: -1;
-    filter: blur(8px);
-  }
+/* 装備スロット */
+.equip-section{flex-shrink:0;}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.2em;margin-bottom:6px;}
+.equip-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.equip-slot{
+  border:1px solid var(--border-mystic);
+  background:rgba(13,8,32,.6);
+  padding:5px;min-height:52px;
+  cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  text-align:center;
+}
+.equip-slot:hover{border-color:var(--neon-purple);box-shadow:0 0 8px var(--glow-purple);}
+.equip-slot.filled{border-color:var(--neon-blue);}
+.equip-slot.magic-slot.filled{border-color:var(--neon-purple);}
+.equip-slot .slot-label{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:.05em;}
+.equip-slot .slot-name{font-size:10px;color:var(--text-main);line-height:1.2;}
+.equip-slot .slot-empty{font-size:9px;color:var(--text-dim);opacity:.5;}
 
-  .login-logo {
-    display: block;
-    width: 130px;
-    height: 130px;
-    margin: 0 auto 8px;
-    object-fit: contain;
-    filter: drop-shadow(0 0 20px var(--glow-purple));
-    animation: logoFloat 4s ease-in-out infinite;
-  }
-  @keyframes logoFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-  }
+/* インベントリリスト */
+.inv-list-section{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;}
+.inv-filter{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;}
+.filter-btn{
+  padding:4px 8px;background:transparent;border:1px solid var(--border-mystic);
+  color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:.1em;cursor:pointer;transition:all .2s;
+}
+.filter-btn.active{background:rgba(176,77,255,.2);border-color:var(--neon-purple);color:var(--neon-blue);}
+.inv-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);flex-shrink:0;}
+.inv-count span{color:var(--gold-bright);}
+.inv-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+.inv-list::-webkit-scrollbar{width:4px;}
+.inv-list::-webkit-scrollbar-thumb{background:var(--border-mystic);}
+.inv-item{
+  display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
+  padding:8px 10px;
+  background:rgba(13,8,32,.6);border:1px solid var(--border-mystic);
+  cursor:pointer;transition:all .2s;
+}
+.inv-item:hover{border-color:var(--neon-purple);background:rgba(176,77,255,.08);}
+.inv-item.equipped{border-color:var(--neon-blue);}
+.item-icon{font-size:18px;width:24px;text-align:center;}
+.item-info{min-width:0;}
+.item-name{font-size:12px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);}
+.item-badge{
+  font-family:'JetBrains Mono',monospace;font-size:8px;
+  padding:2px 5px;border:1px solid;white-space:nowrap;
+}
+.item-badge.weapon{color:var(--hp-color);border-color:var(--hp-color);}
+.item-badge.armor{color:var(--neon-blue);border-color:var(--neon-blue);}
+.item-badge.magic{color:var(--neon-purple);border-color:var(--neon-purple);}
+.item-badge.item{color:var(--gold-bright);border-color:var(--gold-bright);}
+.item-badge.accessory{color:var(--gold);border-color:var(--gold);}
+.item-badge.equipped-mark{background:rgba(77,217,255,.15);color:var(--neon-blue);border-color:var(--neon-blue);}
+.inv-empty{text-align:center;padding:20px;color:var(--text-dim);font-size:12px;}
 
-  .login-title {
-    text-align: center;
-    font-family: 'Cinzel', serif;
-    font-size: 22px;
-    letter-spacing: 0.25em;
-    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 60%, var(--gold-bright) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    margin-bottom: 4px;
-  }
-  .login-subtitle {
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 0.3em;
-    margin-bottom: 28px;
-  }
+/* アイテムアクションメニュー */
+.item-action-menu{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:linear-gradient(180deg,rgba(18,10,42,.99),rgba(6,3,15,.99));
+  border-top:1px solid var(--neon-purple);
+  padding:14px 16px;
+  z-index:60;
+  transform:translateX(-50%) translateY(100%);
+  transition:transform .25s;
+}
+.item-action-menu.open{transform:translateX(-50%) translateY(0);}
+.action-item-name{font-family:'Cinzel',serif;font-size:13px;color:var(--neon-blue);margin-bottom:4px;}
+.action-item-desc{font-size:11px;color:var(--text-dim);margin-bottom:12px;line-height:1.5;}
+.action-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.action-btn{
+  padding:9px 14px;border:1px solid var(--border-mystic);background:transparent;
+  color:var(--text-main);font-family:'Shippori Mincho',serif;font-size:12px;
+  cursor:pointer;transition:all .2s;flex:1;min-width:60px;text-align:center;
+}
+.action-btn:hover{border-color:var(--neon-purple);color:var(--neon-blue);box-shadow:0 0 8px var(--glow-purple);}
+.action-btn.danger{border-color:rgba(255,85,119,.3);color:var(--hp-color);}
+.action-btn.danger:hover{border-color:var(--hp-color);box-shadow:0 0 8px rgba(255,85,119,.4);}
+.action-btn.primary{background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;color:#fff;}
 
-  /* タブ切替 */
-  .tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-bottom: 20px;
-    border: 1px solid var(--border-mystic);
-  }
-  .tab {
-    padding: 10px;
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .tab.active {
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    color: white;
-    text-shadow: 0 0 8px rgba(0,0,0,0.5);
-  }
-  .tab:not(.active):hover {
-    color: var(--neon-blue);
-    background: rgba(77, 217, 255, 0.05);
-  }
+/* ===== HOMETOWN ===== */
+#s-town{overflow:hidden;}
+.town-stage{
+  flex:1;
+  border:1px solid var(--border-mystic);
+  background:radial-gradient(ellipse at center,rgba(176,77,255,.08) 0%,transparent 70%),
+    linear-gradient(180deg,var(--bg-mid),var(--bg-deep));
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  min-height:180px;
+}
+.town-stage::before{
+  content:'';position:absolute;width:200px;height:200px;
+  border:1px solid var(--border-mystic);border-radius:50%;opacity:.3;
+  animation:rotateSlow 40s linear infinite;
+}
+.town-stage::after{
+  content:'';position:absolute;width:140px;height:140px;
+  border:1px dashed var(--neon-purple);border-radius:50%;opacity:.2;
+  animation:rotateSlow 30s linear infinite reverse;
+}
+@keyframes rotateSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.town-content{position:relative;z-index:2;text-align:center;padding:16px;}
+.town-icon{font-size:52px;margin-bottom:6px;filter:drop-shadow(0 0 16px var(--glow-purple));animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.town-title{font-family:'Cinzel',serif;font-size:16px;letter-spacing:.2em;color:var(--neon-blue);text-shadow:0 0 10px var(--glow-blue);margin-bottom:4px;}
+.town-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.15em;}
+.town-caption{
+  border:1px solid var(--border-mystic);border-top:none;
+  background:rgba(6,3,15,.9);padding:8px 14px;
+  font-size:12px;line-height:1.6;color:var(--text-main);min-height:44px;
+}
+.town-menu{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.town-btn{
+  padding:16px 10px;
+  background:linear-gradient(135deg,rgba(18,10,42,.9),rgba(13,8,32,.9));
+  border:1px solid var(--border-mystic);
+  color:var(--text-main);font-family:'Shippori Mincho',serif;font-size:14px;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+  min-height:56px;text-align:center;
+}
+.town-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent,rgba(176,77,255,.2));
+  opacity:0;transition:opacity .2s;
+}
+.town-btn:hover{border-color:var(--neon-purple);color:var(--neon-blue);box-shadow:0 0 14px var(--glow-purple);transform:translateY(-1px);}
+.town-btn:hover::before{opacity:1;}
+.town-btn .btn-sub{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:.1em;}
 
-  .field {
-    margin-bottom: 14px;
-  }
-  .field label {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 0.15em;
-    margin-bottom: 6px;
-  }
-  .field input {
-    width: 100%;
-    padding: 11px 12px;
-    background: rgba(6, 3, 15, 0.6);
-    border: 1px solid var(--border-mystic);
-    color: var(--text-main);
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.2s;
-  }
-  .field input:focus {
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 12px var(--glow-purple);
-  }
+/* ===== CRAFT SCREEN ===== */
+#s-craft{overflow:hidden;}
+.craft-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border-mystic);flex-shrink:0;}
+.craft-tab{
+  padding:9px 4px;background:transparent;border:none;border-right:1px solid var(--border-mystic);
+  color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.05em;cursor:pointer;transition:all .2s;text-align:center;
+}
+.craft-tab:last-child{border-right:none;}
+.craft-tab.active{background:rgba(176,77,255,.2);color:var(--neon-blue);}
+.craft-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;min-height:0;}
+.craft-body::-webkit-scrollbar{width:4px;}
+.craft-body::-webkit-scrollbar-thumb{background:var(--border-mystic);}
+.craft-sub-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.craft-sub-btn{
+  padding:6px 12px;background:transparent;border:1px solid var(--border-mystic);
+  color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;
+  cursor:pointer;transition:all .2s;
+}
+.craft-sub-btn.active{background:rgba(176,77,255,.2);border-color:var(--neon-purple);color:var(--neon-blue);}
+.craft-cost-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border:1px solid var(--border-mystic);background:rgba(13,8,32,.6);
+}
+.craft-cost-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);}
+.craft-cost-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cost-color);}
+.craft-cost-val.over{color:var(--hp-color);}
+.craft-prompt-area{display:flex;flex-direction:column;gap:6px;}
+.craft-prompt-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.1em;}
+.craft-input-row{display:flex;border:1px solid var(--border-mystic);background:rgba(6,3,15,.6);}
+.craft-input-row:focus-within{border-color:var(--neon-purple);box-shadow:0 0 10px var(--glow-purple);}
+.craft-input{
+  flex:1;background:transparent;border:none;padding:11px 12px;
+  font-family:'Shippori Mincho',serif;font-size:13px;color:var(--neon-blue);outline:none;
+}
+.craft-input::placeholder{color:var(--text-dim);font-style:italic;font-size:11px;}
+.craft-cost-inline{
+  padding:11px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--cost-color);border-left:1px solid var(--border-mystic);
+  display:flex;align-items:center;min-width:60px;justify-content:center;
+}
+.craft-cost-inline.over{color:var(--hp-color);}
+.craft-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));
+  color:#fff;border:none;font-family:'Cinzel',serif;font-size:12px;
+  letter-spacing:.25em;cursor:pointer;text-shadow:0 0 8px rgba(0,0,0,.5);transition:all .2s;
+}
+.craft-btn:hover:not(:disabled){box-shadow:0 0 20px var(--neon-purple);}
+.craft-btn:disabled{opacity:.4;cursor:not-allowed;}
+.craft-result{
+  padding:12px;border:1px solid var(--gold);background:rgba(212,168,80,.08);
+}
+.craft-result-title{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-bright);margin-bottom:6px;}
+.craft-result-body{font-size:12px;color:var(--text-main);line-height:1.7;}
 
-  .submit-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    color: white;
-    border: none;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    letter-spacing: 0.3em;
-    cursor: pointer;
-    margin-top: 10px;
-    text-shadow: 0 0 8px rgba(0,0,0,0.5);
-    transition: all 0.2s;
-  }
-  .submit-btn:hover:not(:disabled) {
-    box-shadow: 0 0 24px var(--neon-purple);
-    transform: translateY(-1px);
-  }
-  .submit-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+/* ===== DUNGEON SCREEN ===== */
+#s-dungeon{overflow:hidden;}
+.stage{
+  flex:1;border:1px solid var(--border-mystic);
+  background:radial-gradient(ellipse at center,rgba(176,77,255,.08) 0%,transparent 70%),
+    linear-gradient(180deg,var(--bg-mid),var(--bg-deep));
+  position:relative;overflow:hidden;
+  box-shadow:inset 0 0 40px rgba(176,77,255,.1),0 0 20px var(--shadow-deep);
+  display:flex;align-items:center;justify-content:center;min-height:200px;
+}
+.stage::before{content:'';position:absolute;width:220px;height:220px;border:1px solid var(--border-mystic);border-radius:50%;opacity:.3;animation:rotateSlow 40s linear infinite;}
+.stage::after{content:'';position:absolute;width:160px;height:160px;border:1px dashed var(--neon-purple);border-radius:50%;opacity:.2;animation:rotateSlow 30s linear infinite reverse;}
+.stage-content{position:relative;z-index:2;text-align:center;padding:16px;width:100%;}
+.stage-icon{font-size:60px;margin-bottom:6px;filter:drop-shadow(0 0 18px var(--glow-purple));animation:float 3s ease-in-out infinite;}
+.stage-title{font-family:'Cinzel',serif;font-size:17px;letter-spacing:.2em;color:var(--neon-blue);text-shadow:0 0 10px var(--glow-blue);margin-bottom:6px;}
+.stage-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.12em;}
+.enemy-hp-bar{margin-top:10px;width:100%;height:5px;background:rgba(0,0,0,.5);border:1px solid var(--border-mystic);overflow:hidden;}
+.enemy-hp-fill{height:100%;background:linear-gradient(90deg,var(--hp-color),var(--neon-pink));box-shadow:0 0 8px var(--hp-color);transition:width .5s ease-out;}
+.caption{
+  border:1px solid var(--border-mystic);border-top:none;
+  background:rgba(6,3,15,.9);padding:9px 14px;
+  font-size:12px;line-height:1.6;color:var(--text-main);
+  min-height:54px;max-height:96px;overflow-y:auto;
+}
+.caption::-webkit-scrollbar{width:4px;}
+.caption::-webkit-scrollbar-thumb{background:var(--border-mystic);}
+.caption .sys{color:var(--text-dim);font-style:italic;font-size:11px;}
+.caption .dmg{color:var(--neon-blue);font-weight:700;}
+.caption .wk{color:var(--gold-bright);font-weight:700;}
+.caption .hurt{color:var(--hp-color);font-weight:700;}
+.caption .en{color:var(--neon-purple);font-family:'Cinzel',serif;}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.choice-btn{
+  padding:13px 8px;
+  background:linear-gradient(135deg,rgba(18,10,42,.9),rgba(13,8,32,.9));
+  border:1px solid var(--border-mystic);color:var(--text-main);
+  font-family:'Shippori Mincho',serif;font-size:12px;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+  min-height:50px;text-align:center;
+}
+.choice-btn:hover:not(:disabled){border-color:var(--neon-purple);color:var(--neon-blue);box-shadow:0 0 14px var(--glow-purple);transform:translateY(-1px);}
+.choice-btn:disabled{opacity:.3;cursor:not-allowed;}
+.choice-btn .meta{display:block;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim);margin-top:2px;letter-spacing:.1em;}
 
-  .login-msg {
-    margin-top: 14px;
-    padding: 8px 10px;
-    font-size: 12px;
-    border-left: 2px solid var(--neon-purple);
-    background: rgba(176, 77, 255, 0.08);
-    min-height: 14px;
-  }
-  .login-msg.error {
-    border-color: var(--hp-color);
-    background: rgba(255, 85, 119, 0.08);
-    color: var(--hp-color);
-  }
-  .login-msg.success {
-    border-color: var(--gold-bright);
-    background: rgba(255, 217, 122, 0.08);
-    color: var(--gold-bright);
-  }
+/* 詠唱入力 */
+.cast-row{grid-column:1/-1;display:flex;border:1px solid var(--neon-purple);background:rgba(13,8,32,.95);box-shadow:0 0 14px var(--glow-purple);}
+.cast-input{flex:1;background:transparent;border:none;padding:11px 12px;font-family:'Shippori Mincho',serif;font-size:13px;color:var(--neon-blue);outline:none;}
+.cast-input::placeholder{color:var(--text-dim);font-style:italic;font-size:11px;}
+.cast-cost{padding:11px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold-bright);border-left:1px solid var(--border-mystic);display:flex;align-items:center;min-width:60px;justify-content:center;}
+.cast-cost.over{color:var(--hp-color);}
+.cast-go{padding:11px 14px;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));color:#fff;border:none;border-left:1px solid var(--neon-purple);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;cursor:pointer;}
+.cast-go:disabled{opacity:.4;cursor:not-allowed;}
 
-  .api-warning {
-    margin-top: 16px;
-    padding: 10px;
-    border: 1px dashed var(--gold);
-    font-size: 11px;
-    color: var(--gold);
-    font-family: 'JetBrains Mono', monospace;
-    line-height: 1.5;
-  }
+/* 魔法選択 */
+.magic-select{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;}
+.magic-select-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.15em;}
+.magic-list{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.magic-btn{
+  padding:10px 6px;border:1px solid var(--neon-purple);background:rgba(176,77,255,.1);
+  color:var(--neon-blue);font-family:'Shippori Mincho',serif;font-size:11px;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.magic-btn:hover{box-shadow:0 0 10px var(--glow-purple);background:rgba(176,77,255,.2);}
+.magic-btn .magic-cost{display:block;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim);margin-top:2px;}
+.magic-btn:disabled{opacity:.3;cursor:not-allowed;}
 
-  /* ============ APP ============ */
-  .app {
-    position: relative;
-    z-index: 2;
-    height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 14px 18px 18px;
-    gap: 12px;
-  }
-  .app.hidden { display: none; }
+/* アイテム選択（戦闘中） */
+.item-select{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;}
+.combat-item-list{display:flex;flex-direction:column;gap:4px;max-height:120px;overflow-y:auto;}
+.combat-item-btn{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;border:1px solid var(--border-mystic);background:rgba(13,8,32,.6);
+  cursor:pointer;transition:all .2s;font-size:12px;
+}
+.combat-item-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
 
-  header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 12px;
-  }
+/* フラッシュ */
+.stage.flash-attack{animation:flashAtk .5s ease-out;}
+.stage.flash-hit{animation:flashHit .4s ease-out;}
+@keyframes flashAtk{0%{box-shadow:inset 0 0 40px rgba(176,77,255,.1),0 0 20px var(--shadow-deep)}50%{box-shadow:inset 0 0 80px rgba(77,217,255,.6),0 0 40px var(--neon-blue)}100%{box-shadow:inset 0 0 40px rgba(176,77,255,.1),0 0 20px var(--shadow-deep)}}
+@keyframes flashHit{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 
-  .title-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .logo {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
-    filter: drop-shadow(0 0 12px var(--glow-purple));
-  }
-
-  .title-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .game-title {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: 0.15em;
-    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 60%, var(--gold-bright) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 20px var(--glow-purple);
-  }
-
-  .user-info {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .user-info::before {
-    content: '◆';
-    color: var(--neon-purple);
-    font-size: 8px;
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; text-shadow: 0 0 8px var(--neon-purple); }
-  }
-
-  .header-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-  }
-
-  .logout-btn {
-    background: transparent;
-    border: 1px solid var(--border-mystic);
-    color: var(--text-dim);
-    padding: 4px 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .logout-btn:hover {
-    border-color: var(--neon-pink);
-    color: var(--neon-pink);
-    box-shadow: 0 0 10px rgba(255, 77, 217, 0.3);
-  }
-
-  .stats-mini {
-    display: flex;
-    gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-  }
-  .stat-pill {
-    padding: 2px 7px;
-    border: 1px solid var(--border-mystic);
-    background: rgba(13, 8, 32, 0.6);
-    display: flex;
-    gap: 4px;
-    align-items: center;
-  }
-  .stat-pill .label { opacity: 0.6; }
-  .stat-pill.hp .val { color: var(--hp-color); }
-  .stat-pill.mp .val { color: var(--mp-color); }
-  .stat-pill.es .val { color: var(--essence-color); }
-  .stat-pill.fl .val { color: var(--neon-purple); }
-
-  main {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    min-height: 0;
-  }
-
-  .stage {
-    flex: 1;
-    border: 1px solid var(--border-mystic);
-    background:
-      radial-gradient(ellipse at center, rgba(176, 77, 255, 0.08) 0%, transparent 70%),
-      linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-      inset 0 0 40px rgba(176, 77, 255, 0.1),
-      0 0 20px var(--shadow-deep);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 220px;
-  }
-
-  .stage::before {
-    content: '';
-    position: absolute;
-    width: 220px;
-    height: 220px;
-    border: 1px solid var(--border-mystic);
-    border-radius: 50%;
-    opacity: 0.3;
-    animation: rotateSlow 40s linear infinite;
-  }
-  .stage::after {
-    content: '';
-    position: absolute;
-    width: 160px;
-    height: 160px;
-    border: 1px dashed var(--neon-purple);
-    border-radius: 50%;
-    opacity: 0.2;
-    animation: rotateSlow 30s linear infinite reverse;
-  }
-  @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .stage-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 20px;
-    width: 100%;
-  }
-
-  .stage-icon {
-    font-size: 64px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 0 20px var(--glow-purple));
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-
-  .stage-title {
-    font-family: 'Cinzel', serif;
-    font-size: 18px;
-    letter-spacing: 0.2em;
-    color: var(--neon-blue);
-    text-shadow: 0 0 12px var(--glow-blue);
-    margin-bottom: 8px;
-  }
-
-  .stage-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 0.15em;
-  }
-
-  .stage.flash-attack { animation: flashAttack 0.5s ease-out; }
-  .stage.flash-hit { animation: flashHit 0.4s ease-out; }
-  @keyframes flashAttack {
-    0% { box-shadow: inset 0 0 40px rgba(176, 77, 255, 0.1), 0 0 20px var(--shadow-deep); }
-    50% { box-shadow: inset 0 0 80px rgba(77, 217, 255, 0.6), 0 0 40px var(--neon-blue); }
-    100% { box-shadow: inset 0 0 40px rgba(176, 77, 255, 0.1), 0 0 20px var(--shadow-deep); }
-  }
-  @keyframes flashHit {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
-  }
-
-  .enemy-hp-bar {
-    margin-top: 12px;
-    width: 100%;
-    height: 6px;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--border-mystic);
-    position: relative;
-    overflow: hidden;
-  }
-  .enemy-hp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--hp-color) 0%, var(--neon-pink) 100%);
-    box-shadow: 0 0 8px var(--hp-color);
-    transition: width 0.5s ease-out;
-  }
-
-  .caption {
-    border: 1px solid var(--border-mystic);
-    border-top: none;
-    background: rgba(6, 3, 15, 0.9);
-    padding: 10px 16px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text-main);
-    min-height: 60px;
-    max-height: 110px;
-    overflow-y: auto;
-    font-family: 'Shippori Mincho', serif;
-  }
-  .caption::-webkit-scrollbar { width: 4px; }
-  .caption::-webkit-scrollbar-thumb { background: var(--border-mystic); }
-  .caption .system { color: var(--text-dim); font-style: italic; font-size: 12px; }
-  .caption .damage { color: var(--neon-blue); font-weight: 700; }
-  .caption .weak { color: var(--gold-bright); font-weight: 700; }
-  .caption .hurt { color: var(--hp-color); font-weight: 700; }
-  .caption .enemy-name { color: var(--neon-purple); font-family: 'Cinzel', serif; }
-
-  .choices-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .choice-btn {
-    padding: 14px 10px;
-    background: linear-gradient(135deg, rgba(18, 10, 42, 0.9) 0%, rgba(13, 8, 32, 0.9) 100%);
-    border: 1px solid var(--border-mystic);
-    color: var(--text-main);
-    font-family: 'Shippori Mincho', serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-    min-height: 52px;
-    text-align: center;
-  }
-  .choice-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(176, 77, 255, 0.2) 100%);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .choice-btn:hover:not(:disabled) {
-    border-color: var(--neon-purple);
-    color: var(--neon-blue);
-    box-shadow: 0 0 16px var(--glow-purple), inset 0 0 16px rgba(176, 77, 255, 0.2);
-    transform: translateY(-1px);
-  }
-  .choice-btn:hover:not(:disabled)::before { opacity: 1; }
-  .choice-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  .choice-btn .meta {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: var(--text-dim);
-    margin-top: 3px;
-    letter-spacing: 0.1em;
-  }
-
-  .cast-overlay {
-    grid-column: 1 / -1;
-    display: flex;
-    border: 1px solid var(--neon-purple);
-    background: rgba(13, 8, 32, 0.95);
-    box-shadow: 0 0 16px var(--glow-purple);
-  }
-  .cast-overlay input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 12px 14px;
-    font-family: 'Shippori Mincho', serif;
-    font-size: 14px;
-    color: var(--neon-blue);
-    outline: none;
-  }
-  .cast-overlay input::placeholder {
-    color: var(--text-dim);
-    font-style: italic;
-    font-size: 12px;
-  }
-  .cost-display {
-    padding: 12px 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--essence-color);
-    border-left: 1px solid var(--border-mystic);
-    display: flex;
-    align-items: center;
-    min-width: 70px;
-    justify-content: center;
-  }
-  .cost-display.over { color: var(--hp-color); }
-  .cast-confirm {
-    padding: 12px 16px;
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    color: white;
-    border: none;
-    border-left: 1px solid var(--neon-purple);
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-    text-shadow: 0 0 8px rgba(0,0,0,0.5);
-  }
-  .cast-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .typing::after {
-    content: '▊';
-    color: var(--neon-blue);
-    animation: blink 0.8s steps(1) infinite;
-    margin-left: 2px;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  .sync-indicator {
-    position: fixed;
-    bottom: 8px;
-    right: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: var(--text-dim);
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .sync-indicator.visible { opacity: 1; }
-  .sync-indicator.success { color: var(--neon-blue); }
-  .sync-indicator.error { color: var(--hp-color); }
-
-  /* ============ LOGOUT MODAL ============ */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(6, 3, 15, 0.8);
-    backdrop-filter: blur(4px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  .modal-overlay.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .modal-box {
-    width: 100%;
-    max-width: 300px;
-    margin: 20px;
-    background: linear-gradient(180deg, rgba(18, 10, 42, 0.98) 0%, rgba(6, 3, 15, 0.98) 100%);
-    border: 1px solid var(--neon-purple);
-    box-shadow: 0 0 40px var(--glow-purple);
-    padding: 28px 24px 20px;
-    transform: translateY(10px);
-    transition: transform 0.2s;
-  }
-  .modal-overlay.visible .modal-box {
-    transform: translateY(0);
-  }
-  .modal-title {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    letter-spacing: 0.25em;
-    color: var(--neon-blue);
-    text-align: center;
-    margin-bottom: 8px;
-  }
-  .modal-body {
-    font-size: 13px;
-    color: var(--text-dim);
-    text-align: center;
-    margin-bottom: 24px;
-    line-height: 1.6;
-  }
-  .modal-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .modal-btn-cancel {
-    padding: 11px;
-    background: transparent;
-    border: 1px solid var(--border-mystic);
-    color: var(--text-dim);
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .modal-btn-cancel:hover {
-    border-color: var(--neon-blue);
-    color: var(--neon-blue);
-  }
-  .modal-btn-confirm {
-    padding: 11px;
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    border: none;
-    color: white;
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-shadow: 0 0 8px rgba(0,0,0,0.5);
-  }
-  .modal-btn-confirm:hover {
-    box-shadow: 0 0 16px var(--neon-purple);
-  }
+/* sync */
+.sync-ind{position:fixed;bottom:8px;right:12px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);z-index:100;opacity:0;transition:opacity .3s;}
+.sync-ind.visible{opacity:1;}
+.sync-ind.success{color:var(--neon-blue);}
+.sync-ind.error{color:var(--hp-color);}
 </style>
 </head>
 <body>
 
+<!-- ===== LOGOUT MODAL ===== -->
 <div class="modal-overlay" id="logout-modal">
   <div class="modal-box">
     <div class="modal-title">LOGOUT</div>
     <div class="modal-body">セッションを終了しますか？<br>進行中のデータは失われます。</div>
     <div class="modal-btns">
-      <button class="modal-btn-cancel" onclick="closeLogoutModal()">CANCEL</button>
-      <button class="modal-btn-confirm" onclick="location.reload()">LOGOUT</button>
+      <button class="modal-cancel" onclick="closeModal('logout-modal')">CANCEL</button>
+      <button class="modal-ok" onclick="location.reload()">LOGOUT</button>
     </div>
   </div>
 </div>
 
-<!-- ============ LOGIN SCREEN ============ -->
-<div class="login-screen" id="login-screen">
+<!-- ===== ITEM ACTION MENU ===== -->
+<div class="item-action-menu" id="item-action-menu">
+  <div class="action-item-name" id="action-item-name">—</div>
+  <div class="action-item-desc" id="action-item-desc"></div>
+  <div class="action-btns" id="action-btns"></div>
+</div>
+
+<!-- ===== INVENTORY PANEL ===== -->
+<div class="inv-panel" id="inv-panel">
+  <div class="inv-header">
+    <div class="inv-title">INVENTORY</div>
+    <button class="inv-close" onclick="closeInventory()">✕ CLOSE</button>
+  </div>
+
+  <!-- 装備スロット -->
+  <div class="equip-section">
+    <div class="section-label">— EQUIPPED —</div>
+    <div class="equip-slots" id="equip-slots">
+      <div class="equip-slot" id="slot-weapon" onclick="onSlotClick('weapon')">
+        <div class="slot-label">武器</div><div class="slot-empty" id="slot-weapon-name">空</div>
+      </div>
+      <div class="equip-slot magic-slot" id="slot-magic1" onclick="onSlotClick('magic1')">
+        <div class="slot-label">魔法1</div><div class="slot-empty" id="slot-magic1-name">空</div>
+      </div>
+      <div class="equip-slot magic-slot" id="slot-magic2" onclick="onSlotClick('magic2')">
+        <div class="slot-label">魔法2</div><div class="slot-empty" id="slot-magic2-name">空</div>
+      </div>
+      <div class="equip-slot magic-slot" id="slot-magic3" onclick="onSlotClick('magic3')">
+        <div class="slot-label">魔法3</div><div class="slot-empty" id="slot-magic3-name">空</div>
+      </div>
+      <div class="equip-slot" id="slot-armor" onclick="onSlotClick('armor')">
+        <div class="slot-label">防具</div><div class="slot-empty" id="slot-armor-name">空</div>
+      </div>
+      <div class="equip-slot" id="slot-acc1" onclick="onSlotClick('acc1')">
+        <div class="slot-label">アクセ1</div><div class="slot-empty" id="slot-acc1-name">空</div>
+      </div>
+      <div class="equip-slot" id="slot-acc2" onclick="onSlotClick('acc2')">
+        <div class="slot-label">アクセ2</div><div class="slot-empty" id="slot-acc2-name">空</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フィルター＆リスト -->
+  <div class="inv-list-section">
+    <div class="inv-filter">
+      <button class="filter-btn active" onclick="setInvFilter('all')">すべて</button>
+      <button class="filter-btn" onclick="setInvFilter('weapon')">武器</button>
+      <button class="filter-btn" onclick="setInvFilter('magic')">魔法</button>
+      <button class="filter-btn" onclick="setInvFilter('armor')">防具</button>
+      <button class="filter-btn" onclick="setInvFilter('item')">消耗品</button>
+      <button class="filter-btn" onclick="setInvFilter('accessory')">アクセ</button>
+    </div>
+    <div class="inv-count">所持: <span id="inv-count-num">0</span>/20</div>
+    <div class="inv-list" id="inv-list"></div>
+  </div>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div id="s-login">
   <div class="login-card">
     <img src="logo.png" alt="Promptia" class="login-logo">
     <div class="login-title">PROMPTIA</div>
-    <div class="login-subtitle">— ONLINE —</div>
-
+    <div class="login-sub">— ONLINE —</div>
     <div class="tabs">
       <button class="tab active" id="tab-login" onclick="switchTab('login')">LOGIN</button>
       <button class="tab" id="tab-register" onclick="switchTab('register')">REGISTER</button>
     </div>
-
-    <!-- LOGIN フォーム -->
     <div id="form-login">
-      <div class="field">
-        <label>EMAIL</label>
-        <input type="email" id="login-email" placeholder="example@mail.com" autocomplete="email">
-      </div>
-      <div class="field">
-        <label>USER NAME</label>
-        <input type="text" id="login-name" placeholder="登録済みのユーザー名" maxlength="20">
-      </div>
+      <div class="field"><label>EMAIL</label><input type="email" id="login-email" placeholder="example@mail.com" autocomplete="email"></div>
+      <div class="field"><label>USER NAME</label><input type="text" id="login-name" placeholder="登録済みのユーザー名" maxlength="20"></div>
       <button class="submit-btn" id="btn-login" onclick="doLogin()">ENTER THE DUNGEON</button>
     </div>
-
-    <!-- REGISTER フォーム -->
     <div id="form-register" style="display:none">
-      <div class="field">
-        <label>EMAIL</label>
-        <input type="email" id="reg-email" placeholder="example@mail.com" autocomplete="email">
-      </div>
-      <div class="field">
-        <label>USER NAME（20文字以内）</label>
-        <input type="text" id="reg-name" placeholder="名もなき詠唱者" maxlength="20">
-      </div>
+      <div class="field"><label>EMAIL</label><input type="email" id="reg-email" placeholder="example@mail.com" autocomplete="email"></div>
+      <div class="field"><label>USER NAME（20文字以内）</label><input type="text" id="reg-name" placeholder="名もなき詠唱者" maxlength="20"></div>
       <button class="submit-btn" id="btn-register" onclick="doRegister()">CREATE NEW SOUL</button>
     </div>
-
     <div class="login-msg" id="login-msg"></div>
-
-    <div class="api-warning" id="api-warning" style="display:none">
-      ⚠ 通信エラー。GAS_URL を確認してください。
-    </div>
   </div>
 </div>
 
-<!-- ============ APP ============ -->
-<div class="app hidden" id="app">
-  <header>
+<!-- ===== HOMETOWN ===== -->
+<div class="screen hidden" id="s-town">
+  <div class="hdr">
     <div class="title-area">
-      <img src="logo.png" alt="Promptia Online" class="logo">
-      <div class="title-text">
+      <img src="logo.png" class="logo">
+      <div>
         <div class="game-title">PROMPTIA</div>
-        <div class="user-info" id="user-info">—</div>
+        <div class="user-tag" id="town-user">—</div>
       </div>
     </div>
-    <div class="header-right">
-      <button class="logout-btn" onclick="doLogout()">LOGOUT</button>
-      <div class="stats-mini">
-        <span class="stat-pill fl"><span class="label">F</span><span class="val" id="stat-fl">1</span></span>
-        <span class="stat-pill hp"><span class="label">HP</span><span class="val" id="stat-hp">100</span></span>
-        <span class="stat-pill mp"><span class="label">MP</span><span class="val" id="stat-mp">50</span></span>
-        <span class="stat-pill es"><span class="label">★</span><span class="val" id="stat-es">0</span></span>
+    <div class="hdr-right">
+      <div class="hdr-btns">
+        <button class="icon-btn" onclick="openInventory()">🎒 BAG</button>
+        <button class="icon-btn" onclick="openModal('logout-modal')">LOGOUT</button>
+      </div>
+      <div class="stats-row">
+        <span class="spl fl"><span class="lbl">F</span><span class="val" id="t-fl">1</span></span>
+        <span class="spl hp"><span class="lbl">HP</span><span class="val" id="t-hp">100</span></span>
+        <span class="spl mp"><span class="lbl">MP</span><span class="val" id="t-mp">50</span></span>
+        <span class="spl ct"><span class="lbl">CT</span><span class="val" id="t-ct">10</span></span>
       </div>
     </div>
-  </header>
+  </div>
+  <div class="town-stage">
+    <div class="town-content">
+      <div class="town-icon">🏰</div>
+      <div class="town-title">HOMETOWN</div>
+      <div class="town-sub" id="town-sub">— REST AND PREPARE —</div>
+    </div>
+  </div>
+  <div class="town-caption" id="town-caption">ホームタウンへようこそ。次の冒険に備えよ。</div>
+  <div class="town-menu">
+    <button class="town-btn" onclick="goScreen('s-craft')">生成<span class="btn-sub">CRAFT · コスト消費</span></button>
+    <button class="town-btn" onclick="showShop()">商店<span class="btn-sub">SHOP · 売買</span></button>
+    <button class="town-btn" onclick="showQuest()">クエスト<span class="btn-sub">QUEST · 報酬</span></button>
+    <button class="town-btn" onclick="enterDungeon()">ダンジョン<span class="btn-sub">DUNGEON · 潜る</span></button>
+  </div>
+</div>
 
-  <main>
+<!-- ===== CRAFT ===== -->
+<div class="screen hidden" id="s-craft">
+  <div class="hdr">
+    <div class="title-area">
+      <button class="icon-btn" onclick="goScreen('s-town')">← TOWN</button>
+      <div style="margin-left:8px">
+        <div class="game-title">生成</div>
+        <div class="user-tag">CRAFT STUDIO</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-btns">
+        <button class="icon-btn" onclick="openInventory()">🎒 BAG</button>
+      </div>
+      <div class="stats-row">
+        <span class="spl ct"><span class="lbl">CT</span><span class="val" id="c-ct">10</span></span>
+        <span class="spl mp"><span class="lbl">MP</span><span class="val" id="c-mp">50</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="craft-tabs">
+    <button class="craft-tab active" onclick="setCraftTab('weapon')">⚔ 武器</button>
+    <button class="craft-tab" onclick="setCraftTab('armor')">🛡 防具</button>
+    <button class="craft-tab" onclick="setCraftTab('magic')">✨ 魔法</button>
+    <button class="craft-tab" onclick="setCraftTab('item')">🧪 アイテム</button>
+  </div>
+  <div class="craft-body" id="craft-body"></div>
+</div>
+
+<!-- ===== DUNGEON ===== -->
+<div class="screen hidden" id="s-dungeon">
+  <div class="hdr">
+    <div class="title-area">
+      <img src="logo.png" class="logo">
+      <div>
+        <div class="game-title">PROMPTIA</div>
+        <div class="user-tag" id="d-user">—</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-btns">
+        <button class="icon-btn" onclick="openInventory()">🎒 BAG</button>
+        <button class="icon-btn" onclick="openModal('logout-modal')">LOGOUT</button>
+      </div>
+      <div class="stats-row">
+        <span class="spl fl"><span class="lbl">F</span><span class="val" id="d-fl">1</span></span>
+        <span class="spl hp"><span class="lbl">HP</span><span class="val" id="d-hp">100</span></span>
+        <span class="spl mp"><span class="lbl">MP</span><span class="val" id="d-mp">50</span></span>
+        <span class="spl ct"><span class="lbl">CT</span><span class="val" id="d-ct">10</span></span>
+      </div>
+    </div>
+  </div>
+  <main style="flex:1;display:flex;flex-direction:column;min-height:0;">
     <div class="stage" id="stage">
       <div class="stage-content" id="stage-content">
         <div class="stage-icon">✦</div>
-        <div class="stage-title">PROMPTIA ONLINE</div>
-        <div class="stage-meta">— A WORLD WOVEN BY WORDS —</div>
+        <div class="stage-title">PROMPTIA</div>
+        <div class="stage-meta">— DUNGEON —</div>
       </div>
     </div>
-    <div class="caption" id="caption">古い門が、君の前で軋みながら開いてゆく──</div>
+    <div class="caption" id="caption">深淵へ続く階段が口を開けている。</div>
   </main>
-
-  <footer>
-    <div class="choices-grid" id="choices"></div>
-  </footer>
+  <div class="choices" id="choices"></div>
 </div>
 
-<div class="sync-indicator" id="sync-indicator"></div>
+<div class="sync-ind" id="sync-ind"></div>
 
 <script>
 /* ===========================================================
-   PROMPTIA ONLINE — プロトタイプ v3
-   ★ GAS連携済み
-   =========================================================== */
-
+   PROMPTIA ONLINE v4
+   GAS_URL: JSONPでCORS回避
+=========================================================== */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwYKOj_H7aQ7x__P5JYBVhrExXfoyHyobzRN1uAKIC8fIcAiqz1unsgjs6iRR5ogNta/exec';
 
-// ---------- 起動チェック ----------
-window.addEventListener('DOMContentLoaded', () => {
-  // GAS_URL設定済みのため警告非表示
-});
+// ============================================================
+// STATE
+// ============================================================
+const S = {
+  user: null,
+  player: {
+    hp: 100, hpMax: 100,
+    mp: 50,  mpMax: 50,
+    cost: 10, costMax: 10,
+    atk: 5, def: 0, magicPow: 1.0,
+  },
+  dungeon: { floor: 1, room: 1, totalRooms: 3, inDungeon: false },
+  enemy: null,
+  equip: { weapon: null, magic1: null, magic2: null, magic3: null, armor: null, acc1: null, acc2: null },
+  inventory: [],   // max 20
+  invFilter: 'all',
+  craftTab: 'weapon',
+  craftSubType: null,
+  currentScreen: 's-login',
+};
 
-// ---------- GAS呼び出し共通（JSONP方式 — CORS完全回避） ----------
+// ============================================================
+// GAS通信（JSONP）
+// ============================================================
 function callGAS(action, payload) {
-  return new Promise((resolve) => {
-    if (!GAS_URL) {
-      resolve({ ok: false, error: 'GAS_URL未設定' });
-      return;
-    }
-
-    // ユニークなコールバック名
-    const cbName = 'gasCallback_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-
-    // タイムアウト（15秒）
-    const timer = setTimeout(() => {
-      cleanup();
-      resolve({ ok: false, error: 'タイムアウト（15秒）' });
-    }, 15000);
-
-    // コールバック関数をグローバルに登録
-    window[cbName] = (data) => {
-      cleanup();
-      resolve(data);
-    };
-
-    function cleanup() {
-      clearTimeout(timer);
-      delete window[cbName];
-      if (script && script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    // scriptタグでGASを呼ぶ
-    const params = new URLSearchParams({
-      action,
-      data: JSON.stringify(payload || {}),
-      callback: cbName,
-    });
-    const script = document.createElement('script');
-    script.src = `${GAS_URL}?${params.toString()}`;
-    script.onerror = () => {
-      cleanup();
-      resolve({ ok: false, error: 'スクリプト読み込みエラー' });
-    };
-    document.head.appendChild(script);
+  return new Promise(resolve => {
+    if (!GAS_URL) { resolve({ ok: false, error: 'GAS_URL未設定' }); return; }
+    const cb = 'cb_' + Date.now() + '_' + (Math.random()*9999|0);
+    const timer = setTimeout(() => { cleanup(); resolve({ ok: false, error: 'タイムアウト' }); }, 15000);
+    window[cb] = d => { cleanup(); resolve(d); };
+    function cleanup() { clearTimeout(timer); delete window[cb]; if (sc?.parentNode) sc.parentNode.removeChild(sc); }
+    const sc = document.createElement('script');
+    sc.src = GAS_URL + '?' + new URLSearchParams({ action, data: JSON.stringify(payload||{}), callback: cb });
+    sc.onerror = () => { cleanup(); resolve({ ok: false, error: 'Script load error' }); };
+    document.head.appendChild(sc);
   });
 }
 
 function showSync(msg, type) {
-  const el = document.getElementById('sync-indicator');
-  el.textContent = msg;
-  el.className = 'sync-indicator visible ' + (type || '');
+  const el = document.getElementById('sync-ind');
+  el.textContent = msg; el.className = 'sync-ind visible ' + (type||'');
   clearTimeout(showSync._t);
-  showSync._t = setTimeout(() => el.classList.remove('visible'), 2000);
+  showSync._t = setTimeout(() => el.classList.remove('visible'), 2500);
 }
 
-// ---------- ログイン画面 ----------
+// ============================================================
+// SCREEN CONTROL
+// ============================================================
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  S.currentScreen = id;
+  if (id === 's-craft') renderCraftBody();
+  updateAllStats();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('visible'); }
+function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
+
+// ============================================================
+// LOGIN
+// ============================================================
 function switchTab(which) {
   document.getElementById('tab-login').classList.toggle('active', which === 'login');
   document.getElementById('tab-register').classList.toggle('active', which === 'register');
@@ -875,140 +740,439 @@ function switchTab(which) {
   document.getElementById('form-register').style.display = which === 'register' ? 'block' : 'none';
   setMsg('', '');
 }
-
-function setMsg(text, type) {
+function setMsg(t, type) {
   const el = document.getElementById('login-msg');
-  el.textContent = text;
-  el.className = 'login-msg' + (type ? ' ' + type : '');
+  el.textContent = t; el.className = 'login-msg' + (type ? ' ' + type : '');
 }
-
 async function doLogin() {
-  const email    = document.getElementById('login-email').value.trim();
+  const email = document.getElementById('login-email').value.trim();
   const userName = document.getElementById('login-name').value.trim();
-  if (!email)    { setMsg('メールアドレスを入力してください', 'error'); return; }
+  if (!email) { setMsg('メールアドレスを入力してください', 'error'); return; }
   if (!userName) { setMsg('ユーザー名を入力してください', 'error'); return; }
-
   const btn = document.getElementById('btn-login');
-  btn.disabled = true;
-  setMsg('認証中...', '');
-
+  btn.disabled = true; setMsg('認証中...', '');
   const r = await callGAS('login', { email, userName });
-
   if (r.ok) {
     setMsg(`ようこそ、${r.user.userName} よ`, 'success');
     setTimeout(() => enterApp(r.user), 800);
   } else if (r.error === 'NOT_FOUND') {
-    setMsg('未登録のメールアドレスです。「REGISTER」タブから新規登録してください', 'error');
-    btn.disabled = false;
+    setMsg('未登録のメールアドレスです', 'error'); btn.disabled = false;
   } else if (r.error === 'NAME_MISMATCH') {
-    setMsg('ユーザー名が一致しません', 'error');
-    btn.disabled = false;
+    setMsg('ユーザー名が一致しません', 'error'); btn.disabled = false;
   } else {
-    setMsg(r.error || 'ログイン失敗', 'error');
-    btn.disabled = false;
+    setMsg(r.error || 'ログイン失敗', 'error'); btn.disabled = false;
   }
 }
-
 async function doRegister() {
   const email = document.getElementById('reg-email').value.trim();
   const userName = document.getElementById('reg-name').value.trim();
-  if (!email || !userName) { setMsg('メールアドレスとユーザー名を入力してください', 'error'); return; }
-
+  if (!email || !userName) { setMsg('全項目を入力してください', 'error'); return; }
   const btn = document.getElementById('btn-register');
-  btn.disabled = true;
-  setMsg('登録中...', '');
-
+  btn.disabled = true; setMsg('登録中...', '');
   const r = await callGAS('register', { email, userName });
-
   if (r.ok) {
-    setMsg(`「${r.user.userName}」の魂が記録されました（ID: ${r.user.id}）`, 'success');
+    setMsg(`「${r.user.userName}」（ID: ${r.user.id}）登録完了`, 'success');
     setTimeout(() => enterApp(r.user), 1200);
   } else {
-    setMsg(r.error || '登録失敗', 'error');
-    btn.disabled = false;
+    setMsg(r.error || '登録失敗', 'error'); btn.disabled = false;
   }
 }
-
 function enterApp(user) {
-  state.user = user;
-  state.player.maxFloor = user.maxFloor || 1;
-  document.getElementById('user-info').textContent = `${user.userName} (ID: ${user.id})`;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').classList.remove('hidden');
-  startGame();
+  S.user = user;
+  document.getElementById('s-login').style.display = 'none';
+  document.getElementById('town-user').textContent = user.userName + ' #' + user.id;
+  document.getElementById('d-user').textContent = user.userName + ' #' + user.id;
+  updateAllStats();
+  goScreen('s-town');
+  document.getElementById('town-caption').textContent =
+    `${user.userName} よ、ようこそ。最高到達: 第${user.maxFloor || 1}階層。`;
 }
 
-function doLogout() {
-  document.getElementById('logout-modal').classList.add('visible');
+// ============================================================
+// STATS
+// ============================================================
+function updateAllStats() {
+  const p = S.player;
+  // town
+  document.getElementById('t-fl').textContent = S.dungeon.floor;
+  document.getElementById('t-hp').textContent = p.hp;
+  document.getElementById('t-mp').textContent = p.mp;
+  document.getElementById('t-ct').textContent = p.cost + '/' + p.costMax;
+  // dungeon
+  document.getElementById('d-fl').textContent = S.dungeon.floor;
+  document.getElementById('d-hp').textContent = p.hp;
+  document.getElementById('d-mp').textContent = p.mp;
+  document.getElementById('d-ct').textContent = p.cost + '/' + p.costMax;
+  // craft
+  document.getElementById('c-ct').textContent = p.cost + '/' + p.costMax;
+  document.getElementById('c-mp').textContent = p.mp;
+  // equip stats
+  recalcStats();
 }
-function closeLogoutModal() {
-  document.getElementById('logout-modal').classList.remove('visible');
+function recalcStats() {
+  const p = S.player;
+  p.atk = 5; p.def = 0; p.magicPow = 1.0;
+  const w = S.equip.weapon;
+  if (w) {
+    if (w.subtype === 'sword') p.atk += w.power || 0;
+    if (w.subtype === 'staff') p.magicPow += (w.power || 0) * 0.1;
+  }
+  const a = S.equip.armor;
+  if (a) p.def += a.power || 0;
 }
 
-/* ===========================================================
-   ゲーム状態
-   =========================================================== */
-const state = {
-  user: null,
-  player: { name: '名もなき詠唱者', hp: 100, hpMax: 100, mp: 50, mpMax: 50, essence: 0, maxFloor: 1 },
-  dungeon: { floor: 1, room: 1, totalRooms: 3 },
-  enemy: null,
-  phase: 'intro',
-};
+// ============================================================
+// INVENTORY
+// ============================================================
+function openInventory() {
+  renderInventory();
+  renderEquipSlots();
+  document.getElementById('inv-panel').classList.add('open');
+}
+function closeInventory() {
+  document.getElementById('inv-panel').classList.remove('open');
+  document.getElementById('item-action-menu').classList.remove('open');
+}
+function setInvFilter(f) {
+  S.invFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(
+      f === 'all' ? 'すべて' : f === 'weapon' ? '武器' : f === 'magic' ? '魔法' :
+      f === 'armor' ? '防具' : f === 'item' ? '消耗品' : 'アクセ'
+    ));
+  });
+  renderInventory();
+}
+function renderInventory() {
+  const list = document.getElementById('inv-list');
+  const filtered = S.inventory.filter(it => S.invFilter === 'all' || it.type === S.invFilter);
+  document.getElementById('inv-count-num').textContent = S.inventory.length;
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="inv-empty">アイテムがありません</div>'; return;
+  }
+  list.innerHTML = filtered.map((it, idx) => {
+    const realIdx = S.inventory.indexOf(it);
+    const equipped = isEquipped(it);
+    return `<div class="inv-item${equipped ? ' equipped' : ''}" onclick="onItemClick(${realIdx})">
+      <div class="item-icon">${itemIcon(it.type)}</div>
+      <div class="item-info">
+        <div class="item-name">${it.name}</div>
+        <div class="item-sub">${it.desc || ''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end">
+        <span class="item-badge ${it.type}">${typeName(it.type)}</span>
+        ${equipped ? '<span class="item-badge equipped-mark">装備中</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderEquipSlots() {
+  const slots = ['weapon','magic1','magic2','magic3','armor','acc1','acc2'];
+  slots.forEach(s => {
+    const item = S.equip[s];
+    const el = document.getElementById('slot-' + s + '-name');
+    const slot = document.getElementById('slot-' + s);
+    if (item) {
+      el.textContent = item.name;
+      el.className = 'slot-name';
+      slot.classList.add('filled');
+    } else {
+      el.textContent = '空';
+      el.className = 'slot-empty';
+      slot.classList.remove('filled');
+    }
+  });
+}
+function isEquipped(item) {
+  return Object.values(S.equip).some(e => e && e.id === item.id);
+}
+function itemIcon(type) {
+  return { weapon:'⚔', magic:'✨', armor:'🛡', item:'🧪', accessory:'💎' }[type] || '?';
+}
+function typeName(type) {
+  return { weapon:'武器', magic:'魔法', armor:'防具', item:'消耗品', accessory:'アクセ' }[type] || type;
+}
 
+function onItemClick(idx) {
+  const item = S.inventory[idx];
+  if (!item) return;
+  document.getElementById('action-item-name').textContent = item.name;
+  document.getElementById('action-item-desc').textContent = item.desc || '';
+  const btns = document.getElementById('action-btns');
+  btns.innerHTML = '';
+  // ダンジョン中は装備変更不可
+  const inDungeon = S.dungeon.inDungeon;
+
+  if (item.type === 'weapon' || item.type === 'armor') {
+    if (!inDungeon) {
+      const eq = isEquipped(item);
+      if (eq) {
+        addActionBtn(btns, '外す', () => { unequip(item); closeItemMenu(); });
+      } else {
+        addActionBtn(btns, '装備する', () => { equipItem(item); closeItemMenu(); }, 'primary');
+      }
+    } else {
+      addActionBtn(btns, '装備変更不可\n(ホームのみ)', null, '', true);
+    }
+  }
+  if (item.type === 'magic') {
+    if (!inDungeon) {
+      const eq = isEquipped(item);
+      if (eq) {
+        addActionBtn(btns, '外す', () => { unequip(item); closeItemMenu(); });
+      } else {
+        ['magic1','magic2','magic3'].forEach(slot => {
+          addActionBtn(btns, `${slot.replace('magic','魔法')}に装備`, () => {
+            S.equip[slot] = item; closeItemMenu(); renderEquipSlots(); updateAllStats();
+          }, S.equip[slot] ? '' : 'primary');
+        });
+      }
+    } else {
+      addActionBtn(btns, '装備変更不可\n(ホームのみ)', null, '', true);
+    }
+  }
+  if (item.type === 'item') {
+    addActionBtn(btns, '使う', () => { useItem(item, idx); closeItemMenu(); }, 'primary');
+  }
+  addActionBtn(btns, '捨てる', () => {
+    if (isEquipped(item)) { alert('装備中は捨てられません'); return; }
+    S.inventory.splice(idx, 1); closeItemMenu(); renderInventory();
+  }, 'danger');
+  addActionBtn(btns, 'キャンセル', closeItemMenu);
+  document.getElementById('item-action-menu').classList.add('open');
+}
+function addActionBtn(container, label, fn, cls = '', disabled = false) {
+  const b = document.createElement('button');
+  b.className = 'action-btn ' + cls;
+  b.textContent = label;
+  b.disabled = disabled;
+  if (fn) b.onclick = fn;
+  container.appendChild(b);
+}
+function closeItemMenu() {
+  document.getElementById('item-action-menu').classList.remove('open');
+}
+function equipItem(item) {
+  const slot = item.type === 'weapon' ? 'weapon' : item.type === 'armor' ? 'armor' : null;
+  if (!slot) return;
+  S.equip[slot] = item;
+  renderEquipSlots(); renderInventory(); updateAllStats();
+}
+function unequip(item) {
+  Object.keys(S.equip).forEach(k => { if (S.equip[k]?.id === item.id) S.equip[k] = null; });
+  renderEquipSlots(); renderInventory(); updateAllStats();
+}
+function useItem(item, idx) {
+  if (item.effect === 'heal_hp') {
+    S.player.hp = Math.min(S.player.hpMax, S.player.hp + (item.value || 30));
+    S.inventory.splice(idx, 1);
+    updateAllStats(); renderInventory();
+    captionMsg(`<span class="sys">「${item.name}」を使った。HP +${item.value || 30}</span>`);
+  } else if (item.effect === 'heal_mp') {
+    S.player.mp = Math.min(S.player.mpMax, S.player.mp + (item.value || 20));
+    S.inventory.splice(idx, 1);
+    updateAllStats(); renderInventory();
+    captionMsg(`<span class="sys">「${item.name}」を使った。MP +${item.value || 20}</span>`);
+  }
+}
+function onSlotClick(slot) {
+  const item = S.equip[slot];
+  if (!item) return;
+  const idx = S.inventory.indexOf(item);
+  if (idx >= 0) onItemClick(idx);
+}
+function addToInventory(item) {
+  if (S.inventory.length >= 20) return false;
+  item.id = 'item_' + Date.now() + '_' + (Math.random()*9999|0);
+  S.inventory.push(item);
+  return true;
+}
+
+// ============================================================
+// CRAFT
+// ============================================================
+function setCraftTab(tab) {
+  S.craftTab = tab;
+  S.craftSubType = null;
+  document.querySelectorAll('.craft-tab').forEach((b, i) => {
+    b.classList.toggle('active', ['weapon','armor','magic','item'][i] === tab);
+  });
+  renderCraftBody();
+}
+function calcCraftCost(text) {
+  const len = [...(text||'')].length;
+  let cost = Math.ceil(len * 1.5);
+  const heavy = ['永劫','絶対','神','滅','黄金','深淵','業','暴','焔','雷','凍','聖','最強','究極','無敵'];
+  heavy.forEach(w => { if (text.includes(w)) cost += 8; });
+  return Math.max(3, cost);
+}
+function renderCraftBody() {
+  const el = document.getElementById('craft-body');
+  const p = S.player;
+  const subOptions = {
+    weapon: [{v:'sword', l:'⚔ 剣（物理ATK UP）'}, {v:'staff', l:'🔮 杖（魔法威力UP）'}],
+    armor:  [{v:'armor', l:'🛡 防具（防御力UP）'}],
+    magic:  [{v:'attack', l:'⚔ 攻撃魔法'}, {v:'buff', l:'⬆ バフ'}, {v:'debuff', l:'⬇ デバフ'}, {v:'heal', l:'💚 ヒール'}],
+    item:   [{v:'heal_hp', l:'❤ 回復薬（HP回復）'}, {v:'enhance', l:'⚙ 強化素材（装備強化）'}],
+  };
+  const opts = subOptions[S.craftTab] || [];
+  const sub = S.craftSubType;
+  const placeholder = {
+    weapon: '例: 業火を宿した漆黒の大剣',
+    armor:  '例: 深海の圧力を纏う鱗の鎧',
+    magic:  '例: 敵の影を喰らう呪縛の術式',
+    item:   '例: 月光を閉じ込めた青い水薬',
+  }[S.craftTab];
+
+  el.innerHTML = `
+    <div class="craft-sub-tabs">
+      ${opts.map(o => `<button class="craft-sub-btn${sub === o.v ? ' active' : ''}" onclick="setCraftSub('${o.v}')">${o.l}</button>`).join('')}
+    </div>
+    <div class="craft-cost-bar">
+      <span class="craft-cost-label">残コスト</span>
+      <span class="craft-cost-val" id="craft-ct-disp">${p.cost} / ${p.costMax}</span>
+      <span style="flex:1"></span>
+      <span class="craft-cost-label">消費予定</span>
+      <span class="craft-cost-val" id="craft-cost-preview">—</span>
+    </div>
+    <div class="craft-prompt-area">
+      <div class="craft-prompt-label">— プロンプトを入力 —</div>
+      <div class="craft-input-row">
+        <input class="craft-input" id="craft-input" placeholder="${placeholder}" maxlength="80"
+          oninput="updateCraftCost()">
+        <span class="craft-cost-inline" id="craft-cost-inline">0</span>
+      </div>
+    </div>
+    <button class="craft-btn" id="craft-go-btn" onclick="doCraft()" ${!sub ? 'disabled' : ''}>
+      ${!sub ? '種類を選択してください' : 'GENERATE'}
+    </button>
+    <div id="craft-result" style="display:none" class="craft-result">
+      <div class="craft-result-title">✧ 生成完了</div>
+      <div class="craft-result-body" id="craft-result-body"></div>
+    </div>
+  `;
+}
+function setCraftSub(v) {
+  S.craftSubType = v;
+  renderCraftBody();
+}
+function updateCraftCost() {
+  const text = document.getElementById('craft-input')?.value || '';
+  const cost = calcCraftCost(text);
+  const inline = document.getElementById('craft-cost-inline');
+  const preview = document.getElementById('craft-cost-preview');
+  if (inline) { inline.textContent = cost; inline.className = 'craft-cost-inline' + (cost > S.player.cost ? ' over' : ''); }
+  if (preview) { preview.textContent = cost; preview.className = 'craft-cost-val' + (cost > S.player.cost ? ' over' : ''); }
+}
+async function doCraft() {
+  if (!S.craftSubType) return;
+  const text = document.getElementById('craft-input')?.value.trim() || '';
+  if (!text) return;
+  const cost = calcCraftCost(text);
+  if (cost > S.player.cost) {
+    document.getElementById('craft-result').style.display = 'block';
+    document.getElementById('craft-result-body').textContent = `コストが足りません（必要: ${cost} / 残: ${S.player.cost}）`;
+    return;
+  }
+  if (S.inventory.length >= 20) {
+    document.getElementById('craft-result').style.display = 'block';
+    document.getElementById('craft-result-body').textContent = 'インベントリが満杯です（20個上限）';
+    return;
+  }
+  const btn = document.getElementById('craft-go-btn');
+  btn.disabled = true; btn.textContent = '生成中...';
+
+  // ★ AI生成（ダミー）— Gemini APIに差し替える箇所
+  const item = await generateItem({ prompt: text, type: S.craftTab, subtype: S.craftSubType, cost });
+
+  S.player.cost -= cost;
+  addToInventory(item);
+  updateAllStats();
+
+  document.getElementById('craft-result').style.display = 'block';
+  document.getElementById('craft-result-body').innerHTML =
+    `<strong>${item.name}</strong><br>${item.desc}<br><span style="color:var(--cost-color)">コスト消費: -${cost}</span>`;
+  btn.disabled = false; btn.textContent = 'GENERATE';
+  document.getElementById('craft-input').value = '';
+  updateCraftCost();
+}
+
+/* ★ AI生成ダミー — ここをGemini APIに差し替える */
+async function generateItem({ prompt, type, subtype, cost }) {
+  await new Promise(r => setTimeout(r, 800 + Math.random()*600));
+  const power = Math.floor(cost * 0.6 + Math.random() * 5);
+  const suffixes = ['の断片','の残滓','の欠片','の記憶','の意志','の鼓動'];
+  const suf = suffixes[Math.floor(Math.random()*suffixes.length)];
+  const name = prompt.slice(0, 8) + suf;
+  if (type === 'weapon') return { type:'weapon', subtype, name, desc:`${subtype==='sword'?'物理ATK':'魔法威力'} +${power}　${prompt.slice(0,12)}`, power };
+  if (type === 'armor')  return { type:'armor',  subtype, name, desc:`防御力 +${power}　${prompt.slice(0,12)}`, power };
+  if (type === 'magic')  return { type:'magic',  subtype, name, desc:`${subtypeMagicDesc(subtype)} Lv${Math.floor(power/3)+1}　${prompt.slice(0,10)}`, power, mpCost: Math.ceil(cost*0.6) };
+  if (type === 'item' && subtype === 'heal_hp') return { type:'item', subtype:'heal_hp', name, desc:`HP +${power*3}を回復`, effect:'heal_hp', value: power*3 };
+  return { type:'item', subtype:'enhance', name, desc:`装備強化素材　効力: ${power}`, effect:'enhance', value: power };
+}
+function subtypeMagicDesc(st) {
+  return {attack:'攻撃魔法', buff:'バフ魔法', debuff:'デバフ魔法', heal:'回復魔法'}[st] || '魔法';
+}
+
+// ============================================================
+// HOMETOWN
+// ============================================================
+function showShop() {
+  document.getElementById('town-caption').textContent = '商店は準備中です（近日公開）';
+}
+function showQuest() {
+  document.getElementById('town-caption').textContent = 'クエストは準備中です（近日公開）';
+}
+function enterDungeon() {
+  S.dungeon.inDungeon = true;
+  S.dungeon.room = 1;
+  S.dungeon.totalRooms = 3 + Math.floor((S.dungeon.floor - 1) / 2);
+  goScreen('s-dungeon');
+  startDungeonFloor();
+}
+
+// ============================================================
+// DUNGEON
+// ============================================================
 const enemyPool = [
-  { name: '腐敗せし墓守', icon: '☠', hp: 35, atk: 8, weak: ['炎','光'], lore: '苔むした鎧の隙間から青白い瘴気が漏れ出している。' },
-  { name: '影喰らいの蝙蝠', icon: '🦇', hp: 22, atk: 6, weak: ['光','音'], lore: '闇から滲み出るように現れ、無数の翼が空気を切り裂く。' },
-  { name: '骨砕きの鬼', icon: '👹', hp: 55, atk: 14, weak: ['雷','聖'], lore: '人間の骨で編まれた首飾りを揺らし、地響きと共に立ちはだかる。' },
-  { name: '囁く水鏡', icon: '🪞', hp: 30, atk: 10, weak: ['炎','凍'], lore: '水面に映るのは、かつての自分の姿。鏡の奥から細い指が伸びてくる。' },
-  { name: '黄金喰らいの蛞蝓', icon: '🐌', hp: 45, atk: 7, weak: ['塩','炎'], lore: '体表に金貨が埋め込まれ、ぬらりと光っている。' },
-  { name: '深淵の番人', icon: '👁', hp: 80, atk: 18, weak: ['光','聖'], lore: '六本の腕を持ち、その瞳の奥には星々が渦巻いている。' },
+  { name:'腐敗せし墓守', icon:'☠', hp:35, atk:8,  weak:['炎','光'], lore:'苔むした鎧の隙間から青白い瘴気が漏れ出している。' },
+  { name:'影喰らいの蝙蝠', icon:'🦇', hp:22, atk:6,  weak:['光','音'], lore:'闇から滲み出るように現れ、無数の翼が空気を切り裂く。' },
+  { name:'骨砕きの鬼',    icon:'👹', hp:55, atk:14, weak:['雷','聖'], lore:'人間の骨で編まれた首飾りを揺らし、地響きと共に立ちはだかる。' },
+  { name:'囁く水鏡',      icon:'🪞', hp:30, atk:10, weak:['炎','凍'], lore:'水面に映るのは、かつての自分の姿。' },
+  { name:'黄金喰らいの蛞蝓',icon:'🐌',hp:45, atk:7,  weak:['塩','炎'], lore:'体表に金貨が埋め込まれ、ぬらりと光っている。' },
+  { name:'深淵の番人',    icon:'👁', hp:80, atk:18, weak:['光','聖'], lore:'六本の腕を持ち、その瞳の奥には星々が渦巻いている。' },
 ];
 
-const $stage = document.getElementById('stage');
-const $stageContent = document.getElementById('stage-content');
-const $caption = document.getElementById('caption');
-const $choices = document.getElementById('choices');
-
 function setStage({icon, title, meta, enemy}) {
-  let html = `<div class="stage-icon">${icon || '✦'}</div>`;
+  let html = `<div class="stage-icon">${icon||'✦'}</div>`;
   if (title) html += `<div class="stage-title">${title}</div>`;
-  if (meta) html += `<div class="stage-meta">${meta}</div>`;
+  if (meta)  html += `<div class="stage-meta">${meta}</div>`;
   if (enemy) {
-    const pct = Math.max(0, (enemy.hp / enemy.hpMax) * 100);
+    const pct = Math.max(0, enemy.hp / enemy.hpMax * 100);
     html += `<div class="enemy-hp-bar"><div class="enemy-hp-fill" style="width:${pct}%"></div></div>`;
   }
-  $stageContent.innerHTML = html;
+  document.getElementById('stage-content').innerHTML = html;
 }
-
 function flashStage(type) {
-  $stage.classList.remove('flash-attack', 'flash-hit');
-  void $stage.offsetWidth;
-  $stage.classList.add('flash-' + type);
+  const s = document.getElementById('stage');
+  s.classList.remove('flash-attack','flash-hit'); void s.offsetWidth;
+  s.classList.add('flash-' + type);
 }
-
-function caption(html) { $caption.innerHTML = html; $caption.scrollTop = 0; }
-function captionAdd(html) { $caption.innerHTML += '<br>' + html; $caption.scrollTop = $caption.scrollHeight; }
-
-function updateStats() {
-  document.getElementById('stat-fl').textContent = state.dungeon.floor;
-  document.getElementById('stat-hp').textContent = state.player.hp;
-  document.getElementById('stat-mp').textContent = state.player.mp;
-  document.getElementById('stat-es').textContent = state.player.essence;
+function caption(html) {
+  const c = document.getElementById('caption'); c.innerHTML = html; c.scrollTop = 0;
 }
-
-function calcCost(text) {
-  const len = [...text].length;
-  let cost = Math.ceil(len * 1.2);
-  const heavy = ['永劫','絶対','神','滅','黄金','深淵','業','暴','焔','雷','凍','聖'];
-  heavy.forEach(w => { if (text.includes(w)) cost += 5; });
-  return cost;
+function captionAdd(html) {
+  const c = document.getElementById('caption'); c.innerHTML += '<br>' + html; c.scrollTop = c.scrollHeight;
 }
-
+function captionMsg(html) {
+  // ダンジョン中かどうかで出力先を変える
+  if (S.currentScreen === 's-dungeon') captionAdd(html);
+}
 function setChoices(choices) {
-  $choices.innerHTML = '';
+  const el = document.getElementById('choices');
+  el.innerHTML = '';
   const padded = [...choices];
-  while (padded.length < 4 && padded.length > 0 && padded.length !== 1) padded.push(null);
+  while (padded.length < 4 && padded.length > 1) padded.push(null);
   padded.forEach(c => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
@@ -1016,294 +1180,273 @@ function setChoices(choices) {
       btn.innerHTML = c.label + (c.meta ? `<span class="meta">${c.meta}</span>` : '');
       btn.onclick = c.action;
     } else {
-      btn.innerHTML = '<span style="opacity:0.2">─</span>';
-      btn.disabled = true;
+      btn.innerHTML = '<span style="opacity:.2">─</span>'; btn.disabled = true;
     }
-    $choices.appendChild(btn);
+    el.appendChild(btn);
   });
 }
 
-function showCastInput() {
-  $choices.innerHTML = `
-    <div class="cast-overlay">
-      <input id="cast-input" type="text" placeholder="言葉を紡げ — 例: 燃え盛る赤き刃" maxlength="80" autofocus>
-      <span class="cost-display" id="cost-display">0/${state.player.mp}</span>
-      <button class="cast-confirm" id="cast-confirm">詠唱</button>
-    </div>
-    <button class="choice-btn" onclick="combatChoices()">← 戻る<span class="meta">CANCEL</span></button>
-    <button class="choice-btn" disabled><span style="opacity:0.2">─</span></button>
-  `;
-  const $input = document.getElementById('cast-input');
-  const $cost = document.getElementById('cost-display');
-  const $confirm = document.getElementById('cast-confirm');
-
-  function updateCost() {
-    const c = calcCost($input.value.trim());
-    $cost.textContent = `${c}/${state.player.mp}`;
-    $cost.classList.toggle('over', c > state.player.mp);
-  }
-  $input.addEventListener('input', updateCost);
-  $input.addEventListener('keydown', e => { if (e.key === 'Enter') doCast(); });
-  $confirm.onclick = doCast;
-  $input.focus();
-
-  async function doCast() {
-    const text = $input.value.trim();
-    if (!text) return;
-    const cost = calcCost(text);
-    if (cost > state.player.mp) {
-      caption(`<span class="system">魔力が足りない。必要MP: ${cost} / 現在MP: ${state.player.mp}</span>`);
-      return;
-    }
-    await castSpell(text, cost);
-  }
-}
-
-/* ===========================================================
-   ★ AI応答（ダミー）— ここをGemini APIに差し替える
-   =========================================================== */
-async function generateSpellEffect({prompt, cost, enemy}) {
-  await new Promise(r => setTimeout(r, 700 + Math.random() * 400));
-
-  const elementMap = {
-    '炎': ['炎','焔','火','燃','焼','業火','灼'],
-    '凍': ['氷','凍','凍結','雪','吹雪','寒'],
-    '雷': ['雷','電','稲妻','轟','閃光'],
-    '光': ['光','聖','輝','黄金','陽'],
-    '闇': ['闇','影','黒','虚','深淵'],
-    '音': ['音','響','鐘','叫','咆哮'],
-    '塩': ['塩','清め'],
-  };
-  let element = '無';
-  for (const [el, kws] of Object.entries(elementMap)) {
-    if (kws.some(k => prompt.includes(k))) { element = el; break; }
-  }
-
-  let damage = Math.floor(cost * 0.8 + Math.random() * 6);
-  const weakHit = enemy && enemy.weak.includes(element);
-  if (weakHit) damage = Math.floor(damage * 1.6);
-
-  const flavors = {
-    '炎': `紅蓮の炎が螺旋を描いて${enemy.name}を包む`,
-    '凍': `空気が凍てつき、${enemy.name}の動きが鈍る`,
-    '雷': `閃光が走り、${enemy.name}を貫く`,
-    '光': `眩い光輝が${enemy.name}を浄化せんと迸る`,
-    '闇': `黒い触手が${enemy.name}に絡みつく`,
-    '音': `不協和音が${enemy.name}の精神を揺さぶる`,
-    '塩': `祓いの結晶が${enemy.name}に降り注ぐ`,
-    '無': `形なき念が${enemy.name}を打つ`,
-  };
-
-  return { damage, element, weakHit, flavor: flavors[element] };
-}
-
-/* ===========================================================
-   ゲーム進行
-   =========================================================== */
-function startGame() {
-  setStage({ icon: '🜲', title: `第 ${state.dungeon.floor} 階層`, meta: `${state.dungeon.totalRooms} ROOMS AHEAD` });
-  caption(`<span class="enemy-name">${state.user.userName}</span> よ、ようこそ Promptia へ。<br>湿った石段を降りる。${state.dungeon.totalRooms}つの間が君を待っている。<br><span class="system">最高到達: 第 ${state.player.maxFloor} 階層</span>`);
-  setChoices([{ label: '進む', action: nextRoom, meta: 'ADVANCE' }]);
-  updateStats();
+function startDungeonFloor() {
+  setStage({ icon:'🜲', title:`第 ${S.dungeon.floor} 階層`, meta:`${S.dungeon.totalRooms} ROOMS AHEAD` });
+  caption(`<span class="en">${S.user.userName}</span> よ、第${S.dungeon.floor}階層へ踏み込む。<br><span class="sys">${S.dungeon.totalRooms}つの間が待っている。</span>`);
+  setChoices([{ label:'進む', action:nextRoom, meta:'ADVANCE' }]);
 }
 
 function nextRoom() {
-  state.phase = 'combat';
   let enemy;
-  if (state.dungeon.room === state.dungeon.totalRooms) {
+  if (S.dungeon.room === S.dungeon.totalRooms) {
     enemy = {...enemyPool[5]};
   } else {
-    const pool = enemyPool.slice(0, 5);
-    enemy = {...pool[Math.floor(Math.random() * pool.length)]};
+    enemy = {...enemyPool[Math.floor(Math.random() * 5)]};
   }
+  // 階層スケール
+  const scale = 1 + (S.dungeon.floor - 1) * 0.2;
+  enemy.hp   = Math.floor(enemy.hp * scale);
+  enemy.atk  = Math.floor(enemy.atk * scale);
   enemy.hpMax = enemy.hp;
-  state.enemy = enemy;
-  updateStats();
-
-  setStage({
-    icon: enemy.icon,
-    title: enemy.name,
-    meta: `ROOM ${state.dungeon.room}/${state.dungeon.totalRooms} · 弱点: ${enemy.weak.join('・')}`,
-    enemy,
-  });
-  caption(`<span class="enemy-name">${enemy.name}</span> が現れた。<br><span class="system">${enemy.lore}</span>`);
+  S.enemy = enemy;
+  setStage({ icon:enemy.icon, title:enemy.name, meta:`ROOM ${S.dungeon.room}/${S.dungeon.totalRooms} · 弱点: ${enemy.weak.join('・')}`, enemy });
+  caption(`<span class="en">${enemy.name}</span> が現れた。<br><span class="sys">${enemy.lore}</span>`);
   combatChoices();
 }
 
 function combatChoices() {
   setChoices([
-    { label: '詠唱する', action: showCastInput, meta: 'CAST SPELL' },
-    { label: '休む', action: tryRest, meta: 'MP +5' },
-    { label: '観察', action: observe, meta: 'INSPECT' },
-    { label: '逃げる', action: tryEscape, meta: 'HP -10' },
+    { label:'通常攻撃', action:doNormalAttack, meta:'ATTACK' },
+    { label:'魔法', action:showMagicSelect, meta:'CAST' },
+    { label:'アイテム', action:showItemSelect, meta:'USE ITEM' },
+    { label:'帰還', action:doRetreat, meta:'HP -10' },
   ]);
 }
 
-function tryRest() {
-  const recover = 5 + Math.floor(Math.random() * 5);
-  state.player.mp = Math.min(state.player.mpMax, state.player.mp + recover);
-  updateStats();
-  caption(`君は呼吸を整える。魔力が <span class="weak">+${recover}</span> 戻った。`);
-  setTimeout(() => enemyAttack(), 800);
-}
-
-function observe() {
-  const e = state.enemy;
-  caption(`<span class="enemy-name">${e.name}</span> をじっと見つめる。<br>HP: ${e.hp}/${e.hpMax} · 攻撃力: ${e.atk} · 弱点: <span class="weak">${e.weak.join('・')}</span>`);
-  setTimeout(combatChoices, 100);
-}
-
-function tryEscape() {
-  state.player.hp = Math.max(0, state.player.hp - 10);
-  updateStats();
-  caption(`君は背を向け、暗闇の中を駆ける。背後の咆哮が骨に響く。<span class="hurt"> HP -10</span>`);
-  if (state.player.hp <= 0) return defeat();
-  setTimeout(advanceRoom, 1200);
-}
-
-async function castSpell(text, cost) {
-  state.player.mp -= cost;
-  updateStats();
-
-  caption(`<span style="color:var(--neon-blue)">「${text}」</span><br><span class="typing system">魔力が編まれてゆく</span>`);
+// 通常攻撃
+function doNormalAttack() {
+  const dmg = Math.floor((S.player.atk + Math.random()*4) * 1.0);
+  S.enemy.hp -= dmg;
+  caption(`剣を振るう。<span class="dmg"> ${dmg} ダメージ</span>`);
+  setStage({ icon:S.enemy.icon, title:S.enemy.name, meta:`HP ${Math.max(0,S.enemy.hp)}/${S.enemy.hpMax}`, enemy:S.enemy });
   flashStage('attack');
-
-  const result = await generateSpellEffect({ prompt: text, cost, enemy: state.enemy });
-
-  let line = `${result.flavor}。<span class="damage"> ${result.damage} ダメージ</span>`;
-  if (result.weakHit) line += ` <span class="weak">弱点ヒット！</span>`;
-  caption(line);
-
-  state.enemy.hp -= result.damage;
-  setStage({
-    icon: state.enemy.icon,
-    title: state.enemy.name,
-    meta: `HP ${Math.max(0, state.enemy.hp)}/${state.enemy.hpMax}`,
-    enemy: state.enemy,
-  });
-
-  if (state.enemy.hp <= 0) { setTimeout(enemyDefeated, 800); return; }
-  setTimeout(() => enemyAttack(), 900);
+  if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 700); return; }
+  setTimeout(enemyAttack, 900);
 }
 
+// 魔法選択
+function showMagicSelect() {
+  const magics = ['magic1','magic2','magic3'].map(s => S.equip[s]).filter(Boolean);
+  if (magics.length === 0) {
+    caption('<span class="sys">魔法が装備されていません。ホームで装備してください。</span>');
+    setTimeout(combatChoices, 100); return;
+  }
+  const el = document.getElementById('choices');
+  el.innerHTML = `
+    <div class="magic-select">
+      <div class="magic-select-title">— 魔法を選択 —</div>
+      <div class="magic-list">
+        ${magics.map((m,i) => `
+          <button class="magic-btn${(m.mpCost||10) > S.player.mp ? ' disabled' : ''}"
+            onclick="castEquippedMagic(${i})" ${(m.mpCost||10) > S.player.mp ? 'disabled' : ''}>
+            ${m.name}<span class="magic-cost">MP ${m.mpCost||10}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+    <button class="choice-btn" onclick="combatChoices()">← 戻る<span class="meta">CANCEL</span></button>
+    <button class="choice-btn" disabled><span style="opacity:.2">─</span></button>
+  `;
+}
+async function castEquippedMagic(idx) {
+  const magics = ['magic1','magic2','magic3'].map(s => S.equip[s]).filter(Boolean);
+  const magic = magics[idx];
+  if (!magic) return;
+  const mpCost = magic.mpCost || 10;
+  if (mpCost > S.player.mp) return;
+  S.player.mp -= mpCost;
+  updateAllStats();
+  caption(`<span style="color:var(--neon-blue)">「${magic.name}」</span><br><span class="sys typing">魔力が編まれてゆく</span>`);
+  flashStage('attack');
+  const result = await generateSpellEffect({ magic, enemy: S.enemy });
+  let line = `${result.flavor}。<span class="dmg"> ${result.damage} ダメージ</span>`;
+  if (result.weakHit) line += ` <span class="wk">弱点ヒット！</span>`;
+  caption(line);
+  S.enemy.hp -= result.damage;
+  setStage({ icon:S.enemy.icon, title:S.enemy.name, meta:`HP ${Math.max(0,S.enemy.hp)}/${S.enemy.hpMax}`, enemy:S.enemy });
+  if (S.enemy.hp <= 0) { setTimeout(enemyDefeated, 700); return; }
+  setTimeout(enemyAttack, 900);
+}
+
+// アイテム選択（戦闘中）
+function showItemSelect() {
+  const consumables = S.inventory.filter(it => it.type === 'item');
+  if (consumables.length === 0) {
+    caption('<span class="sys">消耗品がありません。</span>');
+    setTimeout(combatChoices, 100); return;
+  }
+  const el = document.getElementById('choices');
+  el.innerHTML = `
+    <div class="item-select">
+      <div class="magic-select-title">— アイテムを選択 —</div>
+      <div class="combat-item-list">
+        ${consumables.map((it) => {
+          const realIdx = S.inventory.indexOf(it);
+          return `<button class="combat-item-btn" onclick="useCombatItem(${realIdx})">
+            <span>${itemIcon(it.type)} ${it.name}</span>
+            <span style="font-size:10px;color:var(--text-dim)">${it.desc||''}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+    <button class="choice-btn" onclick="combatChoices()">← 戻る<span class="meta">CANCEL</span></button>
+    <button class="choice-btn" disabled><span style="opacity:.2">─</span></button>
+  `;
+}
+function useCombatItem(idx) {
+  const item = S.inventory[idx];
+  if (!item) return;
+  useItem(item, idx);
+  updateAllStats();
+  combatChoices();
+}
+
+// 帰還
+function doRetreat() {
+  S.player.hp = Math.max(0, S.player.hp - 10);
+  updateAllStats();
+  caption(`君は戦場から身を引いた。<span class="hurt"> HP -10</span>`);
+  if (S.player.hp <= 0) { defeat(); return; }
+  setTimeout(() => {
+    S.dungeon.inDungeon = false;
+    goScreen('s-town');
+    document.getElementById('town-caption').textContent = '傷を負いながらも、辛うじて帰還した。';
+  }, 1200);
+}
+
+// 敵の攻撃
 function enemyAttack() {
-  const dmg = Math.max(1, state.enemy.atk + Math.floor(Math.random() * 4) - 2);
-  state.player.hp = Math.max(0, state.player.hp - dmg);
-  state.player.mp = Math.min(state.player.mpMax, state.player.mp + 8);
-  updateStats();
+  const def = S.player.def;
+  const dmg = Math.max(1, Math.floor(S.enemy.atk + Math.random()*4 - 2) - def);
+  S.player.hp = Math.max(0, S.player.hp - dmg);
+  S.player.mp = Math.min(S.player.mpMax, S.player.mp + 6);
+  updateAllStats();
   flashStage('hit');
-  captionAdd(`<span class="enemy-name">${state.enemy.name}</span> の反撃。<span class="hurt"> ${dmg} ダメージ</span>。<span class="system">魔力 +8</span>`);
-  if (state.player.hp <= 0) return defeat();
+  captionAdd(`<span class="en">${S.enemy.name}</span> の反撃。<span class="hurt"> ${dmg} ダメージ</span>　<span class="sys">MP +6</span>`);
+  if (S.player.hp <= 0) { defeat(); return; }
   setTimeout(combatChoices, 600);
 }
 
+// 敵撃破
 function enemyDefeated() {
-  const reward = Math.floor(state.enemy.hpMax / 4);
-  state.player.essence += reward;
-  state.player.hp = Math.min(state.player.hpMax, state.player.hp + 10);
-  state.player.mp = Math.min(state.player.mpMax, state.player.mp + 15);
-  updateStats();
+  const hpRestore = 8;
+  const mpRestore = 12;
+  S.player.hp = Math.min(S.player.hpMax, S.player.hp + hpRestore);
+  S.player.mp = Math.min(S.player.mpMax, S.player.mp + mpRestore);
+  updateAllStats();
+  setStage({ icon:'✧', title:'VICTORY', meta:`ROOM ${S.dungeon.room}/${S.dungeon.totalRooms}` });
+  caption(`<span class="en">${S.enemy.name}</span> は塵となった。<span class="sys"> HP+${hpRestore} MP+${mpRestore}</span>`);
 
-  setStage({ icon: '✧', title: 'VICTORY', meta: `+${reward} ESSENCE` });
-  caption(`<span class="enemy-name">${state.enemy.name}</span> は塵となって崩れ落ちた。<br><span class="system">星屑を ${reward} 得た。傷が少し癒える。</span>`);
+  // ★ アクセサリードロップ（低確率）
+  if (Math.random() < 0.15) {
+    const acc = generateAccessoryDrop();
+    if (addToInventory(acc)) {
+      captionAdd(`<span class="wk">✧ アクセサリーを入手: ${acc.name}</span>`);
+    }
+  }
 
-  if (state.dungeon.room >= state.dungeon.totalRooms) {
-    setTimeout(floorClear, 1400);
+  if (S.dungeon.room >= S.dungeon.totalRooms) {
+    setTimeout(floorClear, 1200);
   } else {
     setTimeout(() => {
       setChoices([
-        { label: '次の間へ', action: advanceRoom, meta: 'NEXT ROOM' },
-        { label: '深く休む', action: deepRest, meta: '★-5 全回復' },
+        { label:'次の間へ', action:() => { S.dungeon.room++; nextRoom(); }, meta:'NEXT ROOM' },
+        { label:'帰還する', action:() => { S.dungeon.inDungeon=false; goScreen('s-town'); }, meta:'RETURN' },
       ]);
     }, 1000);
   }
 }
 
-function deepRest() {
-  if (state.player.essence < 5) {
-    caption('<span class="system">星屑が足りない。</span>');
-    setChoices([{ label: '次の間へ', action: advanceRoom, meta: 'NEXT ROOM' }]);
-    return;
-  }
-  state.player.essence -= 5;
-  state.player.hp = state.player.hpMax;
-  state.player.mp = state.player.mpMax;
-  updateStats();
-  caption('君は壁にもたれ、深く呼吸する。傷は塞がり、魔力は満ちた。');
-  setTimeout(advanceRoom, 1000);
-}
-
-function advanceRoom() {
-  state.dungeon.room++;
-  nextRoom();
+function generateAccessoryDrop() {
+  const names = ['深淵の指輪','星屑のブローチ','時の欠片','沈黙の守護石','輝ける瞳','業火の紋章'];
+  const descs = ['謎めいた力を宿す','かすかに脈動している','時が刻まれた石','静寂を纏う宝石','光を放つ瞳石','灼熱の魔力が宿る'];
+  const i = Math.floor(Math.random() * names.length);
+  return { type:'accessory', name:names[i], desc:descs[i], power: Math.floor(Math.random()*5)+1 };
 }
 
 async function floorClear() {
-  setStage({ icon: '⬇', title: `FLOOR ${state.dungeon.floor} CLEAR`, meta: 'A NEW DEPTH OPENS' });
-  caption(`深淵の番人が崩れ落ちると、床に下層への階段が口を開けた。`);
+  // コスト値+5
+  S.player.cost = Math.min(S.player.costMax, S.player.cost + 5);
+  // 10階層ごとにコスト上限+10
+  if (S.dungeon.floor % 10 === 0) {
+    S.player.costMax += 10;
+    S.player.cost = S.player.costMax;
+  }
+  updateAllStats();
+  setStage({ icon:'⬇', title:`FLOOR ${S.dungeon.floor} CLEAR`, meta:'COST +5' });
+  caption(`深淵の番人が崩れ落ちる。下層への道が開いた。<span class="wk"> コスト +5</span>`);
+  if (S.dungeon.floor % 10 === 0) captionAdd(`<span class="wk">★ コスト上限が +10 増加した！</span>`);
 
-  // ★ サーバーに到達階層を送信（最高記録更新時のみ）
-  await syncFloor(state.dungeon.floor);
+  // GASに最高到達を送信
+  await syncFloor(S.dungeon.floor);
 
   setChoices([
-    { label: '降りる', action: nextFloor, meta: 'NEXT FLOOR' },
-    { label: '帰還する', action: endGame, meta: 'RETURN' },
+    { label:'降りる', action:goNextFloor, meta:'NEXT FLOOR' },
+    { label:'帰還する', action:() => { S.dungeon.inDungeon=false; goScreen('s-town'); }, meta:'RETURN' },
   ]);
+}
+function goNextFloor() {
+  S.dungeon.floor++;
+  S.dungeon.room = 1;
+  S.dungeon.totalRooms = 3 + Math.floor((S.dungeon.floor - 1) / 2);
+  S.player.hpMax += 10; S.player.hp = S.player.hpMax;
+  S.player.mpMax += 5;  S.player.mp = S.player.mpMax;
+  updateAllStats();
+  startDungeonFloor();
+}
+function defeat() {
+  S.dungeon.inDungeon = false;
+  setStage({ icon:'✟', title:'GAME OVER', meta:`第 ${S.dungeon.floor} 階層` });
+  caption(`<span class="hurt">君の言葉は、ここで途絶えた。</span>`);
+  setChoices([{ label:'ホームへ', action:() => { S.player.hp=S.player.hpMax; updateAllStats(); goScreen('s-town'); }, meta:'RETURN' }]);
+}
+
+/* ★ 魔法エフェクト生成（ダミー）— Gemini APIに差し替える */
+async function generateSpellEffect({ magic, enemy }) {
+  await new Promise(r => setTimeout(r, 600 + Math.random()*400));
+  const elementMap = {
+    '炎':['炎','焔','火','燃'], '凍':['氷','凍','雪'], '雷':['雷','電','稲妻'],
+    '光':['光','聖','輝'], '闇':['闇','影','深淵'], '音':['音','咆哮'], '塩':['塩'],
+  };
+  let element = '無';
+  for (const [el, kws] of Object.entries(elementMap)) {
+    if (kws.some(k => magic.name.includes(k))) { element = el; break; }
+  }
+  const baseDmg = Math.floor((magic.power||5) * S.player.magicPow + Math.random()*4);
+  const weakHit = enemy.weak.includes(element);
+  const damage = weakHit ? Math.floor(baseDmg * 1.6) : baseDmg;
+  const flavors = {
+    '炎':`紅蓮の炎が${enemy.name}を包む`, '凍':`${enemy.name}が凍りつく`,
+    '雷':`閃光が${enemy.name}を貫く`, '光':`光輝が${enemy.name}を浄化する`,
+    '闇':`闇が${enemy.name}に絡みつく`, '音':`轟音が${enemy.name}を揺さぶる`,
+    '塩':`祓いの塩が${enemy.name}に降る`, '無':`念が${enemy.name}を打つ`,
+  };
+  return { damage, element, weakHit, flavor: flavors[element] };
 }
 
 async function syncFloor(floor) {
-  if (!state.user || !state.user.id) return;
+  if (!S.user?.id) return;
   showSync('saving...', '');
-  const r = await callGAS('updateFloor', { id: state.user.id, floor });
-  if (r.ok) {
-    if (r.updated) {
-      state.player.maxFloor = r.maxFloor;
-      showSync(`★ 最高到達更新！ 第${r.maxFloor}階層`, 'success');
-      captionAdd(`<span class="weak">★ 最高到達記録を更新した（第 ${r.maxFloor} 階層）</span>`);
-    } else {
-      showSync('saved', 'success');
-    }
+  const r = await callGAS('updateFloor', { id: S.user.id, floor });
+  if (r?.ok) {
+    showSync(r.updated ? `★ 最高記録更新 第${r.maxFloor}階層` : 'saved', 'success');
   } else {
     showSync('sync error', 'error');
   }
 }
 
-function nextFloor() {
-  state.dungeon.floor++;
-  state.dungeon.room = 1;
-  state.dungeon.totalRooms = 3 + state.dungeon.floor;
-  state.player.hpMax += 20; state.player.hp = state.player.hpMax;
-  state.player.mpMax += 10; state.player.mp = state.player.mpMax;
-  enemyPool.forEach(e => { e.hp = Math.floor(e.hp * 1.3); e.atk = Math.floor(e.atk * 1.2); });
-  updateStats();
-  startGame();
-}
-
-function defeat() {
-  setStage({ icon: '✟', title: 'GAME OVER', meta: `第 ${state.dungeon.floor} 階層 / 第 ${state.dungeon.room} の間` });
-  caption(`<span class="hurt">君の言葉は、ここで途絶えた。</span><br><span class="system">獲得した星屑: ${state.player.essence}</span>`);
-  setChoices([{ label: '最初から', action: () => location.reload(), meta: 'RESTART' }]);
-}
-
-function endGame() {
-  setStage({ icon: '✦', title: 'RETURNED', meta: `★ ${state.player.essence} BROUGHT BACK` });
-  caption(`君は地下迷宮を後にした。<br>持ち帰った星屑: <span class="weak">${state.player.essence}</span>`);
-  setChoices([{ label: 'もう一度', action: () => location.reload(), meta: 'AGAIN' }]);
-}
-
-// ---------- Enter キーでログイン/登録 ----------
-document.getElementById('login-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('login-name').focus();
-});
-document.getElementById('login-name').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-document.getElementById('reg-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('reg-name').focus();
-});
-document.getElementById('reg-name').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doRegister();
-});
+// ============================================================
+// ENTER KEY
+// ============================================================
+document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-name').focus(); });
+document.getElementById('login-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('reg-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('reg-name').focus(); });
+document.getElementById('reg-name').addEventListener('keydown', e => { if(e.key==='Enter') doRegister(); });
 </script>
 </body>
 </html>
