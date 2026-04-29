@@ -2721,6 +2721,8 @@ function playSlashEffect() {
     stage.classList.remove('flash-slash');
   }, 500);
 }
+
+function spawnParticles(parent, count, {colors, size, speed, life}) {
   for(let i=0;i<count;i++){
     const p = document.createElement('div');
     p.className = 'sp-particle';
