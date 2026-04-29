@@ -198,10 +198,13 @@ body::after{
 
 /* ===== INVENTORY PANEL — CYBER FANTASY ===== */
 .inv-panel{
-  position:fixed;top:0;right:0;bottom:0;z-index:40;
+  position:fixed;top:0;bottom:0;z-index:40;
+  /* メインUIの右側スペース全体を使う */
+  left:calc(50% + 240px);
+  right:0;
+  width:auto;
   display:none;
   flex-direction:column;
-  width:320px;
   background:
     linear-gradient(180deg,rgba(0,4,26,.97) 0%,rgba(2,6,32,.97) 100%),
     repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(77,217,255,.03) 40px,rgba(77,217,255,.03) 41px),
@@ -214,6 +217,12 @@ body::after{
   transition:opacity .25s, transform .25s;
 }
 .inv-panel.open{opacity:1;transform:translateX(0);}
+/* 画面が狭い時はメインUIの上に重ねる */
+@media(max-width:960px){
+  .inv-panel{
+    left:auto;right:0;width:300px;
+  }
+}
 
 /* ヘッダー */
 .inv-header{
@@ -854,9 +863,10 @@ body::after{
 /* ===== JOB PANEL ===== */
 .job-panel{
   position:fixed;top:0;bottom:0;z-index:35;
-  /* メインUIの左端に合わせる: 画面中央 - メイン幅半分(240px) - パネル幅(200px) */
+  /* メインUIの左側スペース全体を使う */
+  left:0;
   right:calc(50% + 240px);
-  width:200px;
+  width:auto;
   display:none;
   flex-direction:column;
   background:linear-gradient(180deg,rgba(0,4,20,.97),rgba(0,2,14,.97));
@@ -868,11 +878,9 @@ body::after{
 }
 .job-panel.open{opacity:1;transform:translateX(0);}
 /* 画面が狭い時はメインUIの上に重ねる */
-@media(max-width:880px){
+@media(max-width:960px){
   .job-panel{
-    right:auto;left:0;
-    width:200px;
-    z-index:45;
+    right:auto;left:0;width:220px;z-index:45;
   }
 }
 .job-panel-header{
