@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Promptia Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -656,8 +659,7 @@
     <div class="login-msg" id="login-msg"></div>
 
     <div class="api-warning" id="api-warning" style="display:none">
-      ⚠ GAS_URL が未設定です。<br>
-      HTML 1265行目あたりの GAS_URL に、デプロイしたウェブアプリのURLを貼ってください。
+      ⚠ 通信エラー。GAS_URL を確認してください。
     </div>
   </div>
 </div>
@@ -704,7 +706,7 @@
 <script>
 /* ===========================================================
    PROMPTIA ONLINE — プロトタイプ v3
-   ★ GAS_URL を必ず自分のデプロイ済みURLに書き換えてください
+   ★ GAS連携済み
    =========================================================== */
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwYKOj_H7aQ7x__P5JYBVhrExXfoyHyobzRN1uAKIC8fIcAiqz1unsgjs6iRR5ogNta/exec';
@@ -715,19 +717,23 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ---------- GAS呼び出し共通 ----------
+// GASはPOSTでCORSエラーが出やすいため、GETパラメータ方式で完全回避
 async function callGAS(action, payload) {
   if (!GAS_URL) {
     return { ok: false, error: 'GAS_URL未設定' };
   }
   try {
-    // text/plain で送ることでCORSプリフライトを回避
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action, ...payload }),
+    const params = new URLSearchParams({
+      action,
+      data: JSON.stringify(payload || {})
+    });
+    const res = await fetch(`${GAS_URL}?${params.toString()}`, {
+      method: 'GET',
       redirect: 'follow',
     });
-    return await res.json();
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { return { ok: false, error: 'レスポンス解析失敗: ' + text.slice(0, 100) }; }
   } catch (err) {
     return { ok: false, error: '通信エラー: ' + err.message };
   }
