@@ -747,7 +747,33 @@ body::after{
 .stage::before{content:'';position:absolute;width:220px;height:220px;border:1px solid var(--border-mystic);border-radius:50%;opacity:.3;animation:rotateSlow 40s linear infinite;}
 .stage::after{content:'';position:absolute;width:160px;height:160px;border:1px dashed var(--neon-purple);border-radius:50%;opacity:.2;animation:rotateSlow 30s linear infinite reverse;}
 .stage-content{position:relative;z-index:2;text-align:center;padding:16px;width:100%;}
-/* 立ち絵（stage下部オーバーレイ） */
+/* 立ち絵ボックス（1ボックスのみ） */
+.chara-box{
+  flex-shrink:0;
+  height:60px;
+  border:1px solid rgba(77,217,255,.12);
+  background:linear-gradient(135deg,rgba(0,8,28,.7),rgba(10,0,40,.5));
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.chara-box::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent,transparent 30px,rgba(77,217,255,.02) 30px,rgba(77,217,255,.02) 31px);
+}
+.chara-box-inner{
+  font-size:42px;
+  position:relative;z-index:1;
+  filter:drop-shadow(0 0 12px var(--glow-purple));
+  animation:float 3s ease-in-out infinite;
+}
+.chara-box.warrior .chara-box-inner{ filter:drop-shadow(0 2px 14px rgba(255,85,119,.7)); }
+.chara-box.mage    .chara-box-inner{ filter:drop-shadow(0 2px 14px rgba(77,217,255,.7)); }
+.chara-box.passive-active .chara-box-inner{
+  animation:float 3s ease-in-out infinite, passiveGlow .8s ease-in-out infinite;
+}
+.chara-box.danger .chara-box-inner{
+  animation:float 3s ease-in-out infinite, charaHpDanger 1s ease-in-out infinite;
+}
 .stage-chara{
   position:absolute;
   bottom:0;left:0;
@@ -1815,39 +1841,9 @@ body::after{
     <div class="caption" id="caption">深淵へ続く階段が口を開けている。</div>
   </main>
 
-  <!-- ステータスパネル（4分割） -->
-  <div class="dungeon-status" id="dungeon-status">
-    <!-- 左上：立ち絵 -->
-    <div class="ds-portrait" id="ds-portrait-wrap">
-      <div class="ds-portrait-inner" id="ds-portrait">⚔</div>
-    </div>
-    <!-- 右上：HP・MP -->
-    <div class="ds-bars">
-      <div class="ds-bar-row">
-        <div class="ds-bar-label">
-          <span class="name">HP</span>
-          <span class="val hp-val" id="ds-hp-val">100/100</span>
-        </div>
-        <div class="ds-bar-track">
-          <div class="ds-bar-fill hp" id="ds-hp-bar" style="width:100%"></div>
-        </div>
-      </div>
-      <div class="ds-bar-row">
-        <div class="ds-bar-label">
-          <span class="name">MP</span>
-          <span class="val mp-val" id="ds-mp-val">50/50</span>
-        </div>
-        <div class="ds-bar-track">
-          <div class="ds-bar-fill mp" id="ds-mp-bar" style="width:100%"></div>
-        </div>
-      </div>
-    </div>
-    <!-- 左下：職業スキル -->
-    <div class="ds-equip" id="ds-equip">
-      <div class="ds-skill-title">— SKILLS —</div>
-    </div>
-    <!-- 右下：装備魔法（タップで直接発動） -->
-    <div class="ds-magics" id="ds-magics"></div>
+  <!-- ステータスパネル：立ち絵ボックスのみ -->
+  <div class="chara-box" id="chara-box">
+    <div class="chara-box-inner" id="ds-portrait">⚔</div>
   </div>
 
   <div class="choices" id="choices"></div>
@@ -2185,100 +2181,29 @@ function updateCostTimer() {
 // DUNGEON STATUS PANEL 更新
 // ============================================================
 function updateDungeonStatus() {
-  const p = S.player;
+  const p   = S.player;
   const job = JOBS[S.job] || JOBS.warrior;
-  const isMulti = S.currentScreen === 's-multi-dungeon';
+  if (S.currentScreen === 's-multi-dungeon') return;
 
-  // ソロ用ステータスパネルのみ更新
-  if (isMulti) {
-    renderMultiStatusPanel();
-    return;
-  }
+  const hpPct0         = (p.hp / p.hpMax) * 100;
+  const berserkerActive = S.job === 'warrior' && hpPct0 <= 30;
+  const cls = 'chara-box ' + S.job +
+    (hpPct0 < 25     ? ' danger'        : '') +
+    (berserkerActive ? ' passive-active' : '');
 
-  // 立ち絵（stage下部）
-  const charaWrap = document.getElementById('stage-chara');
-  const charaIcon = document.getElementById('stage-chara-icon');
-  const portraitWrap = document.getElementById('ds-portrait-wrap');
-  const portrait = document.getElementById('ds-portrait');
-  const hpPct0 = (p.hp / p.hpMax) * 100;
-  const berserkerActive = hpPct0 <= 30; // 戦士の誓いパッシブ
+  // 立ち絵ボックス
+  const charaBox  = document.getElementById('chara-box');
+  const charaIcon = document.getElementById('ds-portrait');
+  if (charaBox)  charaBox.className = cls;
   if (charaIcon) charaIcon.textContent = job.icon;
-  if (charaWrap) {
-    charaWrap.className = 'stage-chara ' + S.job +
-      (hpPct0 < 25 ? ' danger' : '') +
-      (berserkerActive && S.job === 'warrior' ? ' passive-active' : '');
-  }
-  // 旧立ち絵エリアも更新
-  if (portrait) portrait.textContent = job.icon;
-  if (portraitWrap) portraitWrap.className = 'ds-portrait ' + S.job;
 
-  // HPバー
-  const hpPct = Math.max(0, Math.min(100, (p.hp / p.hpMax) * 100));
-  const hpBar = document.getElementById('ds-hp-bar');
-  const hpVal = document.getElementById('ds-hp-val');
-  if (hpBar) {
-    hpBar.style.width = hpPct + '%';
-    hpBar.classList.toggle('danger', hpPct < 25);
-    if (hpPct < 25) {
-      hpBar.style.background = 'linear-gradient(90deg,#ff2200,#ff5544)';
-      hpBar.style.boxShadow = '0 0 8px rgba(255,34,0,.8)';
-    } else if (hpPct < 50) {
-      hpBar.style.background = 'linear-gradient(90deg,#ffaa00,#ffcc44)';
-      hpBar.style.boxShadow = '0 0 6px rgba(255,170,0,.5)';
-    } else {
-      hpBar.style.background = '';
-      hpBar.style.boxShadow = '';
-    }
-  }
-  if (hpVal) hpVal.textContent = p.hp + '/' + p.hpMax;
-
-  // MPバー
-  const mpPct = Math.max(0, Math.min(100, (p.mp / p.mpMax) * 100));
-  const mpBar = document.getElementById('ds-mp-bar');
-  const mpVal = document.getElementById('ds-mp-val');
-  if (mpBar) mpBar.style.width = mpPct + '%';
-  if (mpVal) mpVal.textContent = p.mp + '/' + p.mpMax;
-
-  // 左下：職業スキル
-  const equipEl = document.getElementById('ds-equip');
-  if (equipEl) {
-    const skills = (job.skills || []).filter(sk => sk.active !== false);
-    equipEl.innerHTML = `<div class="ds-skill-title">${job.icon} ${job.name} SKILLS</div>` +
-      skills.map(sk => {
-        const cd = S.skillCd[sk.id] || 0;
-        // パッシブ（active:false）で発動中かどうか
-        // 戦士の誓い → HP30%以下で発動中扱い
-        const passiveOn = sk.id === 'chikai' && (p.hp / p.hpMax) <= 0.3;
-        // アクティブバフ発動中
-        const buffOn = S.skillBuff[sk.effect];
-        const isActive = passiveOn || buffOn;
-        return `
-        <div class="ds-skill-item${isActive ? ' passive-active' : ''}">
-          <span class="sk-icon">${isActive ? '⚡' : '✦'}</span>
-          <div class="sk-info">
-            <span class="sk-name">${sk.name}${cd > 0 ? ` <span style="color:var(--text-dim);font-size:8px">CD:${cd}</span>` : ''}${isActive ? ' <span style="font-size:8px">発動中</span>' : ''}</span>
-            <span class="sk-desc">${sk.desc}</span>
-          </div>
-        </div>`;
-      }).join('');
-  }
-
-  // 右下：装備魔法（タップで直接発動）
-  const magicsEl = document.getElementById('ds-magics');
-  if (magicsEl) {
-    magicsEl.innerHTML = ['magic1','magic2','magic3'].map((slot, i) => {
-      const m = S.equip[slot];
-      if (!m) return `<div class="ds-magic-empty">魔法${i+1} ─ 未装備</div>`;
-      const noMp = (m.mpCost||10) > p.mp;
-      const busy = S.busy;
-      return `<div class="ds-magic-item${(noMp||busy)?' disabled':''}"
-        onclick="${(noMp||busy)?'':` castMagicFromPanel(${i})`}">
-        <span class="mg-num">魔法${i+1}</span>
-        <span class="mg-name">${m.name}</span>
-        <span class="mg-mp">MP${m.mpCost||10}</span>
-      </div>`;
-    }).join('');
-  }
+  // stage左下の立ち絵も同期
+  const stageChara = document.getElementById('stage-chara');
+  const stageIcon  = document.getElementById('stage-chara-icon');
+  if (stageIcon)  stageIcon.textContent = job.icon;
+  if (stageChara) stageChara.className = 'stage-chara ' + S.job +
+    (hpPct0 < 25     ? ' danger'        : '') +
+    (berserkerActive ? ' passive-active' : '');
 }
 
 // 魔法パネルから直接発動
@@ -3028,7 +2953,7 @@ function showSkillSelect() {
       </div>
     </div>
     <button class="choice-btn" onclick="combatChoices()">← 戻る<span class="meta">CANCEL</span></button>
-    <button class="choice-btn" style="border-color:rgba(255,85,119,.3);color:var(--hp-color)" onclick="doRetreat()">帰還<span class="meta">HP -10</span></button>
+    <button class="choice-btn" disabled><span style="opacity:.2">─</span></button>
   `;
 }
 
