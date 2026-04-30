@@ -1084,186 +1084,38 @@ body::after{
   pointer-events:none;overflow:hidden;
 }
 
-/* 共通：パーティクル */
-.sp-particle{
-  position:absolute;border-radius:50%;
-  animation:spFloat linear forwards;
+/* ===== EFFECT SPRITES 共通 ===== */
+.sp-sprite{
+  position:absolute;
+  width:448px; height:299px;
+  background-size:300% 200%; /* 3列×2行 */
+  background-repeat:no-repeat;
+  image-rendering:pixelated;
+  animation:spritePlay .5s steps(1) forwards;
 }
-@keyframes spFloat{
-  0%  {transform:translate(0,0) scale(1);opacity:1;}
-  100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}
+@keyframes spritePlay{
+  0%   {background-position:  0%   0%;opacity:1;}
+  16%  {background-position: 50%   0%;opacity:1;}
+  33%  {background-position:100%   0%;opacity:1;}
+  50%  {background-position:  0% 100%;opacity:1;}
+  66%  {background-position: 50% 100%;opacity:1;}
+  83%  {background-position:100% 100%;opacity:.7;}
+  100% {background-position:100% 100%;opacity:0;}
 }
+.sp-sprite.slash   {background-image:url('effects/slash.png');}
+.sp-sprite.magic   {background-image:url('effects/magic.png');}
+.sp-sprite.fire    {background-image:url('effects/fire.png');}
+.sp-sprite.ice     {background-image:url('effects/ice.png');}
+.sp-sprite.thunder {background-image:url('effects/thunder.png');}
+.sp-sprite.light   {background-image:url('effects/light.png');}
+.sp-sprite.dark    {background-image:url('effects/dark.png');}
 
-/* 炎：赤オレンジ コア */
-.sp-fire-core{
-  position:absolute;left:50%;top:50%;
-  width:60px;height:60px;
-  margin:-30px 0 0 -30px;
-  border-radius:50%;
-  background:radial-gradient(circle,#fff8e0 0%,#ff8800 30%,#ff2200 70%,transparent 100%);
-  box-shadow:0 0 30px 10px #ff4400,0 0 60px 20px rgba(255,100,0,.4);
-  animation:fireCoreAnim .7s ease-out forwards;
-}
-@keyframes fireCoreAnim{0%{transform:scale(0);opacity:1}60%{transform:scale(1.4);opacity:1}100%{transform:scale(0.8);opacity:0}}
-.sp-fire-ring{
-  position:absolute;left:50%;top:50%;
-  width:120px;height:60px;
-  margin:-30px 0 0 -60px;
-  border:3px solid #ff6600;
-  border-radius:50%;
-  box-shadow:0 0 12px #ff4400,inset 0 0 12px #ff4400;
-  animation:fireRingAnim .8s ease-out forwards;
-}
-@keyframes fireRingAnim{0%{transform:scale(0);opacity:1}100%{transform:scale(2);opacity:0}}
-
-/* 氷：青白 */
-.sp-ice-core{
-  position:absolute;left:50%;top:50%;
-  width:50px;height:50px;
-  margin:-25px 0 0 -25px;
-  border-radius:50%;
-  background:radial-gradient(circle,#fff 0%,#88ddff 40%,#0088ff 80%,transparent 100%);
-  box-shadow:0 0 20px 8px #4dd9ff,0 0 50px 15px rgba(0,150,255,.3);
-  animation:iceCoreAnim .7s ease-out forwards;
-}
-@keyframes iceCoreAnim{0%{transform:scale(0);opacity:1}50%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}
-.sp-ice-shard{
-  position:absolute;left:50%;top:50%;
-  width:4px;height:30px;
-  margin:-15px 0 0 -2px;
-  background:linear-gradient(180deg,#fff,#4dd9ff,transparent);
-  transform-origin:center bottom;
-  animation:iceShardAnim .8s ease-out forwards;
-}
-@keyframes iceShardAnim{0%{transform:rotate(var(--rot)) scaleY(0);opacity:1}60%{transform:rotate(var(--rot)) scaleY(1);opacity:1}100%{transform:rotate(var(--rot)) scaleY(1) translateY(-20px);opacity:0}}
-
-/* 雷：青×金 */
-.sp-thunder-core{
-  position:absolute;left:50%;top:50%;
-  width:55px;height:55px;
-  margin:-27px 0 0 -27px;
-  border-radius:50%;
-  background:radial-gradient(circle,#fff 0%,#ffffaa 30%,#4488ff 70%,transparent 100%);
-  box-shadow:0 0 25px 10px #4dd9ff,0 0 50px 20px rgba(77,217,255,.4);
-  animation:thunderCoreAnim .5s ease-out forwards;
-}
-@keyframes thunderCoreAnim{0%,20%,40%,60%,80%{opacity:1;transform:scale(1.2)}10%,30%,50%,70%{opacity:.5;transform:scale(0.9)}100%{opacity:0;transform:scale(0.5)}}
-.sp-thunder-bolt{
-  position:absolute;left:50%;top:50%;
-  width:3px;height:40px;
-  margin:-20px 0 0 -1px;
-  background:linear-gradient(180deg,#fff,#ffd97a,#4dd9ff,transparent);
-  transform-origin:center top;
-  clip-path:polygon(30% 0%,60% 0%,45% 50%,70% 50%,20% 100%,35% 55%,10% 55%);
-  width:20px;margin:-20px 0 0 -10px;
-  animation:boltAnim .6s ease-out forwards;
-}
-@keyframes boltAnim{0%{transform:rotate(var(--rot)) scaleY(0);opacity:1}50%{transform:rotate(var(--rot)) scaleY(1);opacity:1}100%{transform:rotate(var(--rot)) scaleY(1) translateY(var(--ty));opacity:0}}
-
-/* 光：金 */
-.sp-light-core{
-  position:absolute;left:50%;top:50%;
-  width:65px;height:65px;
-  margin:-32px 0 0 -32px;
-  border-radius:50%;
-  background:radial-gradient(circle,#fff 0%,#ffeeaa 40%,#ffd97a 80%,transparent 100%);
-  box-shadow:0 0 30px 15px #ffd97a,0 0 70px 25px rgba(255,217,122,.5);
-  animation:lightCoreAnim .8s ease-out forwards;
-}
-@keyframes lightCoreAnim{0%{transform:scale(0);opacity:1}40%{transform:scale(1.5);opacity:1}100%{transform:scale(0.5);opacity:0}}
-.sp-light-ray{
-  position:absolute;left:50%;top:50%;
-  width:3px;height:70px;
-  margin:-35px 0 0 -1px;
-  background:linear-gradient(180deg,transparent,#ffd97a,#fff,#ffd97a,transparent);
-  transform-origin:center center;
-  animation:lightRayAnim .8s ease-out forwards;
-}
-@keyframes lightRayAnim{0%{transform:rotate(var(--rot)) scaleY(0);opacity:1}50%{transform:rotate(var(--rot)) scaleY(1);opacity:.8}100%{transform:rotate(var(--rot)) scaleY(1.2);opacity:0}}
-
-/* 闇：紫黒 */
-.sp-dark-core{
-  position:absolute;left:50%;top:50%;
-  width:55px;height:55px;
-  margin:-27px 0 0 -27px;
-  border-radius:50%;
-  background:radial-gradient(circle,#cc66ff 0%,#6600cc 50%,#1a0033 80%,transparent 100%);
-  box-shadow:0 0 25px 10px #9933ff,0 0 50px 20px rgba(150,0,255,.4);
-  animation:darkCoreAnim .9s ease-out forwards;
-}
-@keyframes darkCoreAnim{0%{transform:scale(0);opacity:.8}40%{transform:scale(1.3);opacity:1}100%{transform:scale(2);opacity:0}}
-.sp-dark-trail{
-  position:absolute;left:50%;top:50%;
-  width:8px;height:8px;
-  margin:-4px 0 0 -4px;
-  border-radius:50%;
-  background:#9933ff;
-  box-shadow:0 0 8px 4px #6600cc;
-  animation:darkTrailAnim 1s ease-out forwards;
-}
-@keyframes darkTrailAnim{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
-
-/* ===== SLASH EFFECT（剣の通常攻撃） ===== */
+/* ===== SLASH EFFECT（画像スプライト） ===== */
 .sp-slash-wrap{
   position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
 }
-/* メイン斬撃アーク */
-.sp-slash{
-  position:absolute;
-  left:50%; top:50%;
-  width:140px; height:70px;
-  margin:-35px 0 0 -100px;
-  border-radius:0 0 140px 0;
-  border-right:6px solid rgba(255,255,255,.95);
-  border-bottom:3px solid rgba(255,255,255,.7);
-  box-shadow:
-    2px 2px 0 rgba(255,80,60,.8),
-    4px 4px 8px rgba(255,80,60,.5),
-    0 0 20px rgba(255,255,255,.6);
-  transform-origin:left center;
-  animation:slashArc .35s cubic-bezier(.2,.8,.4,1) forwards;
-}
-@keyframes slashArc{
-  0%  {transform:rotate(-70deg) scaleX(0);opacity:1;}
-  40% {transform:rotate(0deg)   scaleX(1);opacity:1;}
-  70% {transform:rotate(30deg)  scaleX(1);opacity:.8;}
-  100%{transform:rotate(50deg)  scaleX(.6);opacity:0;}
-}
-/* 残像1 */
-.sp-slash-trail1{
-  position:absolute;
-  left:50%; top:50%;
-  width:120px; height:55px;
-  margin:-27px 0 0 -90px;
-  border-radius:0 0 120px 0;
-  border-right:3px solid rgba(255,255,255,.5);
-  border-bottom:2px solid rgba(255,255,255,.3);
-  transform-origin:left center;
-  animation:slashTrail1 .4s cubic-bezier(.2,.8,.4,1) .04s forwards;
-}
-@keyframes slashTrail1{
-  0%  {transform:rotate(-65deg) scaleX(0);opacity:.7;}
-  40% {transform:rotate(5deg)   scaleX(1);opacity:.5;}
-  100%{transform:rotate(55deg)  scaleX(.4);opacity:0;}
-}
-/* 残像2 */
-.sp-slash-trail2{
-  position:absolute;
-  left:50%; top:50%;
-  width:100px; height:44px;
-  margin:-22px 0 0 -80px;
-  border-radius:0 0 100px 0;
-  border-right:2px solid rgba(255,255,255,.3);
-  border-bottom:1px solid rgba(255,255,255,.2);
-  transform-origin:left center;
-  animation:slashTrail2 .45s cubic-bezier(.2,.8,.4,1) .08s forwards;
-}
-@keyframes slashTrail2{
-  0%  {transform:rotate(-60deg) scaleX(0);opacity:.5;}
-  40% {transform:rotate(10deg)  scaleX(1);opacity:.3;}
-  100%{transform:rotate(60deg)  scaleX(.2);opacity:0;}
-}
-/* 衝撃スパーク（命中時） */
+/* 命中スパーク */
 .sp-slash-spark{
   position:absolute;
   left:calc(50% + 20px); top:calc(50% - 10px);
@@ -1271,7 +1123,7 @@ body::after{
   background:#fff;
   border-radius:50%;
   box-shadow:0 0 4px #fff, 0 0 8px rgba(255,80,60,.8);
-  animation:sparkFly .4s ease-out .25s forwards;
+  animation:sparkFly .4s ease-out .3s forwards;
   transform-origin:center;
   opacity:0;
 }
@@ -3263,9 +3115,24 @@ function playSpellEffect(element) {
   if (!canvas) return;
   canvas.innerHTML = '';
 
-  const stage = document.getElementById('stage');
+  // 属性→スプライトファイル名のマッピング
+  const spriteMap = {
+    '炎':'fire', '氷':'ice', '雷':'thunder',
+    '光':'light', '闇':'dark', '無':'magic',
+  };
+  const spriteName = spriteMap[element] || 'magic';
+
+  // スプライト表示
+  const wrap = document.createElement('div');
+  wrap.className = 'sp-slash-wrap';
+  const sprite = document.createElement('div');
+  sprite.className = 'sp-sprite ' + spriteName;
+  wrap.appendChild(sprite);
+  canvas.appendChild(wrap);
+
   // 属性別フラッシュ
   const flashMap = { '炎':'fire','氷':'ice','雷':'thunder','光':'light','闇':'dark' };
+  const stage = document.getElementById('stage');
   const cls = flashMap[element];
   if (cls) {
     stage.classList.remove('effect-fire','effect-ice','effect-thunder','effect-light','effect-dark','flash-attack');
@@ -3276,71 +3143,7 @@ function playSpellEffect(element) {
     flashStage('attack');
   }
 
-  // 属性別パーティクル生成
-  const generators = {
-    '炎': () => {
-      canvas.innerHTML = '<div class="sp-fire-core"></div><div class="sp-fire-ring"></div>';
-      spawnParticles(canvas, 18, {
-        colors: ['#ff2200','#ff6600','#ff8800','#ffcc00'],
-        size:[4,10], speed:80, life:600
-      });
-    },
-    '氷': () => {
-      canvas.innerHTML = '<div class="sp-ice-core"></div>';
-      for(let i=0;i<8;i++){
-        const s = document.createElement('div');
-        s.className='sp-ice-shard';
-        s.style.setProperty('--rot', (i*45)+'deg');
-        canvas.appendChild(s);
-      }
-      spawnParticles(canvas, 14, { colors:['#fff','#88ddff','#4dd9ff'], size:[3,7], speed:70, life:700 });
-    },
-    '雷': () => {
-      canvas.innerHTML = '<div class="sp-thunder-core"></div>';
-      for(let i=0;i<6;i++){
-        const b = document.createElement('div');
-        b.className='sp-thunder-bolt';
-        b.style.setProperty('--rot',(i*60)+'deg');
-        b.style.setProperty('--ty','-50px');
-        canvas.appendChild(b);
-      }
-      spawnParticles(canvas, 16, { colors:['#fff','#ffd97a','#4dd9ff'], size:[2,6], speed:100, life:500 });
-    },
-    '光': () => {
-      canvas.innerHTML = '<div class="sp-light-core"></div>';
-      for(let i=0;i<8;i++){
-        const r = document.createElement('div');
-        r.className='sp-light-ray';
-        r.style.setProperty('--rot',(i*45)+'deg');
-        canvas.appendChild(r);
-      }
-      spawnParticles(canvas, 20, { colors:['#fff','#ffeeaa','#ffd97a'], size:[3,8], speed:90, life:800 });
-    },
-    '闇': () => {
-      canvas.innerHTML = '<div class="sp-dark-core"></div>';
-      for(let i=0;i<12;i++){
-        const t = document.createElement('div');
-        t.className='sp-dark-trail';
-        const angle = (i/12)*Math.PI*2;
-        const dist = 40+Math.random()*40;
-        t.style.setProperty('--tx', Math.cos(angle)*dist+'px');
-        t.style.setProperty('--ty', Math.sin(angle)*dist+'px');
-        t.style.animationDelay = (i*0.05)+'s';
-        canvas.appendChild(t);
-      }
-      spawnParticles(canvas, 12, { colors:['#9933ff','#6600cc','#cc66ff'], size:[4,9], speed:60, life:900 });
-    },
-  };
-
-  const gen = generators[element];
-  if (gen) gen();
-  else {
-    // 無属性：シアンパーティクル
-    spawnParticles(canvas, 12, { colors:['#4dd9ff','#b04dff'], size:[3,7], speed:70, life:600 });
-  }
-
-  // 一定時間後にクリア
-  setTimeout(() => { if(canvas) canvas.innerHTML=''; }, 1000);
+  setTimeout(() => { if(canvas) canvas.innerHTML=''; }, 600);
 }
 
 // 剣の通常攻撃エフェクト
@@ -3349,62 +3152,32 @@ function playSlashEffect() {
   if (!canvas) return;
   canvas.innerHTML = '';
 
-  // 斬撃本体
   const wrap = document.createElement('div');
   wrap.className = 'sp-slash-wrap';
-  wrap.innerHTML = `
-    <div class="sp-slash"></div>
-    <div class="sp-slash-trail1"></div>
-    <div class="sp-slash-trail2"></div>
-  `;
 
-  // スパーク（命中時の火花）8方向
-  const sparkAngles = [0, 25, 45, 70, 90, -20, -45, -70];
-  sparkAngles.forEach(angle => {
+  const sprite = document.createElement('div');
+  sprite.className = 'sp-sprite slash';
+  wrap.appendChild(sprite);
+
+  // 命中スパーク（8方向）
+  [0,25,45,70,90,-20,-45,-70].forEach(angle => {
     const sp = document.createElement('div');
     sp.className = 'sp-slash-spark';
-    const rad = (angle * Math.PI) / 180;
-    const dist = 18 + Math.random() * 22;
-    sp.style.setProperty('--sx', Math.cos(rad) * dist + 'px');
-    sp.style.setProperty('--sy', Math.sin(rad) * dist + 'px');
-    sp.style.animationDelay = (0.25 + Math.random() * 0.05) + 's';
+    const rad = angle * Math.PI / 180;
+    const dist = 22 + Math.random() * 28;
+    sp.style.setProperty('--sx', Math.cos(rad)*dist+'px');
+    sp.style.setProperty('--sy', Math.sin(rad)*dist+'px');
+    sp.style.animationDelay = (0.3 + Math.random()*0.05)+'s';
     wrap.appendChild(sp);
   });
 
   canvas.appendChild(wrap);
-
-  // ステージフラッシュ
   const stage = document.getElementById('stage');
-  stage.classList.remove('flash-slash');
-  void stage.offsetWidth;
+  stage.classList.remove('flash-slash'); void stage.offsetWidth;
   stage.classList.add('flash-slash');
-
-  setTimeout(() => {
-    canvas.innerHTML = '';
-    stage.classList.remove('flash-slash');
-  }, 500);
+  setTimeout(() => { canvas.innerHTML=''; stage.classList.remove('flash-slash'); }, 600);
 }
 
-function spawnParticles(parent, count, {colors, size, speed, life}) {
-  for(let i=0;i<count;i++){
-    const p = document.createElement('div');
-    p.className = 'sp-particle';
-    const angle = Math.random()*Math.PI*2;
-    const dist  = speed * (0.5 + Math.random());
-    const s     = size[0] + Math.random()*(size[1]-size[0]);
-    const color = colors[Math.floor(Math.random()*colors.length)];
-    p.style.cssText = `
-      left:calc(50% - ${s/2}px); top:calc(50% - ${s/2}px);
-      width:${s}px; height:${s}px;
-      background:${color};
-      box-shadow:0 0 ${s}px ${color};
-      --tx:${Math.cos(angle)*dist}px; --ty:${Math.sin(angle)*dist}px;
-      animation-duration:${life*(0.7+Math.random()*0.6)}ms;
-      animation-delay:${Math.random()*0.1}s;
-    `;
-    parent.appendChild(p);
-  }
-}
 
 // 魔法エフェクト生成（GAS→Gemini経由）
 async function generateSpellEffect({ magic, enemy, resonanceMul }) {
