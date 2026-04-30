@@ -430,7 +430,12 @@ body::after{
 .item-badge.magic{color:var(--neon-purple);border-color:rgba(176,77,255,.3);}
 .item-badge.item{color:var(--gold-bright);border-color:rgba(255,217,122,.3);}
 .item-badge.accessory{color:var(--gold);border-color:rgba(212,168,80,.3);}
-.item-badge.locked{color:var(--gold);border-color:rgba(212,168,80,.4);}
+.item-badge.el-炎{color:#ff6644;border-color:rgba(255,102,68,.4);}
+.item-badge.el-氷{color:#88ddff;border-color:rgba(136,221,255,.4);}
+.item-badge.el-雷{color:#ffd97a;border-color:rgba(255,217,122,.4);}
+.item-badge.el-光{color:#ffffaa;border-color:rgba(255,255,170,.4);}
+.item-badge.el-闇{color:#cc88ff;border-color:rgba(204,136,255,.4);}
+.item-badge.el-無属性{color:rgba(77,217,255,.4);border-color:rgba(77,217,255,.15);}
 .item-badge.equipped-mark{
   background:rgba(77,217,255,.1);color:var(--neon-blue);
   border-color:rgba(77,217,255,.4);
@@ -944,7 +949,26 @@ body::after{
 .ds-skill-item .sk-icon{ font-size:11px;width:14px;flex-shrink:0; }
 .ds-skill-item .sk-info{ display:flex;flex-direction:column;gap:1px;min-width:0; }
 .ds-skill-item .sk-name{ font-size:10px;color:var(--neon-purple);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.ds-skill-item .sk-desc{ font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(77,217,255,.35);line-height:1.3; }
+/* パッシブ発動中ハイライト */
+.stage-chara.passive-active .stage-chara-inner{
+  animation:float 3s ease-in-out infinite, passiveGlow 0.8s ease-in-out infinite;
+}
+@keyframes passiveGlow{
+  0%,100%{filter:drop-shadow(0 0 16px rgba(255,85,119,.4));}
+  50%{filter:drop-shadow(0 0 32px rgba(255,150,0,1)) drop-shadow(0 0 48px rgba(255,85,119,.8));}
+}
+.ds-skill-item.passive-active{
+  animation:skillPassivePulse 0.8s ease-in-out infinite;
+  border:1px solid rgba(255,150,0,.5)!important;
+}
+@keyframes skillPassivePulse{
+  0%,100%{background:rgba(255,100,0,.05);box-shadow:none;}
+  50%{background:rgba(255,100,0,.18);box-shadow:0 0 10px rgba(255,100,0,.4);}
+}
+.ds-skill-item.passive-active .sk-name{
+  color:var(--gold-bright)!important;
+  text-shadow:0 0 8px rgba(255,200,0,.6);
+}
 
 /* 右下：装備魔法（タップで直接発動） */
 .ds-magics{
@@ -1852,7 +1876,9 @@ const S = {
     level: 1, exp: 0, expNext: 100,
     atk: 5, def: 0, magicPow: 1.0,
   },
-  job: 'warrior', // 'warrior' | 'mage'
+  job: 'warrior',
+  skillBuff: {},    // { atkUp: true, shield: true, mpDiscount: true, resonance: true }
+  skillCd: {},      // { gouki: 2, teppeki: 0, ... } 残りターン数 // 'warrior' | 'mage'
   dungeon: { floor: 1, room: 1, totalRooms: 3, inDungeon: false },
   enemy: null,
   equip: { weapon: null, magic1: null, magic2: null, magic3: null, armor: null, acc1: null, acc2: null },
@@ -2003,18 +2029,18 @@ const JOBS = {
     name:'戦士', icon:'⚔', sub:'STR型・高HP・物理特化',
     bonus:{ hpMul:1.3, mpMul:0.8, atkBonus:5, defBonus:3, magicMul:0.7 },
     skills:[
-      { name:'剛力の構え', desc:'通常攻撃ダメージ +20%' },
-      { name:'鉄壁',       desc:'受けるダメージを DEF×2 で軽減' },
-      { name:'戦士の誓い', desc:'HP50%以下で ATK +10%' },
+      { id:'gouki',   name:'剛力の構え', desc:'次の攻撃ダメージ +50%',        mpCost:0, cd:3, effect:'atkUp',     active:true  },
+      { id:'teppeki', name:'鉄壁',       desc:'次に受けるダメージを半減',       mpCost:0, cd:4, effect:'shield',    active:true  },
+      { id:'chikai',  name:'戦士の誓い', desc:'HP30%以下で自動発動 ATK+30%',   mpCost:0, cd:0, effect:'berserker', active:false },
     ],
   },
   mage: {
     name:'魔法使い', icon:'🔮', sub:'INT型・高MP・魔法特化',
     bonus:{ hpMul:0.8, mpMul:1.4, atkBonus:0, defBonus:0, magicMul:1.5 },
     skills:[
-      { name:'詠唱加速',   desc:'魔法の消費MP -15%' },
-      { name:'属性共鳴',   desc:'弱点ヒット時ダメージ倍率 ×2.0' },
-      { name:'魔力循環',   desc:'戦闘後のMP回復量 +50%' },
+      { id:'kasoku',  name:'詠唱加速',  desc:'次の魔法のMP消費 -50%',         mpCost:0,  cd:3, effect:'mpDiscount', active:true  },
+      { id:'kyoumei', name:'属性共鳴',  desc:'次の魔法の弱点倍率 ×2.0',       mpCost:10, cd:4, effect:'resonance',  active:true  },
+      { id:'junkan',  name:'魔力循環',  desc:'MP を小回復（最大値の20%）',     mpCost:0,  cd:5, effect:'mpRecover',  active:true  },
     ],
   },
 };
@@ -2175,9 +2201,12 @@ function updateDungeonStatus() {
   const portraitWrap = document.getElementById('ds-portrait-wrap');
   const portrait = document.getElementById('ds-portrait');
   const hpPct0 = (p.hp / p.hpMax) * 100;
+  const berserkerActive = hpPct0 <= 30; // 戦士の誓いパッシブ
   if (charaIcon) charaIcon.textContent = job.icon;
   if (charaWrap) {
-    charaWrap.className = 'stage-chara ' + S.job + (hpPct0 < 25 ? ' danger' : '');
+    charaWrap.className = 'stage-chara ' + S.job +
+      (hpPct0 < 25 ? ' danger' : '') +
+      (berserkerActive && S.job === 'warrior' ? ' passive-active' : '');
   }
   // 旧立ち絵エリアも更新
   if (portrait) portrait.textContent = job.icon;
@@ -2213,17 +2242,25 @@ function updateDungeonStatus() {
   // 左下：職業スキル
   const equipEl = document.getElementById('ds-equip');
   if (equipEl) {
-    const skills = job.skills || [];
+    const skills = (job.skills || []).filter(sk => sk.active !== false);
     equipEl.innerHTML = `<div class="ds-skill-title">${job.icon} ${job.name} SKILLS</div>` +
-      skills.map(sk => `
-        <div class="ds-skill-item">
-          <span class="sk-icon">✦</span>
+      skills.map(sk => {
+        const cd = S.skillCd[sk.id] || 0;
+        // パッシブ（active:false）で発動中かどうか
+        // 戦士の誓い → HP30%以下で発動中扱い
+        const passiveOn = sk.id === 'chikai' && (p.hp / p.hpMax) <= 0.3;
+        // アクティブバフ発動中
+        const buffOn = S.skillBuff[sk.effect];
+        const isActive = passiveOn || buffOn;
+        return `
+        <div class="ds-skill-item${isActive ? ' passive-active' : ''}">
+          <span class="sk-icon">${isActive ? '⚡' : '✦'}</span>
           <div class="sk-info">
-            <span class="sk-name">${sk.name}</span>
+            <span class="sk-name">${sk.name}${cd > 0 ? ` <span style="color:var(--text-dim);font-size:8px">CD:${cd}</span>` : ''}${isActive ? ' <span style="font-size:8px">発動中</span>' : ''}</span>
             <span class="sk-desc">${sk.desc}</span>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
   }
 
   // 右下：装備魔法（タップで直接発動）
@@ -2391,13 +2428,15 @@ function renderInventory() {
     return `<div class="inv-item${equipped?' equipped':''}${locked?' locked-item':''} rarity-${rarity}" onclick="onItemClick(${realIdx})">
       <div class="item-icon">${itemIcon(it.type)}</div>
       <div class="item-info">
-        <div class="item-name">${locked?'🔒 ':''}${it.name}</div>
+        <div class="item-name">${locked?'🔒 ':''}${it.name}${it.epithet ? `<span style="font-size:9px;color:var(--text-dim);margin-left:4px">— ${it.epithet}</span>` : ''}</div>
         <div class="item-sub">${it.desc||''}</div>
+        ${it.flavor ? `<div style="font-size:8px;color:rgba(255,217,122,.4);font-style:italic;margin-top:1px;line-height:1.3;">${it.flavor}</div>` : ''}
       </div>
       <div class="item-right-col">
         <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end">
           <span class="item-badge ${it.type}">${typeName(it.type)}</span>
           <span class="rarity-badge ${rarity}">${RARITIES.find(r=>r.id===rarity)?.label||'COMMON'}</span>
+          ${it.element && it.element !== '無属性' ? `<span class="item-badge el-${it.element}">${it.element}</span>` : ''}
           ${equipped?'<span class="item-badge equipped-mark">装備中</span>':''}
           ${it.power?`<span class="item-badge" style="color:var(--cost-color);border-color:var(--cost-color)">PWR${it.power}</span>`:''}
         </div>
@@ -2468,14 +2507,17 @@ function typeName(type) {
 function onItemClick(idx) {
   const item = S.inventory[idx];
   if (!item) return;
-  document.getElementById('action-item-name').textContent = item.name;
-  // アクセサリーは効果一覧を詳細表示
+  document.getElementById('action-item-name').innerHTML =
+    item.name + (item.epithet ? `<span style="font-size:10px;color:var(--text-dim);margin-left:6px">— ${item.epithet}</span>` : '');
   if (item.type === 'accessory' && item.effects?.length) {
     document.getElementById('action-item-desc').innerHTML =
       item.effects.map(ef => `<span style="color:var(--neon-blue)">${ef.label} +${ef.value}${ef.unit}</span>`).join('　') +
-      (item.floor ? `<br><span style="opacity:.5">入手: 第${item.floor}層</span>` : '');
+      (item.floor ? `<br><span style="opacity:.5">入手: 第${item.floor}層</span>` : '') +
+      (item.flavor ? `<br><span style="color:rgba(255,217,122,.5);font-style:italic">${item.flavor}</span>` : '');
   } else {
-    document.getElementById('action-item-desc').textContent = item.desc || '';
+    document.getElementById('action-item-desc').innerHTML =
+      (item.desc || '') +
+      (item.flavor ? `<br><span style="color:rgba(255,217,122,.5);font-style:italic">${item.flavor}</span>` : '');
   }
   const btns = document.getElementById('action-btns');
   btns.innerHTML = '';
@@ -2683,23 +2725,46 @@ async function generateItem({ prompt, type, subtype, cost }) {
   const mul    = rarityPowerMul(rarity);
   const power  = Math.floor((cost * 0.6 + Math.random() * 5) * mul);
 
-  const r = await callGAS('geminiItem', { prompt, type, subtype, rarity, power });
+  const r = await callGAS('geminiItem', {
+    prompt, type, subtype, rarity, power,
+    playerLevel: S.player.level,
+    floor: S.dungeon.floor,
+  });
 
   // フォールバック（GAS失敗時）
   const fallbackNames = {
     common:'古びた遺物', rare:'輝ける断片', epic:'深淵の欠片',
     legend:'星霊の残滓', mythos:'神話の痕跡', architect:'記録されぬ何か'
   };
-  const name   = r?.name   || fallbackNames[rarity] || '謎の遺物';
-  const desc   = r?.desc   || `パワー ${power}`;
-  const flavor = r?.flavor || '';
+  const name    = r?.name    || fallbackNames[rarity] || '謎の遺物';
+  const epithet = r?.epithet || '';
+  const flavor  = r?.flavor  || '';
+  const option  = r?.option  || '';
+  const element = r?.element || '無属性';
+
+  // desc はシステムが自動生成（AIは数値を返さない）
+  function makeDesc(t, st, pw, opt) {
+    const base = {
+      sword: `物理ATK +${pw}`,
+      staff: `魔法ATK +${pw}`,
+      armor: `防御力 +${pw}`,
+      attack:`${element !== '無属性' ? element + '属性' : ''}魔法 Lv${Math.floor(pw/3)+1}`,
+      buff:  `バフ魔法 Lv${Math.floor(pw/3)+1}`,
+      debuff:`デバフ魔法 Lv${Math.floor(pw/3)+1}`,
+      heal:  `回復魔法 Lv${Math.floor(pw/3)+1}`,
+      heal_hp:`HP +${pw*3}回復`,
+      enhance:`強化素材 効力${pw}`,
+    }[st] || `パワー ${pw}`;
+    return base + (opt ? `　[${opt}]` : '');
+  }
 
   const item = (() => {
-    if (type==='weapon') return { type:'weapon', subtype, name, desc, flavor, power };
-    if (type==='armor')  return { type:'armor',  subtype, name, desc, flavor, power };
-    if (type==='magic')  return { type:'magic',  subtype, name, desc, flavor, power, mpCost:Math.ceil(cost*0.6) };
-    if (type==='item' && subtype==='heal_hp') return { type:'item', subtype:'heal_hp', name, desc, flavor, effect:'heal_hp', value:power*3 };
-    return { type:'item', subtype:'enhance', name, desc, flavor, effect:'enhance', value:power };
+    const d = makeDesc(type, subtype, power, option);
+    if (type==='weapon') return { type:'weapon', subtype, name, epithet, desc:d, flavor, power, option, element };
+    if (type==='armor')  return { type:'armor',  subtype, name, epithet, desc:d, flavor, power, option, element };
+    if (type==='magic')  return { type:'magic',  subtype, name, epithet, desc:d, flavor, power, mpCost:Math.ceil(cost*0.6), option, element };
+    if (type==='item' && subtype==='heal_hp') return { type:'item', subtype:'heal_hp', name, epithet, desc:d, flavor, effect:'heal_hp', value:power*3, option, element };
+    return { type:'item', subtype:'enhance', name, epithet, desc:d, flavor, effect:'enhance', value:power, option, element };
   })();
   item.rarity = rarity;
   return item;
@@ -2823,7 +2888,7 @@ function combatChoices() {
     { label: isStaff ? '魔弾' : '通常攻撃', action:doNormalAttack, meta: isStaff ? 'M.ATK' : 'ATTACK' },
     { label:'魔法', action:showMagicSelect, meta:'CAST' },
     { label:'アイテム', action:showItemSelect, meta:'USE ITEM' },
-    { label:'帰還', action:doRetreat, meta:'HP -10' },
+    { label:'特技', action:showSkillSelect, meta:'SKILL' },
   ]);
 }
 
@@ -2835,12 +2900,12 @@ function doNormalAttack() {
   let dmg, msg;
   if (isStaff) {
     // 魔弾：MATKを参照
-    dmg = Math.floor((S.player.matk + Math.random()*4) * S.player.magicPow);
+    dmg = Math.floor((S.player.matk + Math.random()*4) * S.player.magicPow * consumeAtkBuff());
     msg = `魔弾を放つ。<span class="dmg"> ${dmg} ダメージ</span>`;
     playSpellEffect('無');
   } else {
     // 通常攻撃：ATKを参照
-    dmg = Math.floor(S.player.atk + Math.random()*4);
+    dmg = Math.floor((S.player.atk + Math.random()*4) * consumeAtkBuff());
     msg = `剣を振るう。<span class="dmg"> ${dmg} ダメージ</span>`;
     playSlashEffect();
   }
@@ -2881,15 +2946,24 @@ async function castEquippedMagic(idx) {
   const magics = ['magic1','magic2','magic3'].map(s => S.equip[s]).filter(Boolean);
   const magic = magics[idx];
   if (!magic) { unlockCombat(); return; }
-  const mpCost = magic.mpCost || 10;
-  if (mpCost > S.player.mp) { unlockCombat(); return; }
+  // mpDiscountバフ適用
+  const discount = consumeMpDiscount();
+  const mpCost = Math.floor((magic.mpCost || 10) * discount);
+  if (mpCost > S.player.mp) {
+    caption(`<span class="sys">MPが足りない（必要: ${mpCost}）</span>`);
+    unlockCombat(); combatChoices(); return;
+  }
   S.player.mp -= mpCost;
   updateAllStats();
-  caption(`<span style="color:var(--neon-blue)">「${magic.name}」</span><br><span class="sys">魔力が編まれてゆく</span>`);
+  const discountMsg = discount < 1 ? ` <span class="wk">（詠唱加速 -${Math.floor((1-discount)*100)}%）</span>` : '';
+  caption(`<span style="color:var(--neon-blue)">「${magic.name}」</span>${discountMsg}<br><span class="sys">魔力が編まれてゆく</span>`);
   flashStage('attack');
-  const result = await generateSpellEffect({ magic, enemy: S.enemy });
+  // resonanceバフを渡す
+  const resonanceMul = consumeResonanceMul();
+  const result = await generateSpellEffect({ magic, enemy: S.enemy, resonanceMul });
   let line = `${result.flavor}。<span class="dmg"> ${result.damage} ダメージ</span>`;
   if (result.weakHit) line += ` <span class="wk">弱点ヒット！</span>`;
+  if (resonanceMul > 1) line += ` <span class="wk">属性共鳴！</span>`;
   caption(line);
   S.enemy.hp -= result.damage;
   setStage({ icon:S.enemy.icon, title:S.enemy.name, meta:`HP ${Math.max(0,S.enemy.hp)}/${S.enemy.hpMax}`, enemy:S.enemy });
@@ -2930,6 +3004,124 @@ function useCombatItem(idx) {
   combatChoices();
 }
 
+// ============================================================
+// スキルシステム
+// ============================================================
+function showSkillSelect() {
+  const job = JOBS[S.job];
+  const el = document.getElementById('choices');
+  el.innerHTML = `
+    <div class="magic-select" style="grid-column:1/-1">
+      <div class="magic-select-title">— ${job.icon} ${job.name}の特技 —</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        ${job.skills.filter(sk => sk.active !== false).map((sk, i) => {
+          const cd = S.skillCd[sk.id] || 0;
+          const active = S.skillBuff[sk.effect];
+          const disabled = cd > 0;
+          return `<button class="combat-item-btn${disabled ? ' disabled' : ''}"
+            style="opacity:${disabled ? 0.4 : 1};cursor:${disabled ? 'not-allowed' : 'pointer'}"
+            onclick="${disabled ? '' : `useSkill(${job.skills.indexOf(sk)})`}">
+            <span style="color:var(--neon-purple)">${sk.name}</span>
+            <span style="font-size:10px;color:var(--text-dim)">${sk.desc}${disabled ? `　CD:${cd}` : ''}${active ? '　<span style="color:var(--cost-color)">発動中</span>' : ''}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+    <button class="choice-btn" onclick="combatChoices()">← 戻る<span class="meta">CANCEL</span></button>
+    <button class="choice-btn" style="border-color:rgba(255,85,119,.3);color:var(--hp-color)" onclick="doRetreat()">帰還<span class="meta">HP -10</span></button>
+  `;
+}
+
+function useSkill(idx) {
+  if (S.busy) return;
+  const job = JOBS[S.job];
+  const sk = job.skills[idx];
+  if (!sk) return;
+  const cd = S.skillCd[sk.id] || 0;
+  if (cd > 0) return;
+
+  lockCombat();
+
+  // MP消費チェック
+  if (sk.mpCost > 0 && S.player.mp < sk.mpCost) {
+    caption(`<span class="sys">MPが足りない（必要: ${sk.mpCost}）</span>`);
+    unlockCombat(); combatChoices(); return;
+  }
+  if (sk.mpCost > 0) {
+    S.player.mp -= sk.mpCost;
+    updateAllStats();
+  }
+
+  // 効果適用
+  switch (sk.effect) {
+    case 'atkUp':
+      S.skillBuff.atkUp = true;
+      caption(`<span class="wk">✦ 剛力の構え！次の攻撃ダメージ +50%</span>`);
+      break;
+    case 'shield':
+      S.skillBuff.shield = true;
+      caption(`<span class="wk">✦ 鉄壁！次に受けるダメージを半減</span>`);
+      break;
+    case 'berserker':
+      if (S.player.hp / S.player.hpMax > 0.3) {
+        caption(`<span class="sys">HP30%以下の時のみ使用可能</span>`);
+        unlockCombat(); combatChoices(); return;
+      }
+      S.skillBuff.berserker = true;
+      caption(`<span class="wk">✦ 戦士の誓い！絶望が力に変わる…ATK+30%</span>`);
+      break;
+    case 'mpDiscount':
+      S.skillBuff.mpDiscount = true;
+      caption(`<span class="wk">✦ 詠唱加速！次の魔法のMP消費 -50%</span>`);
+      break;
+    case 'resonance':
+      S.skillBuff.resonance = true;
+      caption(`<span class="wk">✦ 属性共鳴！次の魔法の弱点倍率 ×2.0</span>`);
+      break;
+    case 'mpRecover': {
+      const heal = Math.floor(S.player.mpMax * 0.2);
+      S.player.mp = Math.min(S.player.mpMax, S.player.mp + heal);
+      updateAllStats();
+      caption(`<span class="wk">✦ 魔力循環！MP +${heal} 回復</span>`);
+      break;
+    }
+  }
+
+  // クールダウンセット
+  S.skillCd[sk.id] = sk.cd;
+
+  // 敵のターン（スキルもターン消費）
+  setTimeout(() => enemyAttack(), 500);
+}
+
+// クールダウンを1ターン進める（enemyAttack後に呼ぶ）
+function tickSkillCd() {
+  Object.keys(S.skillCd).forEach(id => {
+    if (S.skillCd[id] > 0) S.skillCd[id]--;
+  });
+}
+
+// バフを消費して攻撃倍率を返す
+function consumeAtkBuff() {
+  let mul = 1.0;
+  if (S.skillBuff.atkUp)    { mul *= 1.5; delete S.skillBuff.atkUp; }
+  if (S.skillBuff.berserker){ mul *= 1.3; delete S.skillBuff.berserker; }
+  return mul;
+}
+function consumeMpDiscount() {
+  if (S.skillBuff.mpDiscount) { delete S.skillBuff.mpDiscount; return 0.5; }
+  return 1.0;
+}
+function consumeResonanceMul() {
+  if (S.skillBuff.resonance) { delete S.skillBuff.resonance; return 2.0; }
+  return 1.0;
+}
+function consumeShield() {
+  if (S.skillBuff.shield) { delete S.skillBuff.shield; return true; }
+  return false;
+}
+
+// ============================================================
 // 帰還
 function doRetreat() {
   if (S.busy) return;
@@ -2950,13 +3142,21 @@ function doRetreat() {
 
 // 敵の攻撃
 function enemyAttack() {
+  tickSkillCd(); // クールダウン1ターン進める
   const def = S.player.def;
-  const dmg = Math.max(1, Math.floor(S.enemy.atk + Math.random()*4 - 2) - def);
+  let dmg = Math.max(1, Math.floor(S.enemy.atk + Math.random()*4 - 2) - def);
+  // 鉄壁バフ
+  const shielded = consumeShield();
+  if (shielded) {
+    dmg = Math.floor(dmg * 0.5);
+  }
   S.player.hp = Math.max(0, S.player.hp - dmg);
   S.player.mp = Math.min(S.player.mpMax, S.player.mp + 6);
   updateAllStats();
+  updateDungeonStatus();
   flashStage('hit');
-  captionAdd(`<span class="en">${S.enemy.name}</span> の反撃。<span class="hurt"> ${dmg} ダメージ</span>　<span class="sys">MP +6</span>`);
+  const shieldMsg = shielded ? ' <span class="wk">（鉄壁！半減）</span>' : '';
+  captionAdd(`<span class="en">${S.enemy.name}</span> の反撃。<span class="hurt"> ${dmg} ダメージ</span>${shieldMsg}　<span class="sys">MP +6</span>`);
   if (S.player.hp <= 0) { defeat(); return; }
   setTimeout(combatChoices, 300);
 }
@@ -3280,11 +3480,12 @@ function spawnParticles(parent, count, {colors, size, speed, life}) {
 }
 
 // 魔法エフェクト生成（GAS→Gemini経由）
-async function generateSpellEffect({ magic, enemy }) {
+async function generateSpellEffect({ magic, enemy, resonanceMul }) {
   const element = detectElement(magic.name + (magic.desc||''));
   const baseDmg = Math.floor((S.player.matk||5) * S.player.magicPow + Math.random()*4);
   const weakHit = enemy.weak.includes(element);
-  const damage  = weakHit ? Math.floor(baseDmg * 1.6) : baseDmg;
+  const weakMul = weakHit ? (resonanceMul || 1) * 1.6 : 1.0;
+  const damage  = weakHit ? Math.floor(baseDmg * weakMul) : baseDmg;
 
   // エフェクトは即時再生（GAS待たない）
   playSpellEffect(element);
