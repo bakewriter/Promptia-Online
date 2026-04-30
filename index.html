@@ -750,9 +750,11 @@ body::after{
 /* 立ち絵ボックス（1ボックスのみ） */
 .chara-box{
   flex-shrink:0;
-  height:60px;
-  border:1px solid rgba(77,217,255,.12);
-  background:linear-gradient(135deg,rgba(0,8,28,.7),rgba(10,0,40,.5));
+  height:64px;
+  min-height:64px;
+  border:1px solid rgba(77,217,255,.15);
+  border-top:none;
+  background:linear-gradient(135deg,rgba(0,8,28,.8),rgba(10,0,40,.6));
   display:flex;align-items:center;justify-content:center;
   position:relative;overflow:hidden;
 }
